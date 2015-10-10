@@ -1,0 +1,6 @@
+<expr> ::= mymul(<expr>, <expr>) | mysub(<expr>, <expr>) | myadd(<expr>, <expr>) | pdiv(<expr>, <expr>) | if_cond(<expr>, <expr>, <expr>, <expr>)
+	| (<expr>) 
+	| sin(<expr>) | cos(<expr>) | tan(<expr>) | exp(<expr>)  
+	| x | y | 1.000 | <const> | -<const>
+<const> ::= 0.<digit><digit><digit>
+<digit> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
