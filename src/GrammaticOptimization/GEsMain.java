@@ -28,6 +28,14 @@ public class GEsMain {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        try{
+        String current = new java.io.File( "." ).getCanonicalPath();
+        System.out.println("Current dir:"+current);
+        }
+        catch(java.io.IOException e){
+            e.printStackTrace();
+        }
+        
         Random rand=new Random();
         int []newArray= new int[10];
         newArray[0]=0;
@@ -49,9 +57,10 @@ public class GEsMain {
         
         GEGrammar grammar=new GEGrammar(geno);
         grammar.setMaxWraps(9);
-        grammar.readBNFFile("/Users/adilraja/mywork/adils-java/GrammaticOptimization/dist/grammar.bnf");
-   //     try{
-       //     grammar.genotype2phenotype(true);
+        if(grammar.readBNFFile("gecart_grammar.v2.bnf"))
+            System.out.println("Reading of the grammar file was successful\n");
+    //    try{
+    //        grammar.genotype2phenotype(true);
     //    }
       //  catch(java.lang.Exception e){
        //     System.out.println(e+"In Main");
@@ -62,21 +71,28 @@ public class GEsMain {
         while(symbIt.hasNext()){
             System.out.print(symbIt.next().getSymbol());
         }
-        if(grammar.phenotype.getValid()==true)
-            System.out.println("\nThe above phenotype is valid");
-        else 
-            System.out.println("\nThe above phenotype is not valid");
-        System.out.println("\n\nHere is the grammar");
+        
+        System.out.println("\n\nHere is the grammar\n");
+        String tmpStr;
         while(ruleIt.hasNext()){
             Rule tmpRule=ruleIt.next();
-            System.out.print("\n"+tmpRule.lhs.get(0).getSymbol()+"::=");
+            System.out.print(tmpRule.lhs.get(0).getSymbol()+"::=");
             Iterator<Production> prodIt=tmpRule.iterator();
             while(prodIt.hasNext()){
-                Iterator<Symbol> symbIt2=prodIt.next().iterator();
+                Iterator<Symbol> symbIt2=prodIt.next().iterator(); 
                 while(symbIt2.hasNext()){
-                    System.out.print(symbIt2.next().getSymbol());
+                    tmpStr=symbIt2.next().getSymbol();
+                    if(tmpStr.equalsIgnoreCase(" ") || tmpStr.equalsIgnoreCase("")){
+                        symbIt2.remove();
+                    }
+                    else{
+                        System.out.print(tmpStr);
+                    }
+                    
                 }
+                System.out.print("|");
             }
+            System.out.println();
         }
         System.out.println("My name is John Rambo "+grammar.size());
         System.out.println(newArray.length);
@@ -92,16 +108,30 @@ public class GEsMain {
         
         ruleIt=grammar.iterator();
         System.out.println("\n\nHere is the grammar's NT/T info");
+        Symbol tmpSymb23=null;
         while(ruleIt.hasNext()){
             Rule tmpRule=ruleIt.next();
             System.out.print("\n"+tmpRule.lhs.get(0).getType().toString()+"::=");
             Iterator<Production> prodIt=tmpRule.iterator();
+            
             while(prodIt.hasNext()){
                 Iterator<Symbol> symbIt2=prodIt.next().iterator();
+                
                 while(symbIt2.hasNext()){
-                    System.out.print(symbIt2.next().getType().toString()+" ");
+                    tmpSymb23=symbIt2.next();
+                    System.out.print(tmpSymb23.getType().toString()+"("+tmpSymb23.getSymbol() +") ");
                 }
+                System.out.print("|");
             }
+        }
+        if(grammar.phenotype.getValid()==true)
+            System.out.println("\nThe above phenotype is valid");
+        else 
+            System.out.println("\nThe above phenotype is not valid");
+        int loopC=grammar.getPhenotype().size();
+        Iterator<Symbol> symbIt3=grammar.getPhenotype().iterator();
+        for(int i=0;i<loopC;i++){
+            System.out.print(symbIt3.next().getSymbol()+" ");
         }
         
     }

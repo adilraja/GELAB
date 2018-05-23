@@ -35,7 +35,9 @@ public class Genotype extends ArrayList<Integer>{//codonType
         
     }
     
-    /** Creates a new instance of Genotype */
+    /** 
+     * Creates a new instance of Genotype 
+     */
     public Genotype(final int []newArray, final int newLength, final boolean newValid, final double newFitness) {
         _libGE_Genotype_valid=newValid;
         _libGE_Genotype_fitness=newFitness;

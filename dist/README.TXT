@@ -20,8 +20,9 @@ Notes:
 
 * If two JAR files on the project classpath have the same name, only the first
 JAR file is copied to the lib folder.
-* If the classpath contains a folder of classes or resources, none of the
-classpath elements are copied to the dist folder.
+* Only JAR files are copied to the lib folder.
+If the classpath contains other types of files or folders, these files (folders)
+are not copied.
 * If a library on the projects classpath also has a Class-Path element
 specified in the manifest,the content of the Class-Path element has to be on
 the projects runtime path.

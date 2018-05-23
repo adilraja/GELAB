@@ -125,27 +125,41 @@ public boolean readBNFFile(final String filename){
             // Open the file that is the first 
             // command line parameter
             
-        //    FileInputStream fstream = new FileInputStream("adil.bnf");
+         //   FileInputStream fstream = new FileInputStream(filename);
             // Convert our input stream to a
             // DataInputStream
-        //    BufferedReader in = new BufferedReader(new InputStreamReader(fstream));
+            BufferedReader in=null;
+            try{
+                in = new BufferedReader(new FileReader(filename));
+            }
+            catch(java.io.FileNotFoundException e){
+                e.printStackTrace();
+            }
             // Continue to read lines while 
             // there are still some left to read
    //         DataInput  s = new DataInputStream(new FileInputStream("~/mywork/GE/libGE-0.26/EXAMPLES/IntertwinedSpirals/GE_MITGALIB"));
-    //        String thisLine;
-     //       while ((thisLine=s.readLine()) !=null)
-      //      {
-       //         program.concat(thisLine);
-        //    }
-            //s.close();
+            String thisLine;
+            try{
+                while ((thisLine=in.readLine()) !=null)
+                {
+                 //   program.concat(thisLine);
+                    program=program+thisLine+"\n";
+                }
+                in.close();
+            }
+            catch(java.io.IOException e){
+                e.printStackTrace();
+            }
+            
 //	} 
   //      catch (Exception e)
 //	{
   //          System.out.println(e+" File input error");
 //	}
-//	program.concat("\n");
-        program="<expr>  ::= (<expr> <op> <expr>)\n| DIV(<expr>, <expr>)\n| ABS(<expr>)\n| GT(<expr>, <expr>)\n| <var>\n<op>    ::= + | - | *\n<var>   ::= X | V | (-1.0)\n";
-	
+        program=program+"\n";
+	//program.concat("\n");
+     //  program="<expr>  ::= (<expr> <op> <expr>)\n| DIV(<expr>, <expr>)\n| ABS(<expr>)\n| GT(<expr>, <expr>)\n| <var>\n<op>    ::= + | - | *\n<var>   ::= X | V | (-1.0)\n";
+	System.out.println(program);
             return readBNFString(program);
 }
 
@@ -183,7 +197,6 @@ final int LHS_READ	=	2;
 final int PRODUCTION	=	3;
 final int START_OF_LINE	=	4;
 int state=START;// Current state of parser
-
 	
 //#define libGE_DEBUG_CFGRAMMAR_PARSER
 stream+="\n";
@@ -197,7 +210,7 @@ for(int pass=1;pass<=2;pass++){
                     // Simulate presence of endl at end of grammar
                     currentChar='\n';
             }
-            System.out.println("I am here "+ii);
+         //   System.out.println("I am here in readBNFString "+ii);
             if(stream.charAt(ii)=='\\'){// Escape sequence
                 ii++;
                 if(ii>=stream_size){
@@ -218,25 +231,25 @@ for(int pass=1;pass<=2;pass++){
                 else if(stream.charAt(ii)=='\\'){// Backslash
                     currentChar='\\';
                 }
-                else if(stream.charAt(ii)=='0'){// Null character
-                    currentChar='\0';
+                else if(stream.charAt(ii)=='\u0000'){// Null character
+                    currentChar='\u0000';
                 }
       //          else if(stream.charAt(ii)=='a'){// Audible bell
         //                currentChar='\a';
           //      }
-                else if(stream.charAt(ii)=='b'){// Backspace
+                else if(stream.charAt(ii)=='\b'){// Backspace
                         currentChar='\b';
                 }
-                else if(stream.charAt(ii)=='f'){// Formfeed
+                else if(stream.charAt(ii)=='\f'){// Formfeed
                         currentChar='\f';
                 }
-                else if(stream.charAt(ii)=='n'){// Newline
+                else if(stream.charAt(ii)=='\n'){// Newline
                         currentChar='\n';
                 }
-                else if(stream.charAt(ii)=='r'){// Carriage return
+                else if(stream.charAt(ii)=='\r'){// Carriage return
                         currentChar='\r';
                 }
-                else if(stream.charAt(ii)=='t'){// Horizontal tab
+                else if(stream.charAt(ii)=='\t'){// Horizontal tab
                         currentChar='\t';
                 }
      //           else if(stream[ii]=='v'){// Vertical tab
@@ -278,7 +291,8 @@ for(int pass=1;pass<=2;pass++){
                     break;// Ignore DOS newline first char
                 }
             switch(currentChar){
-                case ' ':// Ignore whitespaces
+    //            case ' ':// Ignore whitespaces
+                case '\u0020'://ignore space
                 case '\t':// Ignore tabs
                 case '\n':// Ignore newlines
                         break;
@@ -303,7 +317,7 @@ for(int pass=1;pass<=2;pass++){
                         break;// Ignore DOS newline first char
                 }
                 switch(currentChar){
-                case '\n':// Newlines are illigal here
+                case '\n':// Newlines are illegal here
                     System.out.println("ERROR: Newline inside non-terminal.");
                     ERROR_IN_GRAMMAR();
                     break;
@@ -398,7 +412,8 @@ for(int pass=1;pass<=2;pass++){
                         break;// Ignore DOS newline first char
                 }
                 switch(currentChar){
-                    case ' ':// Ignore whitespaces
+  //                  case ' ':// Ignore whitespaces
+                    case '\u0020'://Ignore space
                     case '\t':// Ignore tabs
                     case '\n':// Ignore newlines
                             break;
@@ -698,11 +713,35 @@ for(int pass=1;pass<=2;pass++){
         }
     }
 }
-
+this.pruneSpaces();//removes extra spaces
 updateRuleFields();
 setValidGrammar(true);
 genotype2phenotype();
 return true;
+}
+
+/**
+ * pruneSpaces: some times, while reading a bnf file, and parsing it, white spaces are not
+ * ignored or omitted properly. This function does that.
+ */
+
+public void pruneSpaces(){
+    Iterator<Rule> ruleIt=this.iterator();
+    String tmpStr;
+    while(ruleIt.hasNext()){
+        Rule tmpRule=ruleIt.next();
+            //System.out.print(tmpRule.lhs.get(0).getSymbol()+"::=");
+            Iterator<Production> prodIt=tmpRule.iterator();
+            while(prodIt.hasNext()){
+                Iterator<Symbol> symbIt2=prodIt.next().iterator(); 
+                while(symbIt2.hasNext()){
+                    tmpStr=symbIt2.next().getSymbol();
+                    if(tmpStr.equalsIgnoreCase(" ") || tmpStr.equalsIgnoreCase("")){
+                        symbIt2.remove();
+                    }
+                }
+            }
+        }
 }
 
 /**
