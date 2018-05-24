@@ -2,8 +2,8 @@
 		| <u-pre-op>(<expr>)
 		| <b-pre-op>(<expr>,<expr>)
 		| <var>
-<op>	::=	+ | - | *
-<u-pre-op>	::=	ABS
+<op>	::=	+ | - | * | /
+<u-pre-op>	::=	ABS| sin | cos | exp | log
 <b-pre-op>	::=	DIV
-			| GT
+			| GT | LT
 <var>	::=	X | V | (-1.0)

@@ -25,8 +25,8 @@ public abstract class Mapper extends ArrayList<Rule> {
     
     public Mapper(){
         super();
-        phenotype=new Phenotype();
-        genotype=new Genotype();
+        this.phenotype=new Phenotype();
+        this.genotype=new Genotype();
         
     }
     /**
@@ -68,7 +68,7 @@ public abstract class Mapper extends ArrayList<Rule> {
      *returns a pointer to the phenotype structure of this mapper
      */
     public final Phenotype getPhenotype(){
-        return phenotype;
+        return this.phenotype;
     }
     /**
      *Sets this mapper's phenotype structure to be a copy of the argument phenotype

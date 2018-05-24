@@ -28,13 +28,13 @@ public class GEsMain {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        try{
-        String current = new java.io.File( "." ).getCanonicalPath();
-        System.out.println("Current dir:"+current);
-        }
-        catch(java.io.IOException e){
-            e.printStackTrace();
-        }
+    //    try{
+    //    String current = new java.io.File( "." ).getCanonicalPath();
+    //    System.out.println("Current dir:"+current);
+    //    }
+    //   catch(java.io.IOException e){
+    //        e.printStackTrace();
+    //    }
         
         Random rand=new Random();
         int []newArray= new int[10];
@@ -55,17 +55,36 @@ public class GEsMain {
        }
         Genotype geno=new Genotype(newArray, 10, true,10);
         
+
         GEGrammar grammar=new GEGrammar(geno);
+     //   grammar.setGenotype(geno);
+     
+
         grammar.setMaxWraps(9);
-        if(grammar.readBNFFile("gecart_grammar.v2.bnf"))
-            System.out.println("Reading of the grammar file was successful\n");
-    //    try{
-    //        grammar.genotype2phenotype(true);
-    //    }
-      //  catch(java.lang.Exception e){
-       //     System.out.println(e+"In Main");
-        //}
-        Iterator<Symbol> symbIt=grammar.getPhenotype().iterator();
+
+        if(grammar.readBNFFile("grammars/sr.bnf")) {
+        } else {
+            System.out.println("Reading of the grammar file was not successful\n");
+        }
+
+        try{
+            grammar.genotype2phenotype(true);
+        }
+        catch(java.lang.Exception e){
+            System.out.println(e+"In Main");
+        }
+        catch(java.lang.NoClassDefFoundError e){
+            e.printStackTrace();
+        }
+           Tree tmpTree=grammar.derivationTree;
+        Iterator<Symbol> symbIt=null;
+        try{
+            symbIt=grammar.getPhenotype().iterator();
+        }
+        catch(java.lang.NullPointerException e){
+            e.printStackTrace();
+        }
+        
         Iterator<Rule> ruleIt=grammar.iterator();
         System.out.println("Here are the results: phenotype sizse= "+grammar.getPhenotype().size());
         while(symbIt.hasNext()){
@@ -82,12 +101,12 @@ public class GEsMain {
                 Iterator<Symbol> symbIt2=prodIt.next().iterator(); 
                 while(symbIt2.hasNext()){
                     tmpStr=symbIt2.next().getSymbol();
-                    if(tmpStr.equalsIgnoreCase(" ") || tmpStr.equalsIgnoreCase("")){
-                        symbIt2.remove();
-                    }
-                    else{
+                //    if(tmpStr.equalsIgnoreCase(" ") || tmpStr.equalsIgnoreCase("")){
+                //        symbIt2.remove();
+                //    }
+               //     else{
                         System.out.print(tmpStr);
-                    }
+                //    }
                     
                 }
                 System.out.print("|");

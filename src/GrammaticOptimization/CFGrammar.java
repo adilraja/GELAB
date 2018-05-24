@@ -159,7 +159,7 @@ public boolean readBNFFile(final String filename){
         program=program+"\n";
 	//program.concat("\n");
      //  program="<expr>  ::= (<expr> <op> <expr>)\n| DIV(<expr>, <expr>)\n| ABS(<expr>)\n| GT(<expr>, <expr>)\n| <var>\n<op>    ::= + | - | *\n<var>   ::= X | V | (-1.0)\n";
-	System.out.println(program);
+	//System.out.println(program);
             return readBNFString(program);
 }
 
@@ -479,7 +479,7 @@ for(int pass=1;pass<=2;pass++){
                             // Reset separator marker
                             separated=0;
                             if((currentBuffer.length()!=0)||(newProduction.size()!=0)){// There is a symbol to add
-                                System.out.println("A symbol '" + currentBuffer + "'" + newSymbol.getType().toString() + "\t");
+                                //System.out.println("A symbol '" + currentBuffer + "'" + newSymbol.getType().toString() + "\t");
                             if(currentBuffer.length()==0){
                                 // No symbol exists; create terminal empty symbol
                                 newSymbol.setType(SymbolType.TSymbol);
@@ -716,7 +716,7 @@ for(int pass=1;pass<=2;pass++){
 this.pruneSpaces();//removes extra spaces
 updateRuleFields();
 setValidGrammar(true);
-genotype2phenotype();
+//genotype2phenotype();
 return true;
 }
 

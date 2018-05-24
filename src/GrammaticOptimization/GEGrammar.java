@@ -15,11 +15,13 @@ package GrammaticOptimization;
  */
 import java.util.*;
 import java.util.ListIterator;
+import java.util.Iterator;
 
 public class GEGrammar extends CFGrammar {
     
     private int maxWraps;
     protected ArrayList<Production> productions;
+    private int counterFlag;//I just put it here
     
     
     /** 
@@ -103,13 +105,13 @@ public final ArrayList<Production> getProductions()throws Exception{
  */
 public boolean genotype2phenotype(){
     
- //   try{
+    try{
 	 return genotype2phenotype(false);
-   // }
-   // catch(Exception e){
-      //  System.out.println(e+" genotype2phenotype()");
-        //return false;
-    //}
+    }
+    catch(Exception e){
+        System.out.println(e+" genotype2phenotype()");
+        return false;
+    }
 }
 
 /**
@@ -120,18 +122,21 @@ public boolean genotype2phenotype(){
  * With argument set to true, also updates derivationTree.
  */
 public boolean genotype2phenotype(final boolean buildDerivationTree){
+        
 	this.derivationTree=new Tree();//Initialize the tree
 	boolean returnValue=true;
 	int newEffectiveSize=0;
+        this.counterFlag=0;
 	// Start by setting effectiveSize to 0
 	genotype.setEffectiveSize(newEffectiveSize);
+  //      System.out.println("You called readBNFString, which called this");
         
-        this.phenotype=new Phenotype(true,1);
+        this.phenotype=new Phenotype(true,1);//No need to do this as this has already been done in Mapper's constructor.
         if(!phenotype.isEmpty())
             phenotype.clear();
         
 	if(buildDerivationTree){
-		this.productions.clear();
+		this.productions.clear();//Removes all items from the list
 	}
 	// Quick safety checks
 	//if((!getValidGrammar())||(!genotype.getValid())||(!getGenotype()->size())){
@@ -156,7 +161,7 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 	if(buildDerivationTree){
 		// Use start symbol as the derivationTree node
             try{
-		derivationTree.setData(getStartSymbol());
+		this.derivationTree.setData(getStartSymbol());
             }
             catch(java.lang.NullPointerException e){
                 System.out.println(e+" The call: derivationTree.setData(getStartSymbol()); in GEGrammar sucks");
@@ -164,10 +169,8 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 	}
 
 	boolean gotToUseWrap=true;
-        Integer codonGenoIt=new Integer(genoIt.next().intValue());
+      Integer codonGenoIt=genoIt.next();
         
-
- 
 	// Get rid of all non-terminal symbols
 	while((!nonterminals.empty())&&(wraps<=getMaxWraps())){
 		// Do a mapping step
@@ -176,7 +179,7 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 				break;
 			case 0:	;
 				break;
-			case 1:	codonGenoIt=new Integer(genoIt.next().intValue());
+			case 1:	codonGenoIt=genoIt.next();
                                 //genoIt++;
 				newEffectiveSize++;
 				if(gotToUseWrap){
@@ -187,7 +190,7 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 				if(!genoIt.hasNext()){
 					//newEffectiveSize+=genotype.size();
 					genoIt=genotype.iterator();
-                                        codonGenoIt=new Integer(genoIt.next().intValue());
+                                     //   codonGenoIt=new Integer(genoIt.next().intValue());
 					gotToUseWrap=true;
 				}
 				break;
@@ -210,12 +213,13 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 	genotype.setWraps(wraps);
 	// Now build derivation tree, based on productions vector
 	if(buildDerivationTree){
-		derivationTree.clear();
-		derivationTree.setData(getStartSymbol());
-		derivationTree.setCurrentLevel(1);
-		derivationTree.setDepth(1);
+		this.derivationTree.clear();
+		this.derivationTree.setData(getStartSymbol());
+		this.derivationTree.setCurrentLevel(1);
+		this.derivationTree.setDepth(1);
 		prodIt=productions.listIterator();//something wrong here
-		buildDTree(derivationTree,prodIt);
+		buildDTree(this.derivationTree,prodIt);
+                Production temp =prodIt.next();
 	}
 	return returnValue;
 }
@@ -257,7 +261,7 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals, Integer codonGenoI
 		if(nonterminals.peek().getSymbol().startsWith("<GECodonValue")&&(codonGenoIt!=null)){
 			// Insert codon value
 			// Extract range for value from non-terminal specification
-			int low=0,high=-1,pointer="<GECodonValue".length();
+			int low=0,high=-1, pointer="<GECodonValue".length();
 			// currentChar is the first character after "<GECodonValue"
 			char currentChar=nonterminals.peek().getSymbol().substring(pointer,pointer+1).charAt(0);
                        
@@ -398,7 +402,7 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals, Integer codonGenoI
                 if((nonterminals.empty()) || (!nonterminals.peek().getType().toString().equalsIgnoreCase("TSymbol"))){
                     break;
                 }
-                    phenotype.add(nonterminals.pop());
+                phenotype.add(nonterminals.pop());
             }
                 catch(java.lang.NullPointerException e){
                 System.out.println(e+" The whileloop at the end of genotype2phenotypeStep sucks");
@@ -425,6 +429,8 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals, Integer codonGenoI
  */
 public void buildDTree(Tree currentNode, ListIterator<Production> prodIt){
     
+    
+    try{
 	// If current symbol is not a non-terminal, or if all productions have been treated
 	if(currentNode.getData().getType().toString().compareTo("NTSymbol")!=0||!prodIt.hasNext()){
 		// Correct productions iterator, as no production was read from it
@@ -441,8 +447,8 @@ public void buildDTree(Tree currentNode, ListIterator<Production> prodIt){
 	Iterator<Tree> treeIt=currentNode.iterator();
 	while(treeIt.hasNext()){
             try{
-                
-                buildDTree(treeIt.next(),prodIt);
+                prodIt.next();
+                buildDTree(treeIt.next(), prodIt);
   //              prodIt.next();
                 
            }
@@ -453,6 +459,10 @@ public void buildDTree(Tree currentNode, ListIterator<Production> prodIt){
 		
 	//	treeIt++;
 	}
+    }
+    catch(java.lang.StackOverflowError e){
+        e.printStackTrace();
+    }
 }
 
 
