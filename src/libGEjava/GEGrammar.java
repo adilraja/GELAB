@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package GrammaticOptimization;
+package libGEjava;
 
 /**
  *
@@ -22,6 +22,7 @@ public class GEGrammar extends CFGrammar {
     private int maxWraps;
     protected ArrayList<Production> productions;
     private int counterFlag;//I just put it here
+    private Stack<Symbol> nonterminals;
     
     
     /** 
@@ -146,9 +147,9 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 		return false;
 	}
 
-	//Wraps counter and nonterminals stack
+	//Wraps counter and nonterminals (Symbols) stack
 	int wraps=0;
-	Stack<Symbol> nonterminals=new Stack();
+	this.nonterminals=new Stack();
 
 	// Iterators
 	Iterator<Rule> ruleIt;
@@ -157,7 +158,7 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
         Integer tmpInt;//shall contain the values in Genotype
 
 	// Start with the start symbol
-	nonterminals.push(getStartSymbol());
+	this.nonterminals.push(getStartSymbol());
 	if(buildDerivationTree){
 		// Use start symbol as the derivationTree node
             try{
@@ -172,9 +173,9 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
       Integer codonGenoIt=genoIt.next();
         
 	// Get rid of all non-terminal symbols
-	while((!nonterminals.empty())&&(wraps<=getMaxWraps())){
+	while((!this.nonterminals.empty())&&(wraps<=getMaxWraps())){
 		// Do a mapping step
-		switch(genotype2phenotypeStep(nonterminals, codonGenoIt, buildDerivationTree)){
+		switch(genotype2phenotypeStep(this.nonterminals, codonGenoIt, buildDerivationTree)){
 			case -1:returnValue=false;
 				break;
 			case 0:	;
@@ -201,11 +202,11 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 	}
 	//newEffectiveSize+=(genoIt-genotype.begin());
 	// Was the mapping successful?
-	if((wraps>getMaxWraps())||(!nonterminals.empty())){
+	if((wraps>getMaxWraps())||(!this.nonterminals.empty())){
 		returnValue=false;
 		// Add remaining symbols in nonterminals queue to phenotype
-		while(!nonterminals.empty()){
-			phenotype.add(nonterminals.pop());
+		while(!this.nonterminals.empty()){
+			phenotype.add(this.nonterminals.pop());
 		}
 	}
 	phenotype.setValid(returnValue);
@@ -241,15 +242,15 @@ public boolean phenotype2genotype(){
   *codon at the position pointed by genoIt.
   *Returns number of codons consumed, -1 if not successful
   */
-public int genotype2phenotypeStep(Stack<Symbol> nonterminals, Integer codonGenoIt, boolean buildDerivationTree){
+public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGenoIt, boolean buildDerivationTree){
 	
 	ListIterator<Production> prodIt;
 	int returnValue=-1;
-
+        this.nonterminals=nonterminals1;
 	// Find the rule for the current non-terminal
 	Rule rulePtr=null;
         try{
-            rulePtr=findRule(nonterminals.peek());
+            rulePtr=findRule(this.nonterminals.peek());
         }
         catch(java.lang.Exception e){
             System.out.println(e+" genotype2phenotypeStep()s rulePtr sucks");
@@ -258,37 +259,37 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals, Integer codonGenoI
         
 	if(rulePtr==null){// Undefined symbol - could be an extension symbol
             try{
-		if(nonterminals.peek().getSymbol().startsWith("<GECodonValue")&&(codonGenoIt!=null)){
+		if(this.nonterminals.peek().getSymbol().startsWith("<GECodonValue")&&(codonGenoIt!=null)){
 			// Insert codon value
 			// Extract range for value from non-terminal specification
 			int low=0,high=-1, pointer="<GECodonValue".length();
 			// currentChar is the first character after "<GECodonValue"
-			char currentChar=nonterminals.peek().getSymbol().substring(pointer,pointer+1).charAt(0);
+			char currentChar=this.nonterminals.peek().getSymbol().substring(pointer,pointer+1).charAt(0);
                        
 			// Look for range definitions
 			while(Character.toString(currentChar).compareTo(">")!=0){
 				if(Character.toString(currentChar).compareTo("-")==0){
 					// Low range specification
-					currentChar=nonterminals.peek().getSymbol().substring(++pointer,pointer+1).charAt(0);
+					currentChar=this.nonterminals.peek().getSymbol().substring(++pointer,pointer+1).charAt(0);
 					while(Character.isDigit(currentChar)){
 						low=(low*10)+(currentChar-'0');
                                    
-						currentChar=nonterminals.peek().getSymbol().substring(++pointer,pointer+1).charAt(0);
+						currentChar=this.nonterminals.peek().getSymbol().substring(++pointer,pointer+1).charAt(0);
 					}
 				}
 				else if(Character.toString(currentChar).compareTo("+")==0){
 					// High range specification
-					currentChar=nonterminals.peek().toString().substring(++pointer,pointer+1).charAt(0);
+					currentChar=this.nonterminals.peek().toString().substring(++pointer,pointer+1).charAt(0);
 					while(Character.isDigit(currentChar)){
 						if(high==-1){
 							high=0;
 						}
 						high=(high*10)+(currentChar-'0');
-						currentChar=nonterminals.peek().toString().substring(++pointer,pointer+1).charAt(0);
+						currentChar=this.nonterminals.peek().toString().substring(++pointer,pointer+1).charAt(0);
 					}
 				}
 				else{// Ignore errors
-					currentChar=nonterminals.peek().toString().substring(++pointer,pointer+1).charAt(0);
+					currentChar=this.nonterminals.peek().toString().substring(++pointer,pointer+1).charAt(0);
 				}
 			}
 			// High range was not specified, so set it to maximum
@@ -296,7 +297,7 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals, Integer codonGenoI
 				high=genotype.getMaxCodonValue();
 			}
 			// Remove non-terminal
-			nonterminals.pop();
+			this.nonterminals.pop();
 			// Print value onto "codon"
 			String codon;
 			if(high==low){
@@ -313,7 +314,7 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals, Integer codonGenoI
 		else{
 			// Unknown symbol or special symbol that requires non-empty genotype
 			// Include symbol on phenotype
-			phenotype.add(nonterminals.pop());
+			phenotype.add(this.nonterminals.pop());
 			// Remove non-terminal
 			//nonterminals.pop();
 			// Invalidate mapping
@@ -330,7 +331,7 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals, Integer codonGenoI
 	else if((rulePtr.getMinimumDepth()>=(32767>>1))// Stuck on recursive rule
 		&&(rulePtr.size()<=1)){// No codon will be consumed
 		// Include symbol on phenotype
-		phenotype.add(nonterminals.pop());
+		phenotype.add(this.nonterminals.pop());
 		// Remove non-terminal
 		//nonterminals.pop();
 		// Invalidate mapping
@@ -338,7 +339,7 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals, Integer codonGenoI
 	}
 	else{
 		// Remove non-terminal
-		nonterminals.pop();
+		this.nonterminals.pop();
 		// Choose production
 		if(codonGenoIt==null&&rulePtr.size()>1){
 			// Empty genotype, but symbol requires choice
@@ -363,7 +364,7 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals, Integer codonGenoI
 			// Place production on productions vector
                         Production tmpProd=prodIt.next();
 			if(buildDerivationTree){
-				productions.add(tmpProd);//tmpProd is also used latter
+				this.productions.add(tmpProd);//tmpProd is also used latter
 			}
 			// Put all terminal symbols at start of production onto phenotype
 			int s_start=0;
@@ -381,7 +382,7 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals, Integer codonGenoI
 			}
 			// Push all remaining symbols from production onto nonterminals queue, backwards
 			for(;s_stop>s_start;s_stop--){
-				nonterminals.push(tmpProd.get(s_stop-1));
+				this.nonterminals.push(tmpProd.get(s_stop-1));
 			}
 			// 0 or 1 choice for current rule, didn't consume genotype codon
 			if(rulePtr.size()<=1){
@@ -399,10 +400,10 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals, Integer codonGenoI
     //    try{
 	while(true){
             try{
-                if((nonterminals.empty()) || (!nonterminals.peek().getType().toString().equalsIgnoreCase("TSymbol"))){
+                if((this.nonterminals.empty()) || (!this.nonterminals.peek().getType().toString().equalsIgnoreCase("TSymbol"))){
                     break;
                 }
-                phenotype.add(nonterminals.pop());
+                phenotype.add(this.nonterminals.pop());
             }
                 catch(java.lang.NullPointerException e){
                 System.out.println(e+" The whileloop at the end of genotype2phenotypeStep sucks");
@@ -463,6 +464,27 @@ public void buildDTree(Tree currentNode, ListIterator<Production> prodIt){
     catch(java.lang.StackOverflowError e){
         e.printStackTrace();
     }
+}
+
+public void setGenotype(final int[] geno, int size){
+    ArrayList<Integer> genoList=new ArrayList();
+    for(int i=0;i<size;i++){
+        genoList.add(new Integer(geno[i]));
+    }
+    this.genotype.clear();
+    this.genotype.addAll(genoList);
+}
+/**
+ * Converts the contents of the Phenotype list to its string representation and 
+ * then returns it back.
+ * @return 
+ */
+public String phenotypetoString(){
+    String phenotypeString=new String();
+    for(int i=0;i<this.phenotype.size();i++){
+        phenotypeString.concat(phenotype.get(i).getSymbol().toString());
+    }
+    return phenotypeString;
 }
 
 

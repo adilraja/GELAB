@@ -12,7 +12,7 @@
  * @author adilraja
  *
  */
-package GrammaticOptimization;
+package libGEjava;
 
 public interface Initialiser{
     public int getPopSize();

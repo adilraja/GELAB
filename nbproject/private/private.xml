@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
-    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
-        <file>file:/Users/adilraja/mywork/adils-java/GrammaticOptimization/src/GrammaticOptimization/CFGrammar.java</file>
-        <file>file:/Users/adilraja/mywork/adils-java/GrammaticOptimization/src/GrammaticOptimization/GEGrammar.java</file>
-        <file>file:/Users/adilraja/mywork/adils-java/GrammaticOptimization/src/GrammaticOptimization/GEsMain.java</file>
-        <file>file:/Users/adilraja/mywork/adils-java/GrammaticOptimization/src/GrammaticOptimization/Genotype.java</file>
-        <file>file:/Users/adilraja/mywork/adils-java/GrammaticOptimization/src/GrammaticOptimization/Grammar.java</file>
-        <file>file:/Users/adilraja/mywork/adils-java/GrammaticOptimization/src/GrammaticOptimization/Initialiser.java</file>
-        <file>file:/Users/adilraja/mywork/adils-java/GrammaticOptimization/src/GrammaticOptimization/Mapper.java</file>
-        <file>file:/Users/adilraja/mywork/adils-java/GrammaticOptimization/src/GrammaticOptimization/Phenotype.java</file>
-        <file>file:/Users/adilraja/mywork/adils-java/GrammaticOptimization/src/GrammaticOptimization/Production.java</file>
-        <file>file:/Users/adilraja/mywork/adils-java/GrammaticOptimization/src/GrammaticOptimization/Rule.java</file>
-        <file>file:/Users/adilraja/mywork/adils-java/GrammaticOptimization/src/GrammaticOptimization/Symbol.java</file>
-        <file>file:/Users/adilraja/mywork/adils-java/GrammaticOptimization/src/GrammaticOptimization/Tree.java</file>
-        <file>file:/Users/adilraja/mywork/adils-java/GrammaticOptimization/src/GrammaticOptimization/grammar.bnf</file>
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/home/adil/Dropbox/adils-java/GrammaticOptimization/src/GrammaticOptimization/GEsMain.java</file>
+            <file>file:/home/adil/Dropbox/adils-java/GrammaticOptimization/src/GrammaticOptimization/Genotype.java</file>
+            <file>file:/home/adil/Dropbox/adils-java/GrammaticOptimization/src/GrammaticOptimization/GEGrammar.java</file>
+        </group>
     </open-files>
 </project-private>

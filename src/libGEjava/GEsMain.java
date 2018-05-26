@@ -7,13 +7,14 @@
  * and open the template in the editor.
  */
 
-package GrammaticOptimization;
+package libGEjava;
 
 /**
  *
  * @author adilraja
  */
 import java.util.*;
+
 
 
 
@@ -38,16 +39,16 @@ public class GEsMain {
         
         Random rand=new Random();
         int []newArray= new int[10];
-        newArray[0]=0;
+        newArray[0]=152;
         newArray[1]=2;
         newArray[2]=1;
-        newArray[3]=4;
-        newArray[4]=4;
-        newArray[5]=4;
-        newArray[6]=4;
-        newArray[7]=4;
-        newArray[8]=4;
-        newArray[9]=4;
+        newArray[3]=3;
+        newArray[4]=3;
+        newArray[5]=3;
+        newArray[6]=3;
+        newArray[7]=3;
+        newArray[8]=3;
+        newArray[9]=3;
         
         ArrayList<Integer> arrList=new ArrayList();
        for (int i=0;i<10;i++){

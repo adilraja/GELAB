@@ -5,6 +5,9 @@
  */
 package GrammaticOptimization;
 
+import libGEjava.Symbol;
+import libGEjava.CFGrammar;
+import libGEjava.Rule;
 import junit.framework.TestCase;
 
 /**

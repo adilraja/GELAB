@@ -12,7 +12,7 @@
  * @author adilraja
  *
  */
-package GrammaticOptimization;
+package libGEjava;
 
 import java.util.*;
 import java.lang.String;

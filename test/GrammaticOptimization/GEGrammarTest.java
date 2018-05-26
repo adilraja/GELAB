@@ -5,6 +5,10 @@
  */
 package GrammaticOptimization;
 
+import libGEjava.Production;
+import libGEjava.Symbol;
+import libGEjava.Tree;
+import libGEjava.GEGrammar;
 import java.util.ArrayList;
 import java.util.ListIterator;
 import java.util.Stack;
