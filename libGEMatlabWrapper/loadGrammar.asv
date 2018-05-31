@@ -15,18 +15,15 @@ bnffilepath=strcat(pwd, '/grammars/bnffile');
 grammar=javaObject('libGEjava.GEGrammar');
 
 grammar.setMaxWraps(9);
-GrammarFile = grammar.readBNFFile('grammars/sr.bnf');
-disp('Grammar File');
-disp(GrammarFile);
+GrammarFile = grammar.readB
 if grammar.readBNFFile('grammars/sr.bnf')
-    genoSample(1:10) = [1 4 2 5 1 6 3 1 2 8];
-    gen2phen = genotype2phenotype(genoSample,grammar);
-    disp(gen2phen);
+    genoSample = [1 4 2 5 1 6 3 1 2 8];
+    gen2phen = genotype2phenotype(genoSample,grammar.readBNFFile('grammars/sr.bnf'));
 else
     System.out.println('Reading of the grammar file was not successful\n');
 end
 % genotype2phenotype.m class function should be called here, and integer
-% array of random numbers as geno and the grammar javaObject should
-% be passed as an argument to make it work properly!!! @Qadeer Ahmad
+% array of random numbers as geno and the grammar file stored above should
+% be passed as an argument to make it properly work!!! @Qadeer Ahmad
 
 %return grammar;

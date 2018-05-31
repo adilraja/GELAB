@@ -466,6 +466,11 @@ public void buildDTree(Tree currentNode, ListIterator<Production> prodIt){
     }
 }
 
+/**
+ * Converts an integer array to an ArrayList<Integer> genoType
+ * @param geno
+ * @param size 
+ */
 public void setGenotype(final int[] geno, int size){
     ArrayList<Integer> genoList=new ArrayList();
     for(int i=0;i<size;i++){
