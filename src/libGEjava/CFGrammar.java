@@ -120,6 +120,22 @@ public boolean readBNFFile(final String filename){
 	return readBNFString(program);
 	*/
         String program=new String();
+        FileInputStream fileInputStream=null;
+        try{
+            fileInputStream = new FileInputStream(new File(filename));
+        }
+        catch(java.io.FileNotFoundException e){
+            e.printStackTrace();
+        }
+        FileDescriptor fd = null;
+        try{
+            fd=fileInputStream.getFD();
+        }
+        catch(java.io.IOException e){
+            e.printStackTrace();
+        }
+
+
       //  try
 //	{
             // Open the file that is the first 
@@ -130,9 +146,9 @@ public boolean readBNFFile(final String filename){
             // DataInputStream
             BufferedReader in=null;
             try{
-                in = new BufferedReader(new FileReader(filename));
+                in = new BufferedReader(new FileReader(fd));
             }
-            catch(java.io.FileNotFoundException e){
+            catch(java.lang.NullPointerException e){
                 e.printStackTrace();
             }
             // Continue to read lines while 

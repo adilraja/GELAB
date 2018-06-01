@@ -63,7 +63,7 @@ public class GEsMain {
 
         grammar.setMaxWraps(9);
 
-        if(grammar.readBNFFile("grammars/sr.bnf")) {
+        if(grammar.readBNFFile("/home/adil/Dropbox/adils-java/libGEjava/grammars/sr.bnf")) {
         } else {
             System.out.println("Reading of the grammar file was not successful\n");
         }
