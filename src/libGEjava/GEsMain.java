@@ -77,7 +77,7 @@ public class GEsMain {
         catch(java.lang.NoClassDefFoundError e){
             e.printStackTrace();
         }
-           Tree tmpTree=grammar.derivationTree;
+        Tree tmpTree=grammar.derivationTree;
         Iterator<Symbol> symbIt=null;
         try{
             symbIt=grammar.getPhenotype().iterator();
@@ -87,7 +87,7 @@ public class GEsMain {
         }
         
         Iterator<Rule> ruleIt=grammar.iterator();
-        System.out.println("Here are the results: phenotype sizse= "+grammar.getPhenotype().size());
+        System.out.println("Here are the results: phenotype size= "+grammar.getPhenotype().size());
         while(symbIt.hasNext()){
             System.out.print(symbIt.next().getSymbol());
         }
@@ -153,7 +153,11 @@ public class GEsMain {
         for(int i=0;i<loopC;i++){
             System.out.print(symbIt3.next().getSymbol()+" ");
         }
-        
-    }
+        System.out.println("\n Size of Phenotype is: "+ grammar.getPhenotype().size());
+        System.out.println("\n Here is the Phenotype String!");
+        System.out.println(grammar.getPhenotypeString());
+        System.out.println("Here is the genotype string!");
+        System.out.println(grammar.getGenotypeString());
+    } 
     
 }

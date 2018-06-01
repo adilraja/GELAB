@@ -23,6 +23,7 @@ public class GEGrammar extends CFGrammar {
     protected ArrayList<Production> productions;
     private int counterFlag;//I just put it here
     private Stack<Symbol> nonterminals;
+    private String phenotypeString;
     
     
     /** 
@@ -31,6 +32,7 @@ public class GEGrammar extends CFGrammar {
     public GEGrammar() {
         super();
         setMaxWraps(0);
+        this.productions=new ArrayList();
     }
    
     
@@ -116,6 +118,32 @@ public boolean genotype2phenotype(){
 }
 
 /**
+ * This is simply like the above function. Its purpose is to be able to call genotype2phenotype from 
+ * outside java, such as Matlab or Octave
+ * @param buildDerivationTree
+ * @return 
+ */
+public boolean genotype2phenotype(final String buildDerivationTree){
+    
+    if(buildDerivationTree.equalsIgnoreCase("true")){
+        try{
+            return this.genotype2phenotype(true);
+        }
+   //     catch(Exception e){
+   //         e.printStackTrace();
+   //         return false;
+   //     }
+        catch(java.lang.NullPointerException e){
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+    else{
+        return false;
+    }
+}
+
+/**
  * Updates the contents of the phenotype structure, based on the current
  * genotype and the current grammar, and according to the standard GE
  * mapping process. Returns true upon a successful mapping, and false
@@ -131,16 +159,17 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 	// Start by setting effectiveSize to 0
 	genotype.setEffectiveSize(newEffectiveSize);
   //      System.out.println("You called readBNFString, which called this");
-        
+       
         this.phenotype=new Phenotype(true,1);//No need to do this as this has already been done in Mapper's constructor.
         if(!phenotype.isEmpty())
             phenotype.clear();
-        
 	if(buildDerivationTree){
-		this.productions.clear();//Removes all items from the list
+            if(!this.productions.isEmpty())
+                this.productions.clear();//Removes all items from the list
 	}
 	// Quick safety checks
 	//if((!getValidGrammar())||(!genotype.getValid())||(!getGenotype()->size())){
+        
 	if(!getValidGrammar()){
 		phenotype.clear();
 		phenotype.setValid(false);
@@ -171,10 +200,10 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 
 	boolean gotToUseWrap=true;
       Integer codonGenoIt=genoIt.next();
-        
 	// Get rid of all non-terminal symbols
 	while((!this.nonterminals.empty())&&(wraps<=getMaxWraps())){
 		// Do a mapping step
+                
 		switch(genotype2phenotypeStep(this.nonterminals, codonGenoIt, buildDerivationTree)){
 			case -1:returnValue=false;
 				break;
@@ -484,12 +513,32 @@ public void setGenotype(final int[] geno, int size){
  * then returns it back.
  * @return 
  */
-public String phenotypetoString(){
-    String phenotypeString=new String();
-    for(int i=0;i<this.phenotype.size();i++){
-        phenotypeString.concat(phenotype.get(i).getSymbol().toString());
+private String phenotypetoString(){
+    this.phenotypeString=new String();
+    int siz=this.getPhenotype().size();
+    Iterator<Symbol> symbIt=this.getPhenotype().iterator();
+    while(symbIt.hasNext()){
+        this.phenotypeString+=symbIt.next().getSymbol().toString();
     }
-    return phenotypeString;
+    return this.phenotypeString;
+}
+
+/**
+ * return the phenotype string
+ * @return 
+ */
+public String getPhenotypeString(){
+    return this.phenotypetoString();
+}
+
+public String getGenotypeString(){
+    Iterator<Integer> symbIt=this.getGenotype().iterator();
+    String genoString=new String();
+    while(symbIt.hasNext()){
+        genoString+=Integer.toString(symbIt.next().intValue());
+        genoString+=" ";
+    }
+    return genoString;
 }
 
 

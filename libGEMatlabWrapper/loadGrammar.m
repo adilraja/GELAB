@@ -7,6 +7,8 @@ function grammar=loadGrammar(bnffile)
 %java object). This function is written by Muhammad Adil Raja on 25th May,
 %2018.
 
+clear JAVA;
+
 %fileparts(which('loadGrammar.m')), 
 libGEpath=strcat(fileparts(which('loadGrammar.m')), '/libGEjar/libGEjava.jar');
 javaaddpath(libGEpath);

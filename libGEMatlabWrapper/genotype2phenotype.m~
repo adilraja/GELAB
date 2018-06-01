@@ -32,10 +32,14 @@ javaaddpath(libGEpath);
 
 
 grammar.setGenotype(geno, length(geno));
+siz=grammar.getGenotype().size()
+
+st=grammar.getGenotypeString()
+%disp(st);
 
 try
-    grammar.genotype2phenotype('true');
-    %javaMethod('genotype2phenotype', GEGrammar, 1);
+    %grammar.genotype2phenotype(1);
+    javaMethod(grammar.genotype2);
 catch E
     switch E.identifier
         case 'MATLAB:java.lang.Exception'
@@ -47,9 +51,9 @@ catch E
 end
 
 if(grammar.getPhenotype().getValid()==1)
-    fprintf("\nThe above phenotype is valid\n");
+    fprintf("\nThe above phenotype is valid");
 else 
-    fprintf("\nThe above phenotype is not valid\n");
+    fprintf("\nThe above phenotype is not valid");
 end
 %pheno.string=grammar.phenotypetoString();
 %pheno.phenotype=grammar.getPhenotype();
@@ -58,6 +62,6 @@ end
 %grammar has both genotype, phenotype and the string representation of the
 %phenotype.
 pheno=grammar;
-st=grammar.getPhenotypeString();
-disp(st);
+siz=grammar.getPhenotype.size()
+grammar.getPhenotypeString()
 end
