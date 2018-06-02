@@ -1,5 +1,5 @@
 %import libGEjava.*;
-function grammar=genotype2phenotype(geno, grammar)
+function [phenotype_string grammar]=genotype2phenotype(geno, grammar)
 %This function does the mapping from genotype to phenotype. It calls
 %libGE's jar and gets its work done.
 % Inputs:
@@ -58,6 +58,6 @@ end
 %grammar has both genotype, phenotype and the string representation of the
 %phenotype.
 pheno=grammar;
-st=grammar.getPhenotypeString();
-disp(st);
+phenotype_string=grammar.getPhenotypeString();
+disp(phenotype_string);
 end
