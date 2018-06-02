@@ -60,7 +60,9 @@ public GEGrammar(final GEGrammar copy) throws Exception{
 	setMaxWraps(copy.getMaxWraps());
 	// Call genotype2Phenotype() to regenerate phenotype structure,
 	// and productions and derivationTree structures.
-	genotype2phenotype(true);
+        this.productions=new ArrayList();
+        this.productions.clear();
+        //this.genotype2phenotype(true);
 }
 
 
@@ -199,7 +201,13 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 	}
 
 	boolean gotToUseWrap=true;
-      Integer codonGenoIt=genoIt.next();
+      Integer codonGenoIt=new Integer(0);
+      try{
+        codonGenoIt=genoIt.next();
+      }
+      catch(java.util.NoSuchElementException e){
+          e.printStackTrace();
+      }
 	// Get rid of all non-terminal symbols
 	while((!this.nonterminals.empty())&&(wraps<=getMaxWraps())){
 		// Do a mapping step
@@ -435,7 +443,7 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGeno
                 phenotype.add(this.nonterminals.pop());
             }
                 catch(java.lang.NullPointerException e){
-                System.out.println(e+" The whileloop at the end of genotype2phenotypeStep sucks");
+                System.out.println(e+"The while loop at the end of genotype2phenotypeStep sucks");
                 System.exit(0);
             }
             catch(java.util.EmptyStackException e){

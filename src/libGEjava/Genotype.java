@@ -82,6 +82,7 @@ public class Genotype extends ArrayList<Integer>{//codonType
         setMaxCodonValue(copy.getMaxCodonValue());
         setEffectiveSize(copy.getEffectiveSize());
         setWraps(copy.getWraps());
+        this.addAll(copy);
     }
     
     /*Returns the current valid field

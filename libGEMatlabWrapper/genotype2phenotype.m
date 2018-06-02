@@ -57,7 +57,7 @@ end
 %We can probably set the penotype to grammar object and return it as
 %grammar has both genotype, phenotype and the string representation of the
 %phenotype.
-pheno=grammar;
+pheno=javaObject('libGEjava.GEGrammar', grammar);
 phenotype_string=grammar.getPhenotypeString();
 disp(phenotype_string);
 end

@@ -18,7 +18,7 @@ import java.util.*;
 
 
 
-public class GEsMain {
+public class GEsMain{
     
     /** Creates a new instance of GEsMain */
     public GEsMain() {
@@ -27,7 +27,7 @@ public class GEsMain {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws java.lang.Exception{
         // TODO code application logic here
     //    try{
     //    String current = new java.io.File( "." ).getCanonicalPath();
@@ -59,7 +59,8 @@ public class GEsMain {
 
         GEGrammar grammar=new GEGrammar(geno);
      //   grammar.setGenotype(geno);
-     
+     GEGrammar grammar3;
+    
 
         grammar.setMaxWraps(9);
 
@@ -77,6 +78,16 @@ public class GEsMain {
         catch(java.lang.NoClassDefFoundError e){
             e.printStackTrace();
         }
+        
+       
+        //grammar.setPhenotype(new Phenotype());
+         try{
+           //  grammar.setPhenotype(grammar.getPhenotype());
+        grammar3=new GEGrammar(grammar);
+     }
+     catch(java.lang.NullPointerException e){
+         e.printStackTrace();
+     }
         Tree tmpTree=grammar.derivationTree;
         Iterator<Symbol> symbIt=null;
         try{
@@ -158,6 +169,13 @@ public class GEsMain {
         System.out.println(grammar.getPhenotypeString());
         System.out.println("Here is the genotype string!");
         System.out.println(grammar.getGenotypeString());
+        
+    /*    try{
+            GEGrammar grammar2=new GEGrammar(grammar);
+        }
+        catch(java.lang.Exception e){
+            e.printStackTrace();
+        }*/
     } 
     
 }

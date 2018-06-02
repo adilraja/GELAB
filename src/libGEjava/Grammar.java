@@ -55,7 +55,7 @@ public abstract class Grammar extends Mapper{
      *Copy Constructor
      */
     public Grammar(final Grammar copy){
-        super();
+        super(copy);
         setValidGrammar(copy.getValidGrammar());
 	startSymbol=copy.startSymbol;
     }
@@ -84,7 +84,7 @@ public final Symbol getStartSymbol(){
 	//return front().lhs.front();
 	//return (*this)[startSymbol].lhs.front();
         Symbol symb=null;
-        if (startSymbol<this.size())
+        if(this.startSymbol<this.size())
         {
          symb=this.get(startSymbol).lhs.get(0);
         }

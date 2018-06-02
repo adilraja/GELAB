@@ -107,7 +107,7 @@ public final Symbol getData(){
  */
 
 public void setData(final Symbol newData){
-	data=new Symbol(newData);
+	this.data=new Symbol(newData);
 	setValid(true);
 }
 
