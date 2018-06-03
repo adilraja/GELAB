@@ -1,0 +1,109 @@
+Noe I tried the latest version of lua i.e 5.4.3 but it was not installed as installation instaructions in its readme were also different. So I used the  version mentioned in LibGE document 5.0.2.
+
+1- Downloaded the version 5.0.2 of lua from the following link(Old verison that has been tested with LibGE according to LibGE manual):
+http://www.lua.org/ftp/
+
+2- Unzip the .tar using the following coammand:
+tar -xvzf FILENAME
+
+3- Given the following commands
+  'sudo make'
+ 
+
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+Results of commands:
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+
+sheraz@sheraz:~/Desktop/GE/lua-5.0.2$ sudo make
+[sudo] password for sheraz: 
+cd include; make all
+make[1]: Entering directory '/home/sheraz/Desktop/GE/lua-5.0.2/include'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/home/sheraz/Desktop/GE/lua-5.0.2/include'
+cd src; make all
+make[1]: Entering directory '/home/sheraz/Desktop/GE/lua-5.0.2/src'
+gcc -O2 -Wall -I../include      -c -o lapi.o lapi.c
+gcc -O2 -Wall -I../include      -c -o lcode.o lcode.c
+gcc -O2 -Wall -I../include      -c -o ldebug.o ldebug.c
+gcc -O2 -Wall -I../include      -c -o ldo.o ldo.c
+gcc -O2 -Wall -I../include      -c -o ldump.o ldump.c
+gcc -O2 -Wall -I../include      -c -o lfunc.o lfunc.c
+gcc -O2 -Wall -I../include      -c -o lgc.o lgc.c
+gcc -O2 -Wall -I../include      -c -o llex.o llex.c
+gcc -O2 -Wall -I../include      -c -o lmem.o lmem.c
+gcc -O2 -Wall -I../include      -c -o lobject.o lobject.c
+gcc -O2 -Wall -I../include      -c -o lopcodes.o lopcodes.c
+gcc -O2 -Wall -I../include      -c -o lparser.o lparser.c
+gcc -O2 -Wall -I../include      -c -o lstate.o lstate.c
+gcc -O2 -Wall -I../include      -c -o lstring.o lstring.c
+gcc -O2 -Wall -I../include      -c -o ltable.o ltable.c
+In file included from ltable.c:36:0:
+ltable.c: In function ‘luaH_mainposition’:
+llimits.h:72:23: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+ #define IntPoint(p)  ((lu_hash)(p))
+                       ^
+ltable.h:13:32: note: in definition of macro ‘gnode’
+ #define gnode(t,i) (&(t)->node[i])
+                                ^
+ltable.c:71:26: note: in expansion of macro ‘hashmod’
+ #define hashpointer(t,p) hashmod(t, IntPoint(p))
+                          ^
+ltable.c:71:37: note: in expansion of macro ‘IntPoint’
+ #define hashpointer(t,p) hashmod(t, IntPoint(p))
+                                     ^
+ltable.c:108:14: note: in expansion of macro ‘hashpointer’
+       return hashpointer(t, pvalue(key));
+              ^
+llimits.h:72:23: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+ #define IntPoint(p)  ((lu_hash)(p))
+                       ^
+ltable.h:13:32: note: in definition of macro ‘gnode’
+ #define gnode(t,i) (&(t)->node[i])
+                                ^
+ltable.c:71:26: note: in expansion of macro ‘hashmod’
+ #define hashpointer(t,p) hashmod(t, IntPoint(p))
+                          ^
+ltable.c:71:37: note: in expansion of macro ‘IntPoint’
+ #define hashpointer(t,p) hashmod(t, IntPoint(p))
+                                     ^
+ltable.c:110:14: note: in expansion of macro ‘hashpointer’
+       return hashpointer(t, gcvalue(key));
+              ^
+gcc -O2 -Wall -I../include      -c -o ltests.o ltests.c
+gcc -O2 -Wall -I../include      -c -o ltm.o ltm.c
+gcc -O2 -Wall -I../include      -c -o lundump.o lundump.c
+gcc -O2 -Wall -I../include      -c -o lvm.o lvm.c
+gcc -O2 -Wall -I../include      -c -o lzio.o lzio.c
+ar rcu ../lib/liblua.a lapi.o lcode.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o ltests.o ltm.o lundump.o lvm.o lzio.o
+ar: `u' modifier ignored since `D' is the default (see `U')
+ranlib ../lib/liblua.a
+make[1]: Leaving directory '/home/sheraz/Desktop/GE/lua-5.0.2/src'
+cd src/lib; make all
+make[1]: Entering directory '/home/sheraz/Desktop/GE/lua-5.0.2/src/lib'
+gcc -O2 -Wall -I../../include         -c -o lauxlib.o lauxlib.c
+gcc -O2 -Wall -I../../include         -c -o lbaselib.o lbaselib.c
+gcc -O2 -Wall -I../../include         -c -o ldblib.o ldblib.c
+gcc -O2 -Wall -I../../include         -c -o liolib.o liolib.c
+gcc -O2 -Wall -I../../include         -c -o lmathlib.o lmathlib.c
+gcc -O2 -Wall -I../../include         -c -o ltablib.o ltablib.c
+gcc -O2 -Wall -I../../include         -c -o lstrlib.o lstrlib.c
+gcc -O2 -Wall -I../../include         -c -o loadlib.o loadlib.c
+ar rcu ../../lib/liblualib.a lauxlib.o lbaselib.o ldblib.o liolib.o lmathlib.o ltablib.o lstrlib.o loadlib.o
+ar: `u' modifier ignored since `D' is the default (see `U')
+ranlib ../../lib/liblualib.a
+make[1]: Leaving directory '/home/sheraz/Desktop/GE/lua-5.0.2/src/lib'
+cd src/luac; make all
+make[1]: Entering directory '/home/sheraz/Desktop/GE/lua-5.0.2/src/luac'
+gcc -O2 -Wall -I../../include -I..      -c -o luac.o luac.c
+gcc -O2 -Wall -I../../include -I..      -c -o print.o print.c
+gcc -o lopcodes.o -c -O2 -Wall -I../../include -I..    -DLUA_OPNAMES ../lopcodes.c
+gcc -o ../../bin/luac  luac.o print.o lopcodes.o -L../../lib -llua -llualib -lm 
+make[1]: Leaving directory '/home/sheraz/Desktop/GE/lua-5.0.2/src/luac'
+cd src/lua; make all
+make[1]: Entering directory '/home/sheraz/Desktop/GE/lua-5.0.2/src/lua'
+gcc -O2 -Wall -I../../include      -c -o lua.o lua.c
+gcc -o ../../bin/lua  lua.o -L../../lib -llua -llualib -lm 
+make[1]: Leaving directory '/home/sheraz/Desktop/GE/lua-5.0.2/src/lua'
+
