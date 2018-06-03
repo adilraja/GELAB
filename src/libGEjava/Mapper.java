@@ -47,6 +47,7 @@ public abstract class Mapper extends ArrayList<Rule> {
      *Copy Constructor
      */
      public Mapper(final Mapper copy){
+         super(copy);
          this.genotype=new Genotype(copy.genotype);
          this.phenotype=new Phenotype(copy.phenotype);
      }

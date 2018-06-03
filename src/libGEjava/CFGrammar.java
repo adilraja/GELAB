@@ -51,17 +51,26 @@ public CFGrammar(final CFGrammar copy){
     super(copy);
     // Now must go through the copied grammar, and replace references to
     // the copy's lhs symbols with references to the new lhs symbols.
-    Iterator ruleIt=this.iterator();//iterator of Rule
-    Iterator<Rule> prodIt;
-    Iterator<Production> symbIt;
+    Iterator<Rule> ruleIt=this.iterator();//iterator of Rule
+    Iterator<Production> prodIt;
+    Iterator<Symbol> symbIt;
     Rule rulePtr=null;
     int ruleCt=0, prodCt=0, symbCt=0;
     while(ruleIt.hasNext()){
-        prodIt=ruleIt;
+        prodIt=ruleIt.next().iterator();//I think there should be a next here. Adil
+        prodCt=0;
             while(prodIt.hasNext()){
-                symbIt=prodIt.next().iterator();
+                Production tmpProd=prodIt.next();
+                symbIt=tmpProd.iterator();
+                symbCt=0;
                     while(symbIt.hasNext()){
-                            Symbol symb=symbIt.next().get(0);
+                            Symbol symb=null;
+                            try{
+                                symb=symbIt.next();
+                            }
+                            catch(java.util.ConcurrentModificationException e){
+                                e.printStackTrace();
+                            }
                             if(symb.getType().toString().compareTo("NTSymbol")==0){
 				try{
                                     rulePtr=findRule(symb);
@@ -77,15 +86,22 @@ public CFGrammar(final CFGrammar copy){
 					/* Point to symbol's definition */
                                         symb=rulePtr.lhs.get(rulePtr.lhs.size()-1);
                                     }
+                                    
                                 this.get(ruleCt).get(prodCt).insertSymbol(symb,symbCt);
+                                
+                                symbIt=tmpProd.iterator();
+                                for(int ii=0;ii<symbCt+1;ii++){
+                                    symbIt.next();
+                                }
+                               //    symbIt.next();
                             }
-                            symbIt.next();
+                        //    symbIt.next();
                             symbCt++;
                     }
-                    prodIt.next();
+                    //prodIt.next();
                     prodCt++;
             }
-            ruleIt.next();
+            //ruleIt.next();
             ruleCt++;
     }
     // Invalidate phenotype - lower classes in hierarchy can always call

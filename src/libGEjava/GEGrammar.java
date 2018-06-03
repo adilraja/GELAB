@@ -62,7 +62,7 @@ public GEGrammar(final GEGrammar copy) throws Exception{
 	// and productions and derivationTree structures.
         this.productions=new ArrayList();
         this.productions.clear();
-        //this.genotype2phenotype(true);
+        this.genotype2phenotype(true);
 }
 
 
@@ -187,16 +187,25 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 	ListIterator<Production> prodIt;
 	Iterator<Integer> genoIt=genotype.iterator();
         Integer tmpInt;//shall contain the values in Genotype
-
+        
 	// Start with the start symbol
-	this.nonterminals.push(getStartSymbol());
+        Symbol tmpSmb=this.getStartSymbol();
+        try{
+            System.out.println("Here is the symbol: "+tmpSmb.getType().toString());
+        }
+        catch(java.lang.NullPointerException e){
+            System.out.println("Problem getting the symbol!");
+            e.printStackTrace();
+        }
+	this.nonterminals.push(tmpSmb);
 	if(buildDerivationTree){
 		// Use start symbol as the derivationTree node
             try{
-		this.derivationTree.setData(getStartSymbol());
+		this.derivationTree.setData(tmpSmb);
             }
             catch(java.lang.NullPointerException e){
                 System.out.println(e+" The call: derivationTree.setData(getStartSymbol()); in GEGrammar sucks");
+                e.printStackTrace();
             }
 	}
 
@@ -437,13 +446,17 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGeno
     //    try{
 	while(true){
             try{
-                if((this.nonterminals.empty()) || (!this.nonterminals.peek().getType().toString().equalsIgnoreCase("TSymbol"))){
+                if(this.nonterminals.empty()){
+                    break;
+                }
+                else if(!this.nonterminals.peek().getType().toString().equalsIgnoreCase("TSymbol")){
                     break;
                 }
                 phenotype.add(this.nonterminals.pop());
             }
                 catch(java.lang.NullPointerException e){
                 System.out.println(e+"The while loop at the end of genotype2phenotypeStep sucks");
+                e.printStackTrace();
                 System.exit(0);
             }
             catch(java.util.EmptyStackException e){
