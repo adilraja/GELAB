@@ -58,6 +58,9 @@ end
 %grammar has both genotype, phenotype and the string representation of the
 %phenotype.
 pheno=javaObject('libGEjava.GEGrammar', grammar);
+grammar=pheno;
 phenotype_string=grammar.getPhenotypeString();
+disp(phenotype_string);
+phenotype_string=pheno.getPhenotypeString();
 disp(phenotype_string);
 end
