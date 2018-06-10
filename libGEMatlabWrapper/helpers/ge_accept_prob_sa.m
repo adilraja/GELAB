@@ -1,4 +1,4 @@
-% ## Copyright (C) 2017 Adil
+% ## Copyright (C) 2016 Adil
 % ## 
 % ## This program is free software; you can redistribute it and/or modify it
 % ## under the terms of the GNU General Public License as published by
@@ -14,29 +14,21 @@
 % ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 % 
 % ## -*- texinfo -*- 
-% ## @deftypefn {Function File} {@var{retval} =} createChildPopulation (@var{input1}, @var{input2})
-% ##
+% ## @deftypefn {Function File} {@var{retval} =} acceptance_probability_for_simulated_annealing (@var{input1}, @var{input2})
+% ##Computes acceptance probability for simulated annealing. I got inspiration for this from http://katrinaeg.com/simulated-annealing.html
 % ## @seealso{}
 % ## @end deftypefn
 % 
 % ## Author: Adil <adil@adil-HP-250-G3-Notebook-PC>
-% ## Created: 2017-03-16
+% ## Created: 2016-08-14
 
-function [retval] = ge_createChildPopulation(population, genome_length, grammar)
-    childPopulation=ge_initPop(length(population)-1, genome_length, grammar);
-    j=1;
-    for(i=1:length(population)/2)
-        [parent1, parent2]=ge_selection(population, 2);
-        [child1, child2]=ge_crossover(parent1, parent2, genome_length, grammar);%Apply crossover
-        if(rand(1)<0.5)
-          child1=ge_mutation(child1);
-        end
-        if(rand(1)<0.5)
-          child2=ge_mutation(child2);
-        end
-        childPopulation(j)=child1;
-        childPopulation(j+1)=child2;
-        j=j+2;
-    end
-    retval=childPopulation;
+function [retval] = ge_accept_prob_sa (old_cost, new_cost, T)
+%Inspiration for this comes from http://katrinaeg.com/simulated-annealing.html
+if(new_cost<old_cost)
+  retval=1.0;
+elseif(isnan(new_cost) || isinf(new_cost))
+  retval=0;
+else
+  retval=exp((old_cost-new_cost)/T);
+end
 end

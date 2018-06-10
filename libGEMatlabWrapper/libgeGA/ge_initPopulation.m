@@ -22,9 +22,9 @@
 % ## Author: Adil <adil@adil-HP-250-G3-Notebook-PC>
 % ## Created: 2017-03-16
 
-function pop = ge_initPopulation (popSize)
+function pop = ge_initPopulation (popSize, genome_length, grammar)
     for(i=1:popSize)
-        pop(i)=createIndividual;
+        pop(i)=ge_createIndividual(genome_length, grammar);
     end
     
 end

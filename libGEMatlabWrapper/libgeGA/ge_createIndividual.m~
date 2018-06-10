@@ -14,7 +14,7 @@
 % ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 % 
 % ## -*- texinfo -*- 
-% ## @deftypefn {Function File} {@var{retval} =} Evaluate (@var{input1}, @var{input2})
+% ## @deftypefn {Function File} {@var{retval} =} createIndividual (@var{input1}, @var{input2})
 % ##
 % ## @seealso{}
 % ## @end deftypefn
@@ -22,23 +22,15 @@
 % ## Author: FGFS <fgfs@fgfs-Precision-WorkStation-T3500>
 % ## Created: 2017-03-16
 
-function [fitness, individual] = ge_evaluate (individual, data)
-    individual.isEvaluated=1;%Mark this individual as evaluated, so that it does not get re-evaluated
-    var='X';
-    [x, y]=size(data);
-    for(i=1:y)
-       val=strcat('data(:,', num2str(i),')');
-       var2=strcat(var, num2str(i));
-       eval([var2 '=' val ';']); 
-    end
-   
-    %in subsequent generations. This is supposed to save evaluation time.
-    if(individual.valid)%if this is a valid individual
-        result=eval(individual.string);
-        individual.result=result;
-        individual.fitness=ge_mse(result, data.train_y)
-    else
-        individual.fitness=50000;
-    %You ca plug in your own fitness function here.
-    fitness=individual.fitness;
+function individual = ge_createIndividual (genome_length, grammar)
+    rng(0,'twister');
+    %genotype=randi([0 500000], 1, genome_length);
+    
+    individual=struct('genome', randi([0 5000], genome_length, 1), 'fitness', 500000, 'ID', [0 0], 'left_parent', [0 0], 'right_parent', [0 0], 'isEvaluated', 0, 'age', 0, 'result', []);
+    [phenotype_string grammar]=genotype2phenotype(individual.genome, grammar);
+    individual.grammar=grammar;% Trying to assign the grammar object to this struct as a field. I hope this works.
+    individual.string=phenotype_string;
+    individual.valid=grammar.phenotype.getValid(;%
+    %individual.img=rand(300,300);
+    %individual.fitness=500000;
 end

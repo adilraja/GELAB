@@ -26,10 +26,12 @@ function individual = ge_createIndividual (genome_length, grammar)
     rng(0,'twister');
     %genotype=randi([0 500000], 1, genome_length);
     
-    individual=struct("genome", randi([0 5000], genome_length, 1), "fitness", 500000, "ID", [0 0], "left_parent", [0 0], "right_parent", [0 0], "isEvaluated", 0, 'age', 0);
-    [phenotype_string grammar]=genotype2phenotype(genome, grammar);
+    individual=struct('genome', randi([0 500000], genome_length, 1), 'fitness', 500000, 'ID', [0 0], 'left_parent', [0 0], 'right_parent', [0 0], 'isEvaluated', 0, 'age', 0, 'result', []);
+    [phenotype_string grammar]=genotype2phenotype(individual.genome, grammar);
     individual.grammar=grammar;% Trying to assign the grammar object to this struct as a field. I hope this works.
     individual.string=phenotype_string;
+    s=individual.string;
+    individual.valid=grammar.isPhenotypeValid();%
     %individual.img=rand(300,300);
     %individual.fitness=500000;
 end

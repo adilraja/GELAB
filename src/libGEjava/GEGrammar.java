@@ -190,13 +190,13 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
         
 	// Start with the start symbol
         Symbol tmpSmb=this.getStartSymbol();
-        try{
+/*        try{
             System.out.println("Here is the symbol: "+tmpSmb.getType().toString());
         }
         catch(java.lang.NullPointerException e){
             System.out.println("Problem getting the symbol!");
             e.printStackTrace();
-        }
+        }*/
 	this.nonterminals.push(tmpSmb);
 	if(buildDerivationTree){
 		// Use start symbol as the derivationTree node
@@ -549,9 +549,20 @@ private String phenotypetoString(){
  * @return 
  */
 public String getPhenotypeString(){
-    return this.phenotypetoString();
+    if(this.phenotype.getValid()==true)
+        return this.phenotypetoString();
+    else
+        return null;
 }
 
+public boolean isPhenotypeValid(){
+    return this.phenotype.getValid();
+}
+
+/**
+ * Returns the string format of phenotype. Can be plugged into Matlab/eval
+ * @return 
+ */
 public String getGenotypeString(){
     Iterator<Integer> symbIt=this.getGenotype().iterator();
     String genoString=new String();
