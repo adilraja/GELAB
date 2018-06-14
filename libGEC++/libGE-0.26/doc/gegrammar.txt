@@ -1,0 +1,23 @@
+
+
+--------------------------------------------------------------------------------
+|                                 GEGrammar                                    |
+|------------------------------------------------------------------------------|
+| - maxWraps: unsigned int = 0                                                 |
+|------------------------------------------------------------------------------|
+| + GEGrammar()                                                                |
+| + GEGrammar(const Genotype &)                                                |
+| + GEGrammar(const Phenotype &)                                               |
+| + GEGrammar(const GEGrammar &)                                               |
+| + ~GEGrammar(): virtual                                                      |
+| + getMaxWraps(): unsigned int                                                |
+| + setMaxWraps(const unsigned int): void                                      |
+| + getDerivationTree(): const DerivationTree*                                 |
+| + getProductions(): const vector<Production*>*                               |
+| - genotype2Phenotype(): bool                                                 |
+| - phenotype2Genotype(): bool                                                 |
+| - buildDTree(DerivationTree &, vector<Production*>::iterator&): void         |
+| - genotype2PhenotypeStep(stack<const Symbol *> &, Genotype::iterator &): bool|
+--------------------------------------------------------------------------------
+
+

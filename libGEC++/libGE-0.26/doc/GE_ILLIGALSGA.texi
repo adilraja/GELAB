@@ -1,0 +1,73 @@
+@section GE_ILLIGALSGA
+@cindex GE_ILLIGALSGA
+@cindex IlliGAL
+
+This wrapper allows you to
+use the sga (simple genetic algorithm) code from the IlliGAL laboratory with
+libGE (make sure to check their website, @url{http://www-illigal.ge.uiuc.edu}).
+
+@subsection Contents
+
+This wrapper is composed of two files, @file{GE_ILLIGALSGA.h} and
+@file{GE_ILLIGALSGA.cpp}. The former contains the prototypes of the wrapper
+functions; the latter defines certain structures, variables and definitions
+from the sga code (check copyright notice in the file @file{AUTHORS}), as
+well as certain global variables, and the implementation of the wrapper
+functions. The functions available are wrappers to the methods available on
+the @code{CFGrammar} class; in other words, this wrapper maintains a
+@code{CFGrammar} object, and provides functions that allow the sga code to
+interface with that object.
+
+@subsection Installation
+
+The wrapper is installed by default with libGE. An option to the
+@file{configure} script allows you to specify if the wrapper should be
+installed or not:
+
+@kbd{./configure --enable-GE_ILLIGALSGA[=yes/no]}
+
+If ommited, or if the option @kbd{yes/no} is ommited, the wrapper will be
+installed.
+
+@subsection Usage
+
+In your objective function file (e.g. @file{objfunc.c}), the
+@code{application()} or the @code{app_init()} function should initialise the
+GE_ILLIGALSGA wrapper. To do so, code similar to the following should be
+used on the body of the function:
+
+@example
+GE_ILLIGALSGA_setMaxWraps(10); /* set max wrap events to 10 */
+if (!GE_ILLIGALSGA_readBNFFile("grammar.bnf"))@{
+        fprintf(stderr,"Call to GE_ILLIGALSGA_readBNFFile failed.\n");
+        fprintf(stderr,"Execution aborted.\n");
+        exit(0);
+@}
+@end example
+
+These functions are self-explanatory. In the
+@code{objfunc(struct individual *critter)} function, the following calls to
+the wrapper should be made:
+
+@example
+/* Map critter, using 8 bits per codon */
+GE_ILLIGALSGA_Mapper(critter,lchrom,8);
+if(GE_ILLIGALSGA_validPhenotype())@{
+        int phenotype_size;
+        char *characters;
+        phenotype_size=GE_ILLIGALSGA_getPhenotype(&characters);
+        /* Insert evaluation of phenotype here */
+@}
+@end example
+
+The @code{GE_ILLIGALSGA_Mapper} function receives a @code{struct individual*}
+data structure, its length, and the number of bits to use per codon; it assigns
+the genotype (represented by 'critter') to a mapper structure, and performs
+the genotype to phenotype mapping.
+The @code{GE_ILLIGALSGA_getPhenotype} function retrieves the current phenotype
+structure of the mapper.
+
+To build the sga code, compile all files as normal. When linking, use the
+libGE library (either by the @kbd{-lGE} flag or by its full path) and make
+sure to use a C++ compiler.
+

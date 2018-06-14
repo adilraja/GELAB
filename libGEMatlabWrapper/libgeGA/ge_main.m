@@ -1,16 +1,16 @@
 %This is the main file to run ge.
 function [pop, best]=ge_main(numgens, popsize, data, genome_length)
     if(exist('numgens', 'var')==0)
-        numgens=50;
+        numgens=150;
     end
     if(exist('popsize', 'var')==0)
-        popsize=100;
+        popsize=1000;
     end
     if(exist('data', 'var')==0)
         data=ge_load_dataset('trainingDataX.txt', 'trainingDataY.txt', 'testingDataX.txt', 'testingDataY.txt');
     end
     if(exist('genomelength', 'var')==0)
-        genome_length=500;
+        genome_length=3200;
     end
     
     %Load the grammar, you are going to need it.

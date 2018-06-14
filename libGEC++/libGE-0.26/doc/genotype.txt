@@ -1,0 +1,30 @@
+
+
+--------------------------------------------------------------------------------
+|                                  Genotype                                    |
+|------------------------------------------------------------------------------|
+| - _libGE_Genotype_valid: bool = false                                        |
+| - _libGE_Genotype_fitness: FitnessType = MIN_GENOTYPE_FITNESS                |
+| - _libGE_Genotype_maxCodonValue: CodonType = INT_MAX                         |
+| - _libGE_Genotype_effectiveSize: unsigned int = 0                            |
+| - _libGE_Genotype_wraps: unsigned int = 0                                    |
+|------------------------------------------------------------------------------|
+| + Genotype(const int *, const unsigned int, const bool, const FitnessType)   |
+| + Genotype(const vector<CodonType>&, const bool, const FitnessType)          |
+| + Genotype(const CodonType)                                                  |
+| + Genotype(const Genotype &)                                                 |
+| + ~Genotype()                                                                |
+| + getValid(): bool                                                           |
+| + setValid(const bool): void                                                 |
+| + getFitness(): FitnessType                                                  |
+| + setFitness(const FitnessType): void                                        |
+| + getMaxCodonValue(): CodonType                                              |
+| + setMaxCodonValue(const CodonType): void                                    |
+| + getEffectiveSize(): unsigned int                                           |
+| + setEffectiveSize(const unsigned int): void                                 |
+| + getWraps(): unsigned int                                                   |
+| + setWraps(const unsigned int): void                                         |
+| - operator<<(ostream &, const Genotype &): ostream &                         |
+--------------------------------------------------------------------------------
+
+

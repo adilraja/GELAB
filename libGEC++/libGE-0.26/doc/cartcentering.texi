@@ -1,0 +1,1040 @@
+@c --- Cart Centering Problem ---
+@section Cart Centering Problem
+
+@menu
+* Cart Centering Optimal Solution::  The optimal solution for the cart centering problem.
+* Cart Centering Grammar::      The grammar used for this example.
+* EXAMPLES/CartCentering/GEcart.c::  
+* EXAMPLES/CartCentering/cartcenterstart.c::  
+* EXAMPLES/CartCentering/cartcenterend.c::  
+* EXAMPLES/CartCentering/WrappedCPhenotype::  
+* Cart Centering Implementation with GE_ILLIGALSGA::  Implementation of problem using the sga code from IlliGAL.
+* Cart Centering Implementation with GE_MITGALIB::  Implementation of problem using GALib.
+* Cart Centering Implementation with GE_EO::  Implementation of problem using the EO library.
+* Cart Centering Performance::  
+@end menu
+
+The cart centering problem is a control optimisation problem in which an object of fixed mass, often referred to as a wheeled cart, must achieve a state of rest at the center of a one-dimensional track in minimal time. The state of the cart at any time can be described by two variables: its velocity along the track @math{v}; and its position relative to the center of the track @math{x}. The state of the cart can be changed by the control variable @math{u}. This value represents the direction in which a force @math{f} of constant magnitude is applied to the cart. The control variable is limited to either +1 or -1, with a positive value resulting in the application of the force in the positive direction, and a negative value resulting in the application of the force in the negative direction. The force is referred to as the @emph{bang-bang force} and depending on the current state of the cart, has the effect of either accelerating or decelerating its velocity on the track. The problem posed is therefore the generation of a control function which achieves a state of rest at the center of the track in minimal time.
+
+In this implementation, the effect of the control variable on the state of the cart is simulated by re-evaluating the control expression after a specific interval, called a time-step, until a maximum time limit elapses, or the cart achieves the target state.
+
+The change in state due to the bang-bang force after each time-step is calculated using the Euler approximations of higher order differential equations. The following describes the steps taken to calculate the change in state using this method.
+
+First, the following equation for Newton's second law of motion is applied:
+
+@math{a(t) = F(t) / m}
+
+@noindent
+in which @math{a(t)} is the acceleration of the cart due to the bang-bang force at the current time-step @math{t}, @math{F(t)} is the magnitude of the force applied at the current time-step, and @math{m} is the mass of the cart.
+
+Once the acceleration is known, we can calculate the velocity part of the new state of the cart at the next time-step (@math{t + \tau}) using the following equation.
+
+@math{v(t + \tau) = v(t) + \tau a(t)}
+
+The new position of the cart can then be calculated using:
+
+@math{x(t+ \tau) = x(t) + \tau v(t)}
+
+The value of the time-step @math{\tau} can contribute significantly to the amount of error produced by these equations. As a result, this value is usually kept small (@math{0.0 < \tau <= 0.2}).
+
+The values @math{x(t + \tau)} and @math{v(t + \tau)} describe the state of the cart after the force is applied. The Euclidean distance between this state and the target state can be calculated using the following equation.
+
+@math{\epsilon = \sqrt{(x_{curr} - x_{target})^{2} + (v_{curr} - v_{target})^{2}}}
+
+@noindent
+in which @math{x_{curr}} and @math{v_{curr}} represent the current state of the cart, and @math{x_{target}} and @math{v_{target}} represent the target state. In typical implementations, the target position is the origin and the target velocity is 0.0. The cart is said to have achieved the target state when @math{epsilon = 0.0}.
+
+In most implementations of this problem however, the distance between the current and target state is compared with a maximum threshold value. If the distance is less than this value, then the cart is said to have achieved the target state. The optimal solution then becomes that which reduces the distance between current target states to the threshold distance in minimal time. The number of time-steps is also limited to a maximum simulation time @math{t_{max}}.
+
+
+@c --- Cart Centering Optimal Solution ---
+@node Cart Centering Optimal Solution, Cart Centering Grammar,,Cart Centering Problem
+@subsection The Optimal Solution
+
+The optimal solution to the cart centering problem must achieve the target cart state from any initial state in minimal time. The solution shown in the next set of equations is proven to be optimal for the cart centering problem and was successfully evolved using Genetic Programming (GP) by Koza. This equations show how the value of the control variable is calculated from the current state of the cart.
+
+@math{ u(t) = +1, -x(t) > v(t)^{2} @ Sign @ v(t) }
+
+@math{ u(t) = -1  -x(t) < v(t)^{2} @ Sign @ v(t) }
+
+The @emph{Sign} function returns @math{+1.0} if the argument is a positive integer and @math{-1.0} if the argument is less than or equal to zero.
+
+Note: in their paper on the use of Grammatical Evolution (GE) for this problem, Azad et al. found many solutions which appeared to be more successful than this (Azad et al. 2002).
+
+@c --- Cart Centering Grammar ---
+@node Cart Centering Grammar, EXAMPLES/CartCentering/GEcart.c, Cart Centering Optimal Solution,Cart Centering Problem
+@subsection Grammar
+
+Four BNF grammars are supplied with the cart centering example in the libGE distribution. These grammars differ in the number of non-terminals and the number of production rules used to structure the language of the problem. An example grammar is shown below:
+
+@verbatim
+
+<expr>  ::= (<expr> <op> <expr>)
+        | DIV(<expr>, <expr>)
+        | ABS(<expr>)
+        | GT(<expr>, <expr>)
+        | <var>
+<op>    ::= + | - | *
+<var>   ::= X | V | (-1.0)
+
+@end verbatim
+
+In this grammar, the terminal @code{DIV} is a protected version of the standard division arithmetic operator in which division by zero is prevented, the terminal @code{ABS} performs the same functions as the @code{fabs} function found in the C language, and the terminals @code{X} and @code{V} describe the current state of the cart. The remaining non-terminals @code{+}, @code{-}, @code{*}, @code{>} are arithmetic operators. Floating point data types are used for all operations and variables. This and other example grammars for the cart centering problem can be found in the directory: @file{EXAMPLES/CartCentering/grammars}
+
+
+@c --- EXAMPLES/CartCentering/GEcart.c ---
+@node EXAMPLES/CartCentering/GEcart.c, EXAMPLES/CartCentering/cartcenterstart.c, Cart Centering Grammar,Cart Centering Problem
+@subsection @file{GEcart.c}
+
+The file @file{GEcart.c} provides a number of variable and function declarations that are required to evaluate GALib individuals using the GCC, TCC, and libTCC backends. This section documents the use of each of these functions and variables in the cart centering problem. The following list describes each variable and its purpose.
+
+@itemize
+@item @code{X}: the current position of the cart. This variable is specified in the grammar as a terminal.
+@item @code{V}: the current velocity of the cart. This variable is specified in the grammar as a terminal.
+@item @code{currTime}: the current time.
+@item @code{numFitCase}: the number of fitness cases to be tested.
+@item @code{startValuesArray}: a 2-D array containing the initial position and velocity values for each of the fitness cases. Initial values for twenty fitness cases are provided as an example in this file.
+@item @code{numFitCase}: the index of the current fitness case being tested.
+@item @code{sumFitCaseTimes}: the total time required by all completed fitness cases.
+@item @code{hitCount}: the number of fitness cases for which a solution was found that centered the cart before the maximum time elapsed.
+@item @code{maxTime}: the maximum time allowed to center the cart.
+@item @code{overMaxTimePenalty}: the time penalty added to the @code{sumFitCaseTimes} variable if the cart is not centered before the maximum time elapses.
+@item @code{maxHitEuclError}: the maximum euclidean distance allowed between the cart's state and the target state (0,0) for a hit to be registered.
+@item @code{currEuclError}: the euclidean distance between the cart's current state and the target state (0, 0).
+@item @code{timeStep}: the amount of time to advance at each simulation step.
+@item @code{posForceVelChange}: the effect on the velocity of the cart due to a positive bang-bang force.
+@item @code{negForceVelChange}: the effect on the velocity of the cart due to a negative bang-bang force.
+@item @code{velocityChange}: the effect on velocity of the last force applied to the cart i.e. stores either the value of @code{posForceVelChange} or @code{negForceVelChange}.
+@end itemize
+
+The function @code{initCart} must be called before simulation starts. It initialises the variables relating to fitness cases and invokes the @code{resetCart} function.
+
+The @code{resetCart} function sets the value of the variables @code{X} and @code{V} to the initial values specified in the current fitness case (see variable @code{startValuesArray}). The initial euclidean distance is also calculated. This function must also be called before simulation starts.
+
+The function @code{stepSim} steps the simulation by one @code{timeStep}. The effect of applying the force to the cart is simulated by adding the value in the variable @code{velocityChange} to the current velocity variable @code{V}. The current position @code{X} is also recalculated based on the new velocity. The current time variable (@code{currTime}) is then updated and the euclidean distance between the current and target states of the cart is calculated and stored in @code{currEuclError}. If the distance is less than @code{maxHitEuclError}, the cart has achieved the target state and the simulation stops. The current time is added to the total time required for all previous fitness cases (@code{sumFitCaseTimes}) and the hit counter @code{hitCount} is incremented by one. The fitness case index @code{currFitCase} is also incremented by one and the function @code{resetCart} is then called to the set the initial values of the cart's state for the next fitness case.
+
+If the distance is greater than @code{maxHitEuclError}, the current time is compared with the maximum allowed time @code{maxTime}. If it is less than the maximum time, the function simply exits. If the maximum time has elapsed however, the value @code{overMaxTimePenalty} is added to the current fitness case total @code{sumFitCaseTimes}. The fitness case index @code{currFitCase} is then incremented by one and the function @code{resetCart} is called.
+
+The binary function @code{DIV} is a protected form of the division operator which returns a value of 1.0 if the denominator is 0.0. The binary function @code{GT} compares the two arguments and returns 1.0 if the first argument is greater than the second or -1.0 otherwise. The unary function @code{ABS} returns the absolute value of the argument e.g. @math{ABS(-3.5)=3.5}. These three functions are specified in the grammar as terminals.
+
+
+@c --- EXAMPLES/CartCentering/cartcenterstart.c ---
+@node EXAMPLES/CartCentering/cartcenterstart.c, EXAMPLES/CartCentering/cartcenterend.c, EXAMPLES/CartCentering/GEcart.c,Cart Centering Problem
+@subsection @file{cartcenterstart.c}
+
+The file @file{cartcenterstart.c} contains the C code that is prepended to a GE phenotype at the evaluation stage and contains a number of references to the functions and variables declared in @file{GEcart.c}. It also contains the start of the @code{main} function which is called when the compiled program is executed. This function calls the @code{initCart} and @code{resetCart} function described in the previous section.
+
+The function then constructs a while loop to execute the simulation for each fitness case. A fitness case in this example is a pair of initial position and velocity values i.e. a fitness case defines the initial state of the cart.
+
+The body of the loop only contains the start of an @code{if} statement in order to allow the insertion of the GE phenotype expression at compile time. Once the phenotype is inserted, further C code is required to form a valid C program. That code is described in @ref{EXAMPLES/CartCentering/cartcenterend.c}.
+
+
+@c --- EXAMPLES/CartCentering/cartcenterend.c ---
+@node EXAMPLES/CartCentering/cartcenterend.c, EXAMPLES/CartCentering/WrappedCPhenotype, EXAMPLES/CartCentering/cartcenterstart.c,Cart Centering Problem
+@subsection @file{cartcenterend.c}
+
+The code in the file @file{cartcenterend.c} completes the @code{if} statement started in the file @file{cartcenterstart.c} (@pxref{EXAMPLES/CartCentering/cartcenterstart.c}). If the value of the phenotype expression is greater than 0.0, then a positive force is applied to the cart. If the value is less than or equal to 0.0, then a negative force is applied. Forces are applied by assigning the value @code{posForceVelChange} or @code{negForceVelChange} to the variable @code{velocityChange}. The function @code{stepSim} is then called to advance the simulation by one time step.
+
+Once the while loop condition evaluates to false, the total time taken to center the cart for all the fitness cases (@code{sumFitCaseTimes}) and the number of hits achieved (@code{hitCount}) are printed to standard output.
+
+
+@c --- EXAMPLES/CartCentering/WrappedCPhenotype ---
+@node EXAMPLES/CartCentering/WrappedCPhenotype, Cart Centering Implementation with GE_ILLIGALSGA, EXAMPLES/CartCentering/cartcenterend.c,Cart Centering Problem
+@subsection Example wrapped C phenotype
+
+The following code segment shows Koza's optimum solution prepended and appended with the start and end code described previously.
+
+@verbatim
+
+int main(void)
+{
+  initCart();
+  resetCart();
+  while (currFitCase < numFitCase)
+  {
+    if (GT(((-1.0) * X), (V * (ABS(V)))) > 0.0)
+    {
+      velocityChange = posForceVelChange;
+    }
+    else
+    {
+      velocityChange = negForceVelChange;
+    }
+
+    stepSim();
+  }
+
+  printf("%f %d\n",
+         sumFitCaseTimes,
+         hitCount);
+
+  return (0);
+}
+
+@end verbatim
+
+
+@c --- Cart Centering Implementation with GE_ILLIGALSGA ---
+@node Cart Centering Implementation with GE_ILLIGALSGA, Cart Centering Implementation with GE_MITGALIB, EXAMPLES/CartCentering/WrappedCPhenotype,Cart Centering Problem
+@subsection GE_ILLIGALSGA
+
+@menu
+* EXAMPLES/CartCentering/GE_ILLIGALSGA/app.c::  Integration of libGE into objective function.
+* EXAMPLES/CartCentering/GE_ILLIGALSGA/Makefile::  Linking libGE with sga.
+@end menu
+
+The ILLIGAL SGA implementation of the cart centering problem using libGE can be found in @file{EXAMPLES/CartCentering/GE_ILLIGALSGA}. In order to use this problem, you will need to replace the appropriate files in your distribution of the sga-c code with the files provided. The following sections describe the various files provided in the ILLIGAL SGA cart centering example.
+
+@c --- EXAMPLES/CartCentering/GE_ILLIGALSGA/app.c ---
+@node EXAMPLES/CartCentering/GE_ILLIGALSGA/app.c, EXAMPLES/CartCentering/GE_ILLIGALSGA/Makefile,, Cart Centering Implementation with GE_ILLIGALSGA
+@subsubsection @file{app.c}
+
+@cindex Genotypic structure
+@findex app_init()
+@findex objfunc()
+This file contains the source code required to run the cart centering
+problem with the sga-c code using the GCC C compiler for the evolved phenotype
+strings. This file contains definitions for the functions @code{app_init} and @code{objfunc} which are required by sga-c. A new type called @code{Real} is declared at the top of this file as a substitute for the type @code{float}. The function @code{objfunc} uses this type to store the result of the phenotype execution. The @code{typedef} is provided here as a facility in case greater precision is required.
+
+The function @code{app_init} is responsible for initialising the libGE mapper, load the BNF grammar, and prepare any resources required by the function @code{objfunc}. It starts by setting the maximum number of wrapping events allowed, through a call to the wrapper function @code{GE_ILLIGALSGA_setMaxWraps} It then loads the grammar file into the mapper using the function @code{GE_ILLIGALSGA_readBNF}. If this operation fails, an error is printed to standard error output and the program exits.
+
+The function then loads the contents of two files into character arrays. The files @file{cartcenterstart.c} and @file{cartcenterend.c} contain the C code that is prepended and appended to the phenotype code to construct a valid and compilable C program. The content is loaded into the character arrays @code{CCstart} and @code{CCend}. If either of these operations fail, an error message is printed and the program exits.  These files are discussed in more detail in @ref{EXAMPLES/CartCentering/cartcenterstart.c} and @ref{EXAMPLES/CartCentering/cartcenterend.c}.
+
+The function @code{objfunc} contains the code to map the genotypic
+structure passed as an argument onto a phenotypic structure and and to evaluate that phenotype using the GCC compiler. It starts by assigning the @code{struct individual}
+passed as an argument to the GE mapper using the function @code{GE_ILLIGALSGA_Mapper}. The validity of the phenotype generated by the mapper is then accessed by calling the function  @code{GE_ILLIGALSGA_validPhenotype}. If the phenotype is not valid, a fitness of 0 is assigned to the individual and the function exits. If the phenotype is valid, then evaluation can continue.
+
+Evaluation of the phenotype is carried out by creating a plain text file called @file{individual.c} and writing the phenotype code wrapped with the start and end code read into the @code{CCstart} and @code{CCend} char buffers in the function @code{app_init}. Once the concatenated program code has been written to the file it is closed and compiled using by invoking a system call to the C compiler.
+
+The actual compiler used is dependent on the definition of a preprocessor macro. If the macro @code{GECART_USE_TCC_COMP} is defined, then the TinyCC compiler @code{tcc} is used to compile the file. If this macro is not defined however, the GNU compiler @code{gcc} is used. The system call comprises the name of the compiler program, the name of the file containing the phenotype and wrapper code (in this case @file{individual.c}), and a directive to link the resulting executable with the math library @file{m} and the object file @code{GEcart.o}. The source file of this object, called @file{GEcart.c} contains functions and variables that are required by the phenotype code in order to perform the cart centering simulation. For more information on this file, see @ref{EXAMPLES/CartCentering/GEcart.c}. The system call also invokes the execution of the compiled program and redirects all standard output to a file called @code{result}. If any of these operations fail, the program prints an error message and exits.
+
+If the previous operations were successful, the file @code{result} should contain the total time required to center the cart for the fitness cases defined in @file{GEcart.c}. The fitness value is read from the file and assigned to the variable @code{fitness}. The value is then inverted because the problem requires that the total time taken to center and stop the cart be minimised. Inverting the value allows a fitness-maximising GA to interpret the fitness correctly. The value is then assigned to the fitness field in the @code{struct individual} passed as an argument to the function.
+
+
+@c --- EXAMPLES/CartCentering/GE_ILLIGALSGA/Makefile ---
+@node EXAMPLES/CartCentering/GE_ILLIGALSGA/Makefile,  , EXAMPLES/CartCentering/GE_ILLIGALSGA/app.c, Cart Centering Implementation with GE_ILLIGALSGA
+@subsubsection @file{Makefile}
+
+The file @file{Makefile} distributed with this example shows how to link the sga-c code to the libGE library.
+
+Few changes are required to the original Makefile, distributed with the sga-c
+code. The @code{LDLIBS} variable must include @kbd{-lGE}; both the
+@file{GEant.c} and @file{GEtrail.c} files must be compiled (with a C
+compiler); and the linking of all object files should be done with a C++
+compiler (in the file provided, the @command{g++} compiler is used).
+
+
+@page
+@c --- Cart Centering Implementation with GE_MITGALIB ---
+@node Cart Centering Implementation with GE_MITGALIB, Cart Centering Implementation with GE_EO, Cart Centering Implementation with GE_ILLIGALSGA,Cart Centering Problem
+@subsection GE_MITGALIB
+
+@menu
+* Cart Centering GALib Example User Guide::  User guide to the GALib library example.
+* EXAMPLES/CartCentering/GE_MITGALIB/main.cpp::  GALib and libGE settings, plus evolutionary search parameters.
+* EXAMPLES/CartCentering/GE_MITGALIB/initfunc.cpp::  Initialisation functions.
+* EXAMPLES/CartCentering/GE_MITGALIB/GEListGenome.h::  GE specific genome.
+* EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-gcc.cpp::  Implementation using gcc as the evaluator.
+* EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-slang.cpp::  Implementation using slang as the evaluator.
+* EXAMPLES/CartCentering/GE_MITGALIB/GEcart.sl::  Variables and functions required to evaluate phenotype with slang.
+* EXAMPLES/CartCentering/GE_MITGALIB/SLangStartCode::  
+* EXAMPLES/CartCentering/GE_MITGALIB/SLangEndCode::  
+* EXAMPLES/CartCentering/GE_MITGALIB/WrappedSlangPhenotype::  
+* EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-libtcc.cpp::  
+* EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-lua.cpp::  Implementation using lua as the evaluator.
+* EXAMPLES/CartCentering/GE_MITGALIB/GEcart.lua::  Variables and functions required to evaluate phenotype with lua.
+* EXAMPLES/CartCentering/GE_MITGALIB/LuaStartCode::  
+* EXAMPLES/CartCentering/GE_MITGALIB/LuaEndCode::  
+* EXAMPLES/CartCentering/GE_MITGALIB/WrappedLuaPhenotype::  
+* EXAMPLES/CartCentering/GE_MITGALIB/Makefile::  Linking GALib with libGE (and possibly slang).
+@end menu
+
+The example using MIT's GALib library can be found in @file{EXAMPLES/CartCentering/GE_MITGALIB}. The following sections contain a user's guide and a description of the files in this example.
+
+@c --- Cart Centering GALib Example User Guide ---
+@node Cart Centering GALib Example User Guide, EXAMPLES/CartCentering/GE_MITGALIB/main.cpp,, Cart Centering Implementation with GE_MITGALIB
+@subsubsection GALib Example User Guide
+
+This example uses the standard @code{GAParameterList} for passing arguments to specify the parameters of the run. The paramaters specific to GE can also be specified on the command line.
+
+Parameters are passed to the executable in the following fashion:
+
+@command{./executable <param_name> <value>}
+
+The following list shows the parameters accepted by GALib with their default values:
+
+@itemize
+@item popsize: population size (default is 100);
+@item ngen: population size (default is 10);
+@item pcross: crossover probability (default is 0.9);
+@item pmut: mutation probability (default is 0.01);
+@item prepl: steady-state replacement strategy (default is 1.0);
+@item sfreq: how often to record scores (generation interval) (default is 1);
+@item ffreq: how often to dump scores to file (generation interval) (default is 1);
+@item sfile: name of score data file (default is "cc-output.dat");
+@item setttings_file: the name of a file with GALib configuration parameters;
+@end itemize
+
+@noindent
+All other parameters are set to the GALib defaults (check the GALib
+documentation for more details).
+
+The following parameters specific to GE can also be specified on the command line.
+
+@itemize
+@item seed: random seed to be used both by GALib and libGE (default is random);
+@item grammar: grammar file to use (default is "grammar.bnf");
+@item wrap: number of wrapping events (default is 0);
+@item sensible: use sensible initialisation instead of random (default is 0);
+@item min: minimum genotype size for random initialisation (default is 15);
+@item max: maximum genotype size for random initialisation (default is 25);
+@item grow: grow rate for sensible initialisation (default is 0.5);
+@item maxDepth: maximum tree depth for sensible initialisation (default is 10);
+@item tailSize: tail size for sensible initialisation (default is 0);
+@item tailRatio: tail ratio for sensible initialisation (default is 0.0);
+@item effective: use effective crossover instead of one point crossover (default is 0);
+
+@end itemize
+
+For example, to run the @command{GELUA} implementation, using the grammar file
+"grammar-lua.bnf", with a population size of 500 individuals, for 50
+generations, using random seed 1234, and leaving all other parameters to standard values, the command to execute is:
+
+@command{GELUA grammar grammar-lua.bnf popsize 500 ngen 50 seed 1234}
+
+
+@c --- EXAMPLES/CartCentering/GE_MITGALIB/main.cpp ---
+@node EXAMPLES/CartCentering/GE_MITGALIB/main.cpp, EXAMPLES/CartCentering/GE_MITGALIB/initfunc.cpp, Cart Centering GALib Example User Guide, Cart Centering Implementation with GE_MITGALIB
+@subsubsection @file{main.cpp}
+
+@findex objfunc()
+This file drives the GALib evolutionary process. It starts with the declaration of all functions required to set up and perform the GALib evolution, a @code{GEGrammarSI} genotype-to-phenotype mapper, global integers specifying the minimum and maximum size information for random initialisation, and a counter for the number of objective function calls made by GALib.
+
+The most important element of this file however is the function @code{main}. After displaying the current version of libGE, the function creates the variables for the parameters specific to GE e.g. the location of the grammar file, the maximum number of wrapping events allowed, the use of sensible initialisation, etc. Additional variables are created to store the location of a GALib parameters file and the random seed to use. Each of the arguments passed to the program on the command line are then read and values are assigned to the variables when matched.
+
+A @code{GAParameterList} is then created to specify defaults for a number of GALib parameters including population size, number of generations, crossover and mutation probabilities, etc. If a settings file was specified on the command line, parameters are read from this file by calling the @code{GAParameterList::read} member function.
+
+Once the parameters have been read, the genome structure is created. In this example, a class called @code{GEListGenome} is provided (in files @file{GEListGenome.h} and @file{GEListGenome.cpp}) which derives from the GALib class @code{GAListGenome}.
+
+@findex initFuncRandom()
+@findex initFuncSI()
+@findex OnePointCrossover()
+@findex effCrossover()
+@findex PointMutator()
+The function @code{main} then specifies the genetic operators to be employed during the evolution process. The most important of all operators, the fitness operator, is associated with the genome using the member function @code{GAListGenome::evaluator}.
+
+A number of fitness function implementations are provided in the cart centering example for GALib which use a different backend platform to evaluate the GE phenotype. Each of the evaluation backends are implemented in files named @file{cartcenter-*.cpp} with @file{*} replaced by the name of the backend e.g. @file{cartcenter-slang.cpp}. The fitness functions in these files, which are all called @code{objfunc}, implement the function interface required by GALib i.e. they must take a single argument of a GAGenome and return a fitness value. The particular backend fitness function that called at execution time is determined during compilation process. It is therefore sufficient at this point to associate the function name @code{objfunc} with the genome using the function @code{GAListGenome::evaluator}. The compilation process is described in more detail later in this section.
+
+The initialisation operator is specified next using the @code{GAGenome::initialiser} member function. This operator is executed once to generate the initial population (also known as generation 0) of the evolution. In this example, the random initialiser (@code{initFuncRandom()} is the default operator used. Alternatively, sensible initialisation of the population can be specified by supplying the function @code{initFuncSI()} to the @code{GAGenome::initialiser} member function. Both of these initialisation functions are declared in the file @file{initfunc.h} and defined in the file @file{initfunc.cpp},
+
+Two crossover operators are also available in this example. The default operator, implemented in the function @code{GAListGenome::OnePointCrossover}, is part of GALib and provides standard crossover functionality. The other operator, implemented in the function @code{GEListGenome::effCrossover} limits the crossover point to locations within the effective region of the genotype. This operator and the mutation operator @code{GEListGenome::pointMutator} are declared in the @file{GEListGenome.h} and defined in @file{GEListGenome.cpp}. The crossover and mutation operators are associated with the GALib genome using the @code{GAGenome::crossover} and @code{GAGenome::mutation} member functions respectively.
+
+@findex app_init()
+Once all operators have been specified, the @code{main} function calls the function @code{app_init()}. This function, implemented for each of the backend evaluators supplied in this example, is responsible for initialising the GE mapper, loading the BNF grammar, and preparing the backend for the task of evaluating GE phenotypes. These function implementations are described in further detail in the next section.
+
+The @code{main} function then creates an instance of a GALib @code{GAStedyStateGA} which is a steady-state genetic algorithm. The parameters of the GA are set by passing the @code{GAParameterList} instance to the @code{parameters} member function. The GE mapper is also initialised, using either the default values or the values obtained when parsing the command-line arguments. The statistics recording facility of the GA is then customised. Finally, the function @code{main} calls the @code{initialize()} member function to initialise the GA and prepare it for evolution.
+
+The evolutionary cycle is controlled by a @code{while} loop which keeps calling the function @code{step} while the function @code{done} returns false. After each generation, a number of statistics are printed to the file stream.
+
+@findex print_individual()
+Finally, once the evolution is finished, the statistical data is dumped onto
+the screen, as is the best individual of the population (through a call to the
+function @code{print_individual()}, defined in the files @file{cart-*.cpp}).
+
+
+@c --- EXAMPLES/CartCentering/GE_MITGALIB/initfunc.cpp ---
+@node EXAMPLES/CartCentering/GE_MITGALIB/initfunc.cpp, EXAMPLES/CartCentering/GE_MITGALIB/GEListGenome.h, EXAMPLES/CartCentering/GE_MITGALIB/main.cpp, Cart Centering Implementation with GE_MITGALIB
+@subsubsection @file{initfunc.cpp}
+
+@findex initFuncRandom()
+This file contains the two specific initialisation functions designed for this
+example, @code{initFuncRandom()} and @code{initFuncSI()}. The first function randomly initialises each genome in the population. It starts by
+destroying any data possibly contained in an individual and then chooses a number between @code{minSize} and @code{maxSize} (declared and initialised in
+@file{main.cpp}) for its size. It then initialises each gene to a number between 0 and 255, starting with the head of the list.
+
+@findex initFuncSI()
+@findex GEGrammarSI.init()
+@findex init(), GEGrammarSI
+The second function (@code{initFuncSI()}) can be called to use libGE's
+sensible initialisation routines to initialise each genome in the population.
+It starts by destroying any data possibly contained in an individual and then
+uses the @code{init()} method from the mapper to apply the sensible
+initialisation routines. If successful, each codon from the mapper's
+@code{Genotype} structure is then copied into the genome.
+
+
+@c --- EXAMPLES/CartCentering/GE_MITGALIB/GEListGenome.h ---
+@node EXAMPLES/CartCentering/GE_MITGALIB/GEListGenome.h, EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-gcc.cpp, EXAMPLES/CartCentering/GE_MITGALIB/initfunc.cpp, Cart Centering Implementation with GE_MITGALIB
+@subsubsection @file{GEListGenome.h}
+
+This file declares the @code{GEListGenome} class, which is the genome used in
+the cart centering example. It derives from GALib's @code{GAListGenome} class, using the type
+@code{unsigned char} as its elements, as an @code{unsigned char} is usually
+composed of eight bits, which is the standard number of bits per gene used in
+Grammatical Evolution.
+
+@findex getEffectiveSize()
+@findex setEffectiveSize()
+@findex effCrossover()
+@findex pointMutator()
+This class extends the @code{GAListGenome} by allowing the genome to record its
+effective length, that is, the portion of the genome that was actually used
+during the mapping process. It also provides two methods, @code{effCrossover()}
+and @code{pointMutator()}, which implement a crossover restricted to the
+effective lengths of the genomes and GE's standard bit-level mutation,
+respectively. The class also provides a number of functions required for correct operation with GALib including a copy constructor and the @code{clone}, @code{copy}, and @code{equal} functions. The implementation of all these functions is in the file @file{GEListGenome.cpp}.
+
+@c --- EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-gcc.cpp ---
+@node EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-gcc.cpp, EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-slang.cpp, EXAMPLES/CartCentering/GE_MITGALIB/GEListGenome.h, Cart Centering Implementation with GE_MITGALIB
+@subsubsection @file{cartcenter-gcc.cpp}
+
+The file @file{cartcenter-gcc.cpp} contains the functions directly related to the evaluation of each GALib individual, made specifically for usage with the GCC compiler. The following section describes the various files and functions that are part of the C backend for the cart centering example. This section also describes how the default compiler, GCC, can be exchanged for another C compiler called TCC (from the TinyCC distribution).
+.
+@findex app_init()
+The @code{app_init} function, called from the function @code{main}, is responsible for initialising the GE mapper and setting up the C evaluation backend.
+
+The @code{GEGrammarSI} @code{mapper} object, which is declared in the @file{main.cpp}, is initialised by specifying the maximum number of mapping wraps and loading the BNF grammar using the member function @code{readBNFFile}. Both the number of wrapping events and the path to the grammar file are specified in parameters to @code{app_init}. If the grammar fails to load, an error message is printed to the standard error stream (@code{std::cerr}) and the program exits.
+
+The next task in this function is to load the code that will be placed before and after the phenotype which is contained in the files @file{cartcenterstart.c} and @file{cartcenterend.c}. The function loads the contents of these files into the @code{CCstart} and @code{CCend} buffers (character arrays). These buffers are then used in the @code{objfunc} function for every individual that is evaluated using the C compiler backend. For more information about these files, @pxref{EXAMPLES/CartCentering/cartcenterstart.c}, and @ref{EXAMPLES/CartCentering/cartcenterend.c}.
+
+@findex objfunc()
+The function @code{objfunc} provides the definition of the evaluation operator required by GALib. This function takes one argument of type @code{GAGenome} and returns a floating point value representing the fitness awarded to that @code{GAGenome} object. In order to evaluate the genome, the GAGenome object has to be cast into its derived type (@code{GEListGenome}). This allows the extra member functions specified in the class @code{GEListGenome} to be used in this function.
+
+Once cast, the @code{GEListGenome} is then assigned to the @code{mapper} object. A libGE @code{Phenotype} is then extracted from the same @code{mapper} object. If the phenotype is invalid, a fitness value of 0.0 is returned and the function exits. If the phenotype is valid, the full executable code needs to be constructed so that the phenotype can be evaluated in the C backend.
+
+The first step in this process is to create a new empty file called @file{individual.c}. The contents of the buffer @code{CCstart} are written out to this file, followed by the contents of the phenotype, followed by the contents of the buffer @code{CCend}. The file @file{individual.c} is then closed. An example @file{individual.c} file is shown in @ref{EXAMPLES/CartCentering/WrappedCPhenotype}.
+
+At this point, the file contains a full valid C program which should be compilable by any C compiler. In this example, two different C compilers can be used: GCC and TinyCC. If the macro @code{GECART_USE_TCC_COMP} was defined when the file @file{cartcenter-gcc.cpp} was compiled, then the TinyCC C compiler (called @code{tcc}) is used. If the macro was not defined, the GNU C compiler (called @code{gcc}) is used. The compiler program is called by invoking a @code{system} call with the name of the compiler program and the name of the file containing the phenotype and wrapper code i.e. @file{individual.c}. The phenotype file is also linked with the object file produced by the compilation of the file @code{GEcart.c}. The @code{system} call also invokes the execution of the compiled program and redirects all standard output to a file called @file{result}. If the program compiles and the program runs successfully, the file @file{result} should contain the total time required to center the cart for the fitness cases defined for the problem.
+
+To extract this time value, the result file is opened and the first floating point value found is assigned to the variable @code{fitness}. The result file is then closed.
+
+This fitness is then inverted because the problem requires that the total time take to center and stop the cart be minimised. Inverting the value provides GALib with the correct fitness format i.e. GALib is a maximising GA whereas the goal of the cart centering problem is to minimise the total time taken. Before the function returns this value, it sets the effective size of the genotype in the genome object. This value is used by the effective crossover operator.
+
+Finally, the fitness is returned and the function exits.
+
+@findex print_individual()
+Finally, the @code{print_individual} function receives a genome as argument,
+performs its mapping to a phenotype structure, and prints it onto the screen,
+along with measurements of the genotype, generated phenotype, and the mapping
+process itself.
+
+@c --- EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-slang.cpp ---
+@node EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-slang.cpp, EXAMPLES/CartCentering/GE_MITGALIB/GEcart.sl, EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-gcc.cpp, Cart Centering Implementation with GE_MITGALIB
+@subsubsection @file{cartcenter-slang.cpp}
+
+This file contains the functions related to the evaluation of each GALib individual using the S-Lang runtime. The following section describes the various files and functions that are part of the S-Lang backend for the cart centering example.
+
+@findex app_init()
+The @code{app_init} function, called from the @code{main} function, is responsible for initialising the libGE mapper and initialising the S-Lang interpreter.
+
+The @code{GEGrammarSI} mapper object used in this function is declared in the file @file{main.cpp}. The number of wrapping events and the path to the grammar are supplied in parameters to this function. The @code{mapper} object is initialised by specifying the maximum number of mapping wraps and loading the BNF grammar file using the @code{readBNFFile} member function. If the process of loading the grammar fails, an error message is printed to the standard error stream (@code{std::cerr}) and the program exits.
+
+@findex SLang_init_slang()
+@findex SLang_init_stdio()
+@findex SLang_init_slmath()
+The function initialises the S-Lang environment by calling the S-Lang function @code{SLang_init_slang} and loads the stdio and math runtime libraries by calling @code{SLang_init_stdio} and @code{SLang_init_slmath}. If any of these functions fail, the program exits.
+
+@findex SLang_load_file()
+Once the S-Lang environment is set up, the file @file{GEcart.sl} is loaded using the function @code{SLang_load_file}. This file contains the functions and variables required to evaluate a GE phenotype and is only required to be loaded once.
+@findex SLadd_intrinsic_variable()
+In order to extract information from the S-Lang runtime environment, a new C++ variable is added to the environment using the @code{SLadd_intrinsic_variable} function. This function requires the name of the variable within the S-Lang environment (called @code{Total_Time} in this example), the address of the variable in the C/C++ runtime (called @code{fitness} in this example), and the type of data stored in the variable (@code{SLANG_DOUBLE_TYPE}). If any of the S-Lang functions function fail, the program exits.
+
+@findex objfunc()
+The function @code{objfunc} provides the definition of the evaluation operator required by GALib. This function takes one argument of type @code{GAGenome} and returns a floating point value representing the fitness awarded to that @code{GAGenome} object. In order to evaluate the genome, the GAGenome object has to be cast into its derived type (@code{GEListGenome}). This allows the extra member functions specified in the class @code{GEListGenome} to be used in this function.
+
+Once cast, the @code{GEListGenome} is then assigned to the @code{mapper} object. A libGE @code{Phenotype} is then extracted from the same @code{mapper} object. If the phenotype is invalid, a fitness value of 0.0 is returned and the function exits. If the phenotype is valid, the full executable code needs to be constructed so that the phenotype can be evaluated in the S-Lang backend.
+
+Instead of having to construct the program and write it to a file to be compiled, S-Lang allows the interpretation and execution of the program in memory. This is achieved in this function by creating a string called @code{buffer} and appending the start, phenotype, and end code to it.
+
+@findex SLang_load_string()
+Once the complete program is constructed, the @code{buffer} string should contain a program that can execute within the S-Lang runtime. The contents of the string are executed in the runtime by calling the function @code{SLang_load_string}. Once execution has completed, the value in the variable @code{fitness} should contain the total time taken to center the cart for all the specified fitness cases.
+
+Inverting the value provides GALib with the correct fitness format i.e. GALib is a maximising GA whereas the goal of the cart centering problem is to minimise the total time taken.
+
+Before the function returns this value, it sets the effective size of the genotype in the genome object. This value is used by the effective crossover operator.
+
+Finally, the fitness is returned and the function exits.
+
+
+@findex print_individual()
+Finally, the @code{print_individual} function receives a genome as argument,
+performs its mapping to a phenotype structure, and prints it onto the screen,
+along with measurements of the genotype, generated phenotype, and the mapping
+process itself.
+
+
+@c --- EXAMPLES/CartCentering/GE_MITGALIB/GEcart.sl ---
+@node EXAMPLES/CartCentering/GE_MITGALIB/GEcart.sl, EXAMPLES/CartCentering/GE_MITGALIB/SLangStartCode, EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-slang.cpp, Cart Centering Implementation with GE_MITGALIB
+@subsubsection @file{GEcart.sl}
+
+The file @file{GEcart.sl} provides the variables and functions required to evaluate the GE phenotype for the cart centering problem using the S-Lang runtime.  It provides the functions @code{initCart}. @code{resetCart}, @code{stepSim}, and the grammar functions @code{GT}, @code{DIV}, and @code{ABS}. The functionality of the code is the same as that found in the file @file{GEcart.c} and descriptions of the variables and functions can be found in section @ref{EXAMPLES/CartCentering/GEcart.c}.
+
+
+@c --- EXAMPLES/CartCentering/GE_MITGALIB/SLangStartCode ---
+@node EXAMPLES/CartCentering/GE_MITGALIB/SLangStartCode, EXAMPLES/CartCentering/GE_MITGALIB/SLangEndCode, EXAMPLES/CartCentering/GE_MITGALIB/GEcart.sl, Cart Centering Implementation with GE_MITGALIB
+@subsubsection S-Lang start code
+
+The code required to invoke the functions found in @file{GEcart.sl} is much simpler than the code required for the C implementation. Instead of including a number of header files and defining external variables, the functions defined in @file{GEcart.sl} can be called directly. The following code is executed just before the GE phenotype in the @code{objfunc} function described in section @ref{EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-slang.cpp}.
+
+@verbatim
+initCart();
+resetCart();
+while(currFitCase < numFitCase) {
+  if (
+@end verbatim
+
+The code segment above initialises the cart problem, resets the cart to initial position and velocity and creates a loop to iterate while the current fitness case (@code{currFitCase}, a variable defined in @file{GEcart.sl}) is less than the total number of fitness cases (@code{numFitCase}, also in @file{GEcart.sl}). An @code{if} statement is started but the condition part is left empty. This is done to allow the insertion of the GE phenotype code at this point. The remainder of the code is explained in the next section.
+
+
+@c --- EXAMPLES/CartCentering/GE_MITGALIB/SLangEndCode ---
+@node EXAMPLES/CartCentering/GE_MITGALIB/SLangEndCode, EXAMPLES/CartCentering/GE_MITGALIB/WrappedSlangPhenotype, EXAMPLES/CartCentering/GE_MITGALIB/SLangStartCode, Cart Centering Implementation with GE_MITGALIB
+@subsubsection S-Lang end code
+
+In the previous section, the code segment shows that an @code{if} statement is started before the GE phenotype expression is evaluated. The remainder of the condition and the true and false branches are shown in the code segment below.
+
+@verbatim
+  > 0.0)
+  {
+    velocityChange = posForceVelChange;
+  }
+  else
+  {
+    velocityChange = negForceVelChange;
+  }
+  stepSim();
+}
+Total_Time = sumFitCaseTimes;
+@end verbatim
+
+If the value of the GE phenotype is greater than 0.0, the force applied to the cart is positive. If the value is less than or equal to 0.0, the applied force is negative. The application of the force is simulated in this example by assigning the appropriate change in velocity to the variable @code{velocityChange}. See section @file{GEcart.c} for more information on this process.
+
+Once the condition of the outer loop evaluates to false, the total time required to center the cart for all fitness cases is applied to the variable @code{Total\_Time}. This statement allows the value to be transferred into the C++ runtime through the variable @code{fitness}.
+
+@c --- EXAMPLES/CartCentering/GE_MITGALIB/WrappedSlangPhenotype ---
+@node EXAMPLES/CartCentering/GE_MITGALIB/WrappedSlangPhenotype, EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-libtcc.cpp, EXAMPLES/CartCentering/GE_MITGALIB/SLangEndCode, Cart Centering Implementation with GE_MITGALIB
+@subsubsection Example wrapped S-Lang phenotype
+
+A phenotype complete with start and end code is shown in the following code segment as an example.
+
+@verbatim
+initCart();
+resetCart();
+while(currFitCase < numFitCase) {
+  if (GT(((-1.0) * X), (V * (ABS(V)))) > 0.0)
+  {
+    velocityChange = posForceVelChange;
+  }
+  else {
+    velocityChange = negForceVelChange;
+  }
+  stepSim();
+}
+Total_Time = sumFitCaseTimes;
+@end verbatim
+
+
+@c --- EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-libtcc.cpp ---
+@node EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-libtcc.cpp, EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-lua.cpp, EXAMPLES/CartCentering/GE_MITGALIB/WrappedSlangPhenotype, Cart Centering Implementation with GE_MITGALIB
+@subsubsection @file{cartcenter-libtcc.cpp}
+
+The file @file{cartcenter-libtcc.cpp} contains the functions directly related to the evaluation of each GALib individual, made specifically for use with the libTCC library (part of the TinyCC distribution). The cart centering example uses the C API of the libTCC library to interpret, execute, and evaluate the GE phenotype. Evaluation of the phenotype in this way results in significant improvements in execution time over language compilers e.g. GCC, and TCC. The following section describes the various files and functions that are part of the libTCC backend for the cart centering example.
+
+@findex app_init()
+The function @code{app_init} function, called from the function @code{main} in the file @file{main.cpp} is responsible for initialising the libGE mapper, loading the BNF grammar file, and setting up the resources required to evaluate the GE phenotypes using the libTCC evaluator in the function @code{objfunc}.
+
+The @code{GEGrammarSI} @code{mapper} object, which is declared in the @file{main.cpp}, is initialised by specifying the maximum number of mapping wraps and loading the BNF grammar using the member function @code{readBNFFile}. Both the number of wrapping events and the path to the grammar file are specified in parameters to @code{app_init}. If the grammar fails to load, an error message is printed to the standard error stream (@code{std::cerr}) and the program exits.
+
+In order to minimise the time taken to extract, evaluate and award a fitness to a GE phenotype, the start and end code that is placed before and after a GE phenotype are loaded into character buffers in this function. These buffers are accessed in the function @code{objfunc} because they are required for every GALib individual. In this example, the C code in the file @file{cartcenterstart.c} and @file{cartcenterend.c} are read into the @code{char} arrays @code{CCstart} and @code{CCend} respectively. The last task in this function is to load the file @file{GEcart.c} into another character buffer called @code{GEfunc}. This file contains the definitions of the functions and variables used either directly or indirectly by the GE phenotype code. For more information about these files, @pxref{EXAMPLES/CartCentering/GEcart.c} and @ref{EXAMPLES/CartCentering/cartcenterstart.c}, and @ref{EXAMPLES/CartCentering/cartcenterend.c}.
+
+@findex objfunc()
+The function @code{objfunc} provides the definition of the evaluation operator required by GALib. This function takes one argument of type @code{GAGenome} and returns a floating point value representing the fitness awarded to that @code{GAGenome} object. In order to evaluate the genome, the GAGenome object has to be cast into its derived type (@code{GEListGenome}). This allows the extra member functions specified in the class @code{GEListGenome} to be used in this function.
+
+Once cast, the @code{GEListGenome} is then assigned to the @code{mapper} object. A libGE @code{Phenotype} is then extracted from the same @code{mapper} object. If the phenotype is invalid, a fitness value of 0.0 is returned and the function exits. If the phenotype is valid, the full executable code needs to be constructed so that the phenotype can be evaluated in the libTCC backend.
+
+@findex tcc_new()
+@findex tcc_set_output_type()
+@findex tcc_add_library()
+The first task is to set up a new libTCC state which can compile and execute C code. This is achieved by calling the function @code{tcc_new}. The function @code{tcc_set_output_type} is then called to specify that compilation of the C code should take place in main memory to maximise performance. The math library @code{m} is also added to the libTCC state using the @code{tcc_add_library} function to allow the use of the square root function @code{sqrt} in the simulation process.
+
+@findex tcc_compile_string()
+The next step is to make the various functions and variables that are defined in the code stored in the buffer @code{GEfunc} available in the libTCC state. This is achieved by calling the function @code{tcc_compile_string}, and supplying the current libTCC state and the buffer containing the code as arguments. It is important to note that the code in the buffer @code{GEfunc} is not executed at this stage. The purpose of this call is simply to compile the code and make it available to the phenotype code which will be compiled next.
+
+Before the phenotype can be executed in the libTCC state, it must be wrapped with the start and end code stored in the buffers @code{CCstart} and @code{CCend}. The @code{char} buffer @code{buffer} is used to store the result of concatenating the @code{CCstart} buffer, the phenotype code, and the @code{CCend} buffer. An example of this concatenation is shown in @ref{EXAMPLES/CartCentering/WrappedCPhenotype}. This buffer is then passed to the libTCC state using the function @code{tcc_compile_string}. If the compilation is successful, the libTCC state contains the executable form of the wrapped phenotype, the supporting functions, and the variables required to evaluate the GE phenotype.
+
+@findex tcc_relocate()
+@findex tcc_get_symbol()
+In order to execute the code in memory, the @code{main} function (declared in @file{cartcenterstart.c}) must be explicitly invoked. This function is accessed by first calling the function @code{tcc_relocate}. This makes all function and variable symbols accessible through the C interface and should be called after every call to @code{tcc_compile_string}. The function @code{tcc_get_symbol} is then called with a pointer to the libTCC state, a reference to a variable of type @code{unsigned long}, and the name of the symbol we require ("main"). If the required symbol is found, the @code{tcc_get_symbol} function stores its address in the @code{unsigned long} variable. This variable is then cast into a function pointer of type @code{int (*p_tccMainFunc)()}. The main function can the be invoked in the libTCC state by calling the function through the pointer i.e. @code{p_tccMainFunc()}.
+
+@findex tcc_get_symbol()
+@findex tcc_delete()
+The function @code{tcc_get_symbol} is then used again to retrieve the @code{sumFitCaseTimes} symbol within the libTCC state. The symbol corresponds to a variable of type @code{Real} which store the total time required to center the cart for all of the fitness cases. In order to access the value of the symbol, the unsigned @code{long variable} @code{val} must be cast to a pointer to a @code{Real}.. The type @code{Real} is defined at the top of the file using the @code{typedef} directive. In this example, the true type of @code{Real} is @code{double}. It is important that the true type of Real matches the type of the variable @code{sumFitCaseTimes} in the file @code{GEcart.c}. Once the cast is complete, the actual value of the variable @code{sumFitCaseTimes} is then retrieved from the libTCC state by dereferencing the local pointer variable. The function then deletes the libTCC state using the function @code{tcc_delete}.
+
+Inverting the fitness value provides GALib with the correct fitness format i.e. GALib is a maximising GA whereas the goal of the cart centering problem is to minimise the total time taken.
+
+Before the function returns this value, it sets the effective size of the genotype in the genome object. This value is used by the effective crossover operator.
+
+Finally, the fitness is returned and the function exits.
+
+@findex print_individual()
+Finally, the @code{print_individual} function receives a genome as argument,
+performs its mapping to a phenotype structure, and prints it onto the screen,
+along with measurements of the genotype, generated phenotype, and the mapping
+process itself.
+
+@c --- EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-lua.cpp ---
+@node EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-lua.cpp, EXAMPLES/CartCentering/GE_MITGALIB/GEcart.lua, EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-libtcc.cpp, Cart Centering Implementation with GE_MITGALIB
+@subsubsection @file{cartcenter-lua.cpp}
+
+This file contains the functions related to the evaluation of each GALib individual using the Lua evaluator. The cart centerting example uses the C API of the Lua library to interpret, execute, and evaluate the GE phenotype. Evaluation of the phenotype in this way results in significant improvements in execution time over language compilers e.g. GCC, and TCC. The following section describes the various files and functions that are part of the Lua backend for the cart centering example.
+
+In order to access the Lua C API through the C++ code in @file{cartcenter-lua.cpp}, the @code{#include <header.h>} directives must be enclosed in a special directive called @code{extern "C"} e.g.
+@verbatim
+extern "C"
+{
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+}
+@end verbatim
+This tells the compiler that the code in these files is C code and not C++ code. The functions in the file @file{cartcenter-lua.cpp} make use of the GE @code{GEGrammarSI} mapper, defined in the @file{main.cpp} file. A global pointer to a @code{lua_State}, called @code{L} in this example, is also created at the top of the file.for use by all the functions in the file.
+
+@findex app_init()
+The @code{app_init} function, called from the @code{main} function, is responsible for initialising the libGE mapper and initialising the Lua interpreter.
+
+The @code{GEGrammarSI} mapper object used in this function is declared in the file @file{main.cpp}. The number of wrapping events and the path to the grammar are supplied in parameters to this function. The @code{mapper} object is initialised by specifying the maximum number of mapping wraps and loading the BNF grammar file using the @code{readBNFFile} member function. If the process of loading the grammar fails, an error message is printed to the standard error stream (@code{std::cerr}) and the program exits.
+
+@findex lua_open()
+@findex luaL_openlibs()
+The Lua state is opened in this function by a call to the lua API function @code{lua_open}. Additional math and io libraries are added to this state using the function @code{luaL_openlibs}. Once completed, the Lua state is then ready to interpret and execute Lua code.
+
+@findex luaL_dofile()
+@findex lua_tostring()
+In order to minimise the time required for individual evaluations in the function @code{objfunc}, the Lua code in @file{GEcart.lua} is loaded into the state using the function @code{luaL_dofile}. This function loads and executes the Lua code in this file which is discussed in more detail in @ref{EXAMPLES/CartCentering/GE_MITGALIB/GEcart.lua}. It is important to note that, because the file only contains variable declarations and function implementations, no code is executed at this time. If an error occurs while loading this file, Lua sets a error message at the top of its call stack. Each element on the Lua stack has an index e.g. an index of @code{-1} represents the element at the top of the stack. This index value is supplied to the@code{lua_tostring} to retrieve the error message. The message is then printed to standard error output and the program exits.
+
+@findex objfunc()
+The function @code{objfunc} provides the definition of the evaluation operator required by GALib. This function takes one argument of type @code{GAGenome} and returns a floating point value representing the fitness awarded to that @code{GAGenome} object. In order to evaluate the genome, the GAGenome object has to be cast into its derived type (@code{GEListGenome}). This allows the extra member functions specified in the class @code{GEListGenome} to be used in this function.
+
+Once cast, the @code{GEListGenome} is then assigned to the @code{mapper} object. A libGE @code{Phenotype} is then extracted from the same @code{mapper} object. If the phenotype is invalid, a fitness value of 0.0 is returned and the function exits. If the phenotype is valid, the full executable code needs to be constructed so that the phenotype can be evaluated in the Lua backend.
+
+Instead of writing the phenotype code to a new file, the code is constructed in memory by appending the required start code, phenotype code, and end code to a @code{string} object (The start and end code are described in @ref{EXAMPLES/CartCentering/GE_MITGALIB/LuaStartCode} and @ref{EXAMPLES/CartCentering/GE_MITGALIB/LuaEndCode}).
+
+@findex luaL_dostring()
+This code is executed in the Lua runtime by calling the function @code{luaL_dostring} and passing it a pointer to the Lua state and the buffer containing the code to be executed. If execution fails, the error message is retrieved from the Lua stack and printed to standard error output and the program exits.
+
+@findex lua_getglobal()
+@findex lua_isnumber()
+@findex lua_tonumber()
+If the compilation and execution is successful, the function @code{lua_getglobal} is called to retrieve the Lua variable @code{sumFitCaseTimes}. This function pushes the variable on to the top of the stack. The value is checked and retrieved from the stack using the functions @code{lua_isnumber} and @code{lua_tonumber}. The value is then assigned to the @code{fitness} variable.
+
+Inverting the fitness value provides GALib with the correct fitness format i.e. GALib is a maximising GA whereas the goal of the cart centering problem is to minimise the total time taken.
+
+Before the function returns this value, it sets the effective size of the genotype in the genome object. This value is used by the effective crossover operator.
+
+Finally, the fitness is returned and the function exits.
+
+@findex print_individual()
+Finally, the @code{print_individual} function receives a genome as argument,
+performs its mapping to a phenotype structure, and prints it onto the screen,
+along with measurements of the genotype, generated phenotype, and the mapping
+process itself.
+
+@c --- EXAMPLES/CartCentering/GE_MITGALIB/GEcart.lua ---
+@node EXAMPLES/CartCentering/GE_MITGALIB/GEcart.lua, EXAMPLES/CartCentering/GE_MITGALIB/LuaStartCode, EXAMPLES/CartCentering/GE_MITGALIB/cartcenter-lua.cpp, Cart Centering Implementation with GE_MITGALIB
+@subsubsection @file{GEcart.lua}
+
+The file @file{GEcart.lua} defines the variables and functions required to evaluate the GE phenotype for the cart centering problem using the Lua runtime. It provides the functions @code{initCart}. @code{resetCart}, @code{stepSim}, and the grammar functions @code{GT}, @code{DIV}, and @code{ABS}. The functionality of the code is the same as that found in the file @file{GEcart.c} and descriptions of the variables and functions can be found in @ref{EXAMPLES/CartCentering/GEcart.c}.
+
+
+@c --- EXAMPLES/CartCentering/GE_MITGALIB/LuaStartCode ---
+@node EXAMPLES/CartCentering/GE_MITGALIB/LuaStartCode, EXAMPLES/CartCentering/GE_MITGALIB/LuaEndCode, EXAMPLES/CartCentering/GE_MITGALIB/GEcart.lua, Cart Centering Implementation with GE_MITGALIB
+@subsubsection Lua start code
+
+In order to execute the phenotype in the Lua state, code must be prepended and appended to the phenotype. The following code segment shows the code that is prepended to the phenotype. It contains calls to the @code{initCart} and @code{resetCart} functions defined in @file{GEcart.lua}. It also sets up the while loop to continue evaluating the phenotype expression while the current fitness case @code{currFitCase} is less than the total number of fitness cases @code{numFitCase}. It also contains the first part of the if statement that will test the value of the phenotype expression.
+
+@verbatim
+initCart();
+resetCart();
+while currFitCase < numFitCase do
+  if
+@end verbatim
+
+
+@c --- EXAMPLES/CartCentering/GE_MITGALIB/LuaEndCode ---
+@node EXAMPLES/CartCentering/GE_MITGALIB/LuaEndCode, EXAMPLES/CartCentering/GE_MITGALIB/WrappedLuaPhenotype, EXAMPLES/CartCentering/GE_MITGALIB/LuaStartCode, Cart Centering Implementation with GE_MITGALIB
+@subsubsection Lua end code
+
+The following code is appended to the phenotype to finish the condition of the if statement and provide execution paths for both the true and false cases. If the value of the phenotype expression is greater than 0.0, then a positive force is applied to the cart. If the value is less than or equal to 0.0, then a negative force is applied. Forces are applied by assigning the value @code{posForceVelChange} or @code{negForceVelChange} to the variable @code{velocityChange}. The simulation is then stepped by one time step by calling the function @code{stepSim}. Once the while loop condition evaluates to false, the total time taken to center the cart for all the fitness cases (@code{sumFitCaseTimes}) and the number of hits achieved (@code{hitCount}) are printed to standard output.
+
+@verbatim
+  > 0.0 then
+    velocityChange = posForceVelChange;
+  else
+    velocityChange = negForceVelChange;
+  end
+  stepSim();
+end
+@end verbatim
+
+
+@c --- EXAMPLES/CartCentering/GE_MITGALIB/WrappedLuaPhenotype ---
+@node EXAMPLES/CartCentering/GE_MITGALIB/WrappedLuaPhenotype, EXAMPLES/CartCentering/GE_MITGALIB/Makefile, EXAMPLES/CartCentering/GE_MITGALIB/LuaEndCode, Cart Centering Implementation with GE_MITGALIB
+@subsubsection Example wrapped Lua phenotype
+
+A phenotype complete with start and end code is shown below as an example.
+
+@verbatim
+initCart();
+resetCart();
+while currFitCase < numFitCase do
+  if GT(((-1.0) * X), (V * (ABS(V)))) > 0.0) > 0.0 then
+    velocityChange = posForceVelChange;
+  else
+    velocityChange = negForceVelChange;
+  end
+  stepSim();
+end
+@end verbatim
+
+
+@c --- EXAMPLES/CartCentering/GE_MITGALIB/Makefile ---
+@node EXAMPLES/CartCentering/GE_MITGALIB/Makefile,  , EXAMPLES/CartCentering/GE_MITGALIB/WrappedLuaPhenotype, Cart Centering Implementation with GE_MITGALIB
+@subsubsection @file{Makefile}
+
+The file @file{Makefile} contained in the example allows you to create a program using a choice of evaluators for your phenotype strings. Use @command{make} to create all executables, or @command{make GE*} to create a specific evaluator implementation (where @command{*} is any of @command{GCC}, @command{SLANG}, @command{TCC}, @command{LIBTCC}, or @command{LUA}). At the top of the file there are definitions for the location of the GALib, GE, and evaluator specific header and library files. If you have installed any of these in non-standard locations, make sure the values are adjusted to suit your system.
+
+Note: Some of the evaluators require the pre-compilation of the @file{GEcart.c}. This is automatically done by the @file{Makefile} when the relevant evaluators are chosen.
+
+@page
+@c --- Cart Centering Implementation with GE_EO ---
+@node Cart Centering Implementation with GE_EO, Cart Centering Performance, Cart Centering Implementation with GE_MITGALIB,Cart Centering Problem
+@subsection GE_EO
+
+@menu
+* Cart Centering EO Example User Guide::  
+* EXAMPLES/CartCentering/GE_EO/main.cpp::  EO parameters and settings.
+* EXAMPLES/CartCentering/GE_EO/eoGE.h::  Definition of GE genome.
+* EXAMPLES/CartCentering/GE_EO/eoGEInit.h::  Initialisation functions for GE.
+* EXAMPLES/CartCentering/GE_EO/eoGEMutation.h::  Mutation operator for GE genome.
+* EXAMPLES/CartCentering/GE_EO/eoGEQuadCrossover.h::  Crossover operator for GE genome.
+* EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-gcc_tcc.h::  Implementation using gcc as the evaluator.
+* EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-slang.h::  
+* EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-libtcc.h::  Implementation using tcc as the evaluator.
+* EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-lua.h::  Implementation using lua as the evaluator.
+* EXAMPLES/CartCentering/GE_EO/Makefile::  Linking EO and libGE.
+@end menu
+
+The example using the Evolutionary Objects (EO) library can be found in @file{EXAMPLES/CartCentering/GE_EO}. The following sections contain a user's guide and a description of the files in this example.
+
+@c --- Cart Centering EO Example User Guide ---
+@node Cart Centering EO Example User Guide, EXAMPLES/CartCentering/GE_EO/main.cpp,, Cart Centering Implementation with GE_EO
+@subsubsection EO Example User Guide
+
+The EO library has a powerful command-line parser, which is fully-configurable. This example uses that parser to specify both the standard GA parameters, and also the GE specific parameters.
+
+Parameters are passed to the executable in the following fashion:
+
+@command{./executable -param_short_name[=value]}
+
+or
+
+@command{./executable --param_long_name[=value]}
+
+The following are the parameters accepted by this example, and their default values:
+
+@itemize
+@item -h, --help: prints help message (default is 0);
+@item --stopOnUnknownParam: stop if unknown parameter entered (default is 1);
+@item -C, --pCross: probability of crossover (default is 0.9);
+@item -E, --effCross: use effective crossover (default is 0);
+@item -M, --pMut: probability of mutation (default is 1);
+@item -b, --pMutPerBit: probability of bit-flip mutation (default is 0.01);
+@item -s, --sensibleInit: use sensible initialisation (default is 0);
+@item -x, --minSize: minimum size for random initialisation (default is 15);
+@item -X, --maxSize: maximum size for random initialisation (default is 25);
+@item -r, --grow: grow ratio for SI (default is 0.5);
+@item -d, --maxDepth: maximum depth for SI (default is 10);
+@item -T, --tailSize: tail size for SI (default is 0);
+@item -t, --tailRatio: tail ratio for SI (default is 0);
+@item -g, --grammarFile: grammar file (default is "grammar.bnf");
+@item -w, --wrappingEvents: number of wrapping events (default is 0);
+@item -L, --Load: save file to restart run (no default);
+@item -S, --Status: status file (default is "./<name_of_executable>.status");
+@item -R, --seed: random number seed (default is random);
+@item -P, --popSize: population size (default is 100);
+@item -G, --maxGen: maximum number of generations (default is 10).
+@end itemize
+
+For example, to run the @command{GELUA} implementation, using the grammar file "grammar.bnf", with a population size of 500 individuals, for 50 generations, using random seed 1, and leaving all other parameters to standard values, the command to execute is:
+
+@command{GELUA -g=grammar.bnf -P=500 -G=50 -R=1}
+
+
+@c --- EXAMPLES/CartCentering/GE_EO/main.cpp ---
+@node EXAMPLES/CartCentering/GE_EO/main.cpp, EXAMPLES/CartCentering/GE_EO/eoGE.h, Cart Centering EO Example User Guide, Cart Centering Implementation with GE_EO
+@subsubsection @file{main.cpp}
+
+This file contains the @code{main()} function, and is the central point of
+control over the evolutionary process. It begins by including all required EO
+include files, followed by a declaration of the fitness type to be used, and the type of each individual. The typedef directive declares the type @code{Indi} as a substitute name for the individual type @code{eoGE<MyFitT>}. The class eoGE is declared in the file @file{eoGE.h} and is discussed in the next section. This example uses a custom genotype structure because EO does not have direct support for variable-length integer-based structures. The file @file{main.cpp} also declares the libGE @code{GEGrammarSI} mapper.
+
+The function @code{main_function()} starts by defining all parameters available to the system using an instance of the @code{eoParser} class. The name of the parameter, the associated help messages, and the default value are supplied to the @code{eoParser::createParam} member function.
+
+The fitness operator is then declared by creating an instance of the template class @code{eoGEEvalFunc}. The template in this case concerns the type of individual to be evaluated (called @code{Indi} in this example). The operator object is supplied with the libGE mapper object and the path of the BNF grammar file to use.
+
+A number of fitness operator classes are provided in the cart centering example for EO which use a differend backend platform to evaluate the GE phenotype. Each of the evaluation backends are implemented in files named @file{eoGEEvalFunc-*.cpp} with @file{*} replaced by the name of the backend e.g. @file{eoGEEvalFunc-slang.cpp}. All the fitness operator classes are called @code{eoGEEvalFunc} and each implements the interface required by EO i.e. they implement an operator function @code{()} which takes an eo individual, evaluates it, and then assigns a fitness value. The particular backend fitness operator class created at execution time is determined during compilation. It is therefore sufficient at this point to create an instance of the class using the name @code{eoGEEvalFunc}. The compilation process is described in more detail later in this section.
+
+The function @code{main_function} then declares an objective function call counter and a @code{eoPOP} object to store the population of @code{Indi} individuals.
+
+The random seed generator and the @code{Indi} population are then registered with a new instance of the class @code{eoState}. This class is responsible for initialising and evaluating the population in the case of a new run, or loading the population from disk if continuing a previous run.
+
+The definition of roulette-wheel selection and steady-state replacement (GE style) follow, along with the definition of the genetic operators to use (which are encapsulated into a @code{eoTransform} object). Finally, a series of continuators, checkpoints, statistics objects and monitors are defined and associated together. For more information on these settings, see the EO documentation.
+
+At the end of the function @code{main_function}, the actual evolutionary algorithm object is declared. This @code{eoEasyEA} instance is associated with the defined checkpoints, evaluation function, selection procedure, genetic operators, and replacement mechanism. The evolutionary cycle consists merely of associating the EA object with the current population object @code{pop}.
+
+The function @code{main}, declared at the bottom of the file @file{main.cpp} consists of a protected call to the function @code{main_function} in a try/catch block to handle any execution exceptions.
+
+@c --- EXAMPLES/CartCentering/GE_EO/eoGE.h ---
+@node EXAMPLES/CartCentering/GE_EO/eoGE.h, EXAMPLES/CartCentering/GE_EO/eoGEInit.h, EXAMPLES/CartCentering/GE_EO/main.cpp, Cart Centering Implementation with GE_EO
+@subsubsection @file{eoGE.h}
+
+The file @file{eoGE.h} defines the class @code{eoGE}, which represents a genome. The @code{eoGE} genome consists of a vector of @code{unsigned char} elements. This type was chosen because it is typically represented by 8 bits, which is the standard size of GE codons.
+
+The methods @code{printOn()} and @code{readFrom()} output or read a genome using a standard input or output stream respectively. The method @code{getEffectiveSize()} merely returns the recorded effective size of the genotype of this individual.
+
+
+@c --- EXAMPLES/CartCentering/GE_EO/eoGEInit.h ---
+@node EXAMPLES/CartCentering/GE_EO/eoGEInit.h, EXAMPLES/CartCentering/GE_EO/eoGEMutation.h, EXAMPLES/CartCentering/GE_EO/eoGE.h, Cart Centering Implementation with GE_EO
+@subsubsection @file{eoGEInit.h}
+
+The file @file{eoGEInit.h} defines the class @code{eoGEInit} which contains member functions for population initialisation. The constructor of the class reads, processes, and stores the related EO parameters to select a random or a sensible method for population initialisation.
+
+In the case of a random initialisation, the method @code{operator()} calls
+the method @code{randomInit()}. This method creates individuals between the
+sizes @code{minSize} and @code{maxSize} containing random @code{unsigned char} numbers.
+
+@findex GEGrammarSI.init()
+@findex init(), GEGrammarSI
+If sensible initialisation is selected, the mapper's @code{init()} method
+is called, and if successful, the contents of its @code{Genotype} structure are
+used to initialise the @code{_genotype} object passed as an argument.
+
+
+@c --- EXAMPLES/CartCentering/GE_EO/eoGEMutation.h ---
+@node EXAMPLES/CartCentering/GE_EO/eoGEMutation.h, EXAMPLES/CartCentering/GE_EO/eoGEQuadCrossover.h, EXAMPLES/CartCentering/GE_EO/eoGEInit.h, Cart Centering Implementation with GE_EO
+@subsubsection @file{eoGEMutation.h}
+
+The file @file{eoGEMutation.h} declares the class @code{eoGEMutation}, which implements a point mutation operator, as used in standard GE. The mutation is applied to genotypes as arguments to the @code{operator()} method (the probability of mutation is supplied in an argument to the constructor).
+
+@c --- EXAMPLES/CartCentering/GE_EO/eoGEQuadCrossover.h ---
+@node EXAMPLES/CartCentering/GE_EO/eoGEQuadCrossover.h, EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-gcc_tcc.h, EXAMPLES/CartCentering/GE_EO/eoGEMutation.h, Cart Centering Implementation with GE_EO
+@subsubsection @file{eoGEQuadCrossover.h}
+
+The file @file{eoGEQuadCrossover.h} declares the class @code{eoGEQuadCrossover}, which implements the crossover operator to use during the evolutionary cycle. Its constructor receives a boolean argument stating whether to use a standard 1-point crossover or an effective crossover method.
+
+If standard 1-point crossover is specified, a random cut point is selected within each individual. If effective crossover is selected, each cut point must lie within the effective part of each individual (that is, the part of its genome which has been read to create a phenotype). After choosing the cut points, the second half of each individual is then swapped.
+
+@c --- EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-gcc_tcc.h ---
+@node EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-gcc_tcc.h, EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-slang.h, EXAMPLES/CartCentering/GE_EO/eoGEQuadCrossover.h, Cart Centering Implementation with GE_EO
+@subsubsection @file{eoGEEvalFunc-gcc_tcc.h}
+
+The file @file{eoGEEvalFunc-gcc_tcc.cpp} contains the functions directly related to the evaluation of each EO individual using a C compiler such as GCC. The following section describes the various files and functions that are part of the GCC backend for the cart centering example. This section also describes how GCC can be exchanged for another C compiler called TCC (from the TinyCC distribution).
+
+The class @code{eoGEEvalFunc} is a template class which allows the individual type @code{EOT} to be specified when an instance of the class is created. The constructor is responsible for initialising the GE mapper and setting up the C evaluator backend. The @code{mapper} object is initialised by specifying the maximum number of mapping wraps and loading the BNF grammar file using the @code{readBNFFile} member function. Each of these values are supplied as parameters to the constructor function. If the process of loading the grammar fails, an error message is printed to the standard error stream (@code{std::cerr}) and the program exits.
+
+The next task in this function is to load the code that will be placed before and after the phenotype which is contained in the files @file{cartcenterstart.c} and @file{cartcenterend.c}. The function loads the contents of these files into the @code{CCstart} and @code{CCend} buffers (character arrays). These buffers are then used in the member @code{operator()} for every individual that is evaluated using the C compiler backend. For more information about these files, @ref{EXAMPLES/CartCentering/cartcenterstart.c}, and @ref{EXAMPLES/CartCentering/cartcenterend.c}.
+
+The member @code{operator()} provides the definition of the operator required by EO for individual evaluation. It takes one argument of type @code{EOT} which represents an EO individual. The function first checks that this individual has not been evaluated previously by calling the member function @code{EOT::invalid}. If the individual is invalid, then it needs to be evaluated and assigned a fitness.  If the individual is valid, the function exits.
+
+In order to evaluate this individual, the mapper must be supplied with a valid libGE structure. This is constructed by generating an array of integers and copying each element from the EO individual. This array is then supplied to the constructor of the @code{Genotype} object. This is then assigned to the @code{mapper} object using the member function @code{setGenotype}. Once this is complete, a libGE @code{Phenotype} is extracted from the @code{mapper} object. If the phenotype is invalid, a fitness value of 0.0 is returned and the function exits. If the phenotype is valid, the full executable code needs to be constructed so that the phenotype can be evaluated in the C backend.
+
+The first step in this process is to create a new empty file called @file{individual.c}. The contents of the buffer @code{CCstart} are written out to this file, followed by the contents of the phenotype, followed by the contents of the buffer @code{CCend}. The file @file{individual.c} is then closed. An example @file{individual.c} file is shown in @ref{EXAMPLES/CartCentering/WrappedCPhenotype}.
+
+At this point, the file contains a full valid C program which should be compilable by any C compiler. In this example, two different C compilers can be used: GCC and TinyCC. If the macro @code{GECART_USE_TCC_COMP} was defined when the file @file{cartcenter-gcc.cpp} was compiled, then the TinyCC C compiler (called @code{tcc}) is used. If the macro was not defined, the GNU C compiler (called @code{gcc}) is used. The compiler program is called by invoking a @code{system} call with the name of the compiler program and the name of the file containing the phenotype and wrapper code i.e. @file{individual.c}. The phenotype file is also linked with the object file produced by the compilation of the file @code{GEcart.c}. The @code{system} call also invokes the execution of the compiled program and redirects all standard output to a file called @file{result}. If the program compiles and the program runs successfully, the file @file{result} should contain the total time required to center the cart for the fitness cases defined for the problem.
+
+To extract this time value, the result file is opened and the first floating point value found is assigned to the variable @code{fitness}. The result file is then closed.
+
+This fitness is then inverted because the problem requires that the total time take to center and stop the cart be minimised. Inverting the value provides EO with the correct fitness format i.e. EO is a maximising GA whereas the goal of the cart centering problem is to minimise the total time taken. Finally, the fitness is assigned to the EO individual using the member function @code{EOT::fitness}. The function then exits.
+
+
+@c --- EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-slang.h ---
+@node EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-slang.h, EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-libtcc.h, EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-gcc_tcc.h, Cart Centering Implementation with GE_EO
+@subsubsection @file{eoGEEvalFunc-slang.h}
+
+The file @file{eoGEEvalFunc-slang.h} declares the class @code{eoGEEvalFunc} required by EO for individual evaluation. This implementation uses the S-Lang library.
+
+The class @code{eoGEEvalFunc} is a template class which allows the individual type @code{EOT} to be specified when an instance of the class is created. The constructor is responsible for initialising the GE mapper and setting up the GCC or TCC evaluator backend. The @code{mapper} object is initialised by specifying the maximum number of mapping wraps and loading the BNF grammar file using the @code{readBNFFile} member function. Each of these values are supplied as parameters to the constructor function. If the process of loading the grammar fails, an error message is printed to the standard error stream (@code{std::cerr}) and the program exits.
+
+@findex SLang_init_slang()
+@findex SLang_init_stdio()
+@findex SLang_init_slmath()
+The function initialises the S-Lang environment by calling the S-Lang function @code{SLang_init_slang} and loads the stdio and math runtime libraries by calling @code{SLang_init_stdio} and @code{SLang_init_slmath}. If any of these functions fail, the program exits.
+
+@findex SLang_load_file()
+Once the S-Lang environment is set up, the file @file{GEcart.sl}  (@pxref{EXAMPLES/CartCentering/GE_MITGALIB/GEcart.sl}) is loaded using the function @code{SLang_load_file}. This file contains the functions and variables required to evaluate a genotype and is only required to be loaded once.
+
+@findex SLadd_intrinsic_variable()
+In order to extract information from the S-Lang runtime environment, a new C++ variable is added to the environment using the @code{SLadd_intrinsic_variable} function. This function requires the name of the variable within the S-Lang environment (called @code{Total_Time} in this example), the address of the variable in the C/C++ runtime (called @code{fitness} in this example), and the type of data stored in the variable (@code{SLANG_DOUBLE_TYPE}). If any of the S-Lang functions function fail, the program exits.
+
+The member @code{operator()} provides the definition of the operator required by EO for individual evaluation. It takes one argument of type @code{EOT} which represents an EO individual. The function first checks that this individual has not been evaluated previously by calling the member function @code{EOT::invalid}. If the individual is invalid, then it needs to be evaluated and assigned a fitness. If the individual is valid, the function exits.
+
+In order to evaluate this individual, the mapper must be supplied with a valid libGE structure. This is constructed by generating an array of integers and copying each element from the EO individual. This array is then supplied to the constructor of the @code{Genotype} object. This is then assigned to the @code{mapper} object using the member function @code{setGenotype}. Once this is complete, a libGE @code{Phenotype} is extracted from the @code{mapper} object. If the phenotype is invalid, a fitness value of 0.0 is returned and the function exits. If the phenotype is valid, the full executable code needs to be constructed so that the phenotype can be evaluated in the S-Lang backend.
+
+Instead of having to construct the program and write it to a file to be compiled, S-Lang allows the interpretation and execution of the program in memory. This is achieved in this function by creating a string called @code{buffer} and appending the start, phenotype, and end code to it.
+
+@findex SLang_load_string()
+Once the complete program is constructed, the @code{buffer} string should contain a program that can execute within the S-Lang runtime. The contents of the string are executed in the runtime by calling the function @code{SLang_load_string}. Once execution has completed, the value in the variable @code{fitness} should contain the total time taken to center the cart for all the specified fitness cases.
+
+This fitness is then inverted because the problem requires that the total time take to center and stop the cart be minimised. Inverting the value provides EO with the correct fitness format i.e. EO is a maximising GA whereas the goal of the cart centering problem is to minimise the total time taken. Finally, the fitness is assigned to the EO individual using the member function @code{EOT::fitness}. The function then exits.
+
+
+@c --- EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-libtcc.h ---
+@node EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-libtcc.h, EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-lua.h, EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-slang.h, Cart Centering Implementation with GE_EO
+@subsubsection @file{eoGEEvalFunc-libtcc.h}
+
+The file @file{eoGEEvalFunc-slang.h} declares the class @code{eoGEEvalFunc} required by EO for individual evaluation. This implementation uses the libTCC library provided in the TinyCC distribution.
+
+The class @code{eoGEEvalFunc} is a template class which allows the individual type @code{EOT} to be specified when an instance of the class is created. The constructor is responsible for initialising the GE mapper and setting up the libTCC evaluator backend. The @code{mapper} object is initialised by specifying the maximum number of mapping wraps and loading the BNF grammar file using the @code{readBNFFile} member function. Each of these values are supplied as parameters to the constructor function. If the process of loading the grammar fails, an error message is printed to the standard error stream (@code{std::cerr}) and the program exits.
+
+In order to minimise the time taken to extract, evaluate and award a fitness to a GE phenotype, the start and end code that is placed before and after a GE phenotype are loaded into character buffers in this function. These buffers are accessed in the function @code{objfunc} because they are required for every GALib individual. In this example, the C code in the file @file{cartcenterstart.c} and @file{cartcenterend.c} are read into the @code{char} arrays @code{CCstart} and @code{CCend} respectively. The last task in this function is to load the file @file{GEcart.c} into another character buffer called @code{GEfunc}. This file contains the definitions of the functions and variables used either directly or indirectly by the GE phenotype code. For more information about these files, @pxref{EXAMPLES/CartCentering/GEcart.c} and @ref{EXAMPLES/CartCentering/cartcenterstart.c}, and @ref{EXAMPLES/CartCentering/cartcenterend.c}.
+
+The member @code{operator()} provides the definition of the operator required by EO for individual evaluation. It takes one argument of type @code{EOT} which represents an EO individual. The function first checks that this individual has not been evaluated previously by calling the member function @code{EOT::invalid}. If the individual is invalid, then it needs to be evaluated and assigned a fitness. If the individual is valid, the function exits.
+
+In order to evaluate this individual, the mapper must be supplied with a valid libGE structure. This is constructed by generating an array of integers and copying each element from the EO individual. This array is then supplied to the constructor of the @code{Genotype} object. This is then assigned to the @code{mapper} object using the member function @code{setGenotype}. Once this is complete, a libGE @code{Phenotype} is extracted from the @code{mapper} object. If the phenotype is invalid, a fitness value of 0.0 is returned and the function exits. If the phenotype is valid, the full executable code needs to be constructed so that the phenotype can be evaluated in the libTCC backend.
+
+@findex tcc_new()
+@findex tcc_set_output_type()
+@findex tcc_add_library()
+The first task is to set up a new libTCC state which can compile and execute C code. This is achieved by calling the function @code{tcc_new}. The function @code{tcc_set_output_type} is then called to specify that compilation of the C code should take place in main memory to maximise performance. The math library @code{m} is also added to the libTCC state using the @code{tcc_add_library} function to allow the use of the square root function @code{sqrt} in the simulation process.
+
+@findex tcc_compile_string()
+@findex tcc_relocate()
+The next step is to make the various functions and variables that are defined in the code stored in the buffer @code{GEfunc} available in the libTCC state. This is achieved by calling the function @code{tcc_compile_string}, and supplying the current libTCC state and the buffer containing the code as arguments. It is important to note that the code in the @code{GEfunc} buffer is not executed at this stage. The purpose of this call is simply to compile the code and make it available to the phenotype code which will be compiled next.
+
+@findex tcc_compile_string()
+Before the phenotype can be executed in the libTCC state, it must be wrapped with the start and end code stored in the @code{CCstart} and @code{CCend} buffers. The @code{char} buffer @code{buffer} is used to store the result of concatenating the buffer @code{CCstart}, the phenotype code, and the buffer @code{CCend}. An example of this concatenation is shown in @ref{EXAMPLES/CartCentering/WrappedCPhenotype}. This buffer is then passed to the libTCC state using the function @code{tcc_compile_string}. If the compilation is successful, the libTCC state contains the executable form of the wrapped phenotype, the supporting functions, and the variables required to evaluate the GE phenotype.
+
+@findex tcc_relocate()
+@findex tcc_get_symbol()
+In order to execute the code in memory, the @code{main} function (declared in @file{cartcenterstart.c}) must be explicitly invoked. This function is accessed by first calling the function @code{tcc_relocate}. This makes all function and variable symbols accessible through the C interface and should be called after every call to @code{tcc_compile_string}. The function @code{tcc_get_symbol} is then called with a pointer to the libTCC state, a reference to a variable of type @code{unsigned long}, and the name of the symbol we require ("main"). If the required symbol is found, the @code{tcc_get_symbol} function stores its address in the @code{unsigned long} variable. This variable is then cast into a function pointer of type @code{int (*p_tccMainFunc)()}. The main function can the be invoked in the libTCC state by calling the function through the pointer i.e. @code{p_tccMainFunc()}.
+
+@findex tcc_get_symbol()
+@findex tcc_delete()
+The function @code{tcc_get_symbol} is then used again to retrieve the @code{sumFitCaseTimes} symbol within the libTCC state. The symbol corresponds to a variable of type @code{Real} which store the total time required to center the cart for all of the fitness cases. In order to access the value of the symbol, the unsigned @code{long variable} @code{val} must be cast to a pointer to a @code{Real}.. The type @code{Real} is defined at the top of the file using the @code{typedef} directive. In this example, the true type of @code{Real} is @code{double}. It is important that the true type of Real matches the type of the variable @code{sumFitCaseTimes} in the file @code{GEcart.c}. Once the cast is complete, the actual value of the variable @code{sumFitCaseTimes} is then retrieved from the libTCC state by dereferencing the local pointer variable. The function then deletes the libTCC state using the function @code{tcc_delete}.
+
+This fitness is then inverted because the problem requires that the total time take to center and stop the cart be minimised. Inverting the value provides EO with the correct fitness format i.e. EO is a maximising GA whereas the goal of the cart centering problem is to minimise the total time taken. Finally, the fitness is assigned to the EO individual using the member function @code{EOT::fitness}. The function then exits.
+
+
+@c --- EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-lua.h ---
+@node EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-lua.h, EXAMPLES/CartCentering/GE_EO/Makefile, EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-libtcc.h, Cart Centering Implementation with GE_EO
+@subsubsection @file{eoGEEvalFunc-lua.h}
+
+The file @file{eoGEEvalFunc-lua.h} declares the class @code{eoGEEvalFunc} required by EO for individual evaluation. The cart centering example uses the C API of the Lua library to interpret, execute, and evaluate the GE phenotype. Evaluation of the phenotype in this way results in significant improvements in execution time over language compilers e.g. GCC, and TCC. The following section describes the various files and functions that are part of the Lua backend for the cart centering example.
+
+In order to access the Lua C API through the C++ code in @file{eoGEEvalFunc-lua.h}, the @code{#include <header.h>} directives must be enclosed in a special directive called @code{extern "C"} e.g.
+@verbatim
+extern "C"
+{
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+}
+@end verbatim
+
+This tells the compiler that the code in these files is C code and not C++ code. The functions in the file @file{cartcenter-lua.cpp} make use of the GE @code{GEGrammarSI} mapper, defined in the @file{main.cpp} file. A global pointer to a @code{lua_State}, called @code{L} in this example, is also created at the top of the file.for use by all the functions in the file.
+
+This class is a template class which allows the individual type @code{EOT} to be specified when an instance of the class is created. The constructor is responsible for initialising the GE mapper and setting up the libTCC evaluator backend. The @code{mapper} object is initialised by specifying the maximum number of mapping wraps and loading the BNF grammar file using the @code{readBNFFile} member function. Each of these values are supplied as parameters to the constructor function. If the process of loading the grammar fails, an error message is printed to the standard error stream (@code{std::cerr}) and the program exits.
+
+@findex lua_open()
+@findex luaL_openlibs()
+The Lua state is opened in this function by a call to the lua API function @code{lua_open}. Additional math and io libraries are added to this state using the function @code{luaL_openlibs}. Once completed, the Lua state is then ready to interpret and execute Lua code.
+
+@findex luaL_dofile()
+@findex lua_tostring()
+In order to minimise the time required for individual evaluations in the function @code{objfunc}, the Lua code in @file{GEcart.lua} is loaded into the state using the function @code{luaL_dofile}. This function loads and executes the Lua code in this file which is discussed in more detail in @ref{EXAMPLES/CartCentering/GE_MITGALIB/GEcart.lua}. It is important to note that, because the file only contains variable declarations and function implementations, no code is executed at this time. If an error occurs while loading this file, Lua sets a error message at the top of its call stack. Each element on the Lua stack has an index e.g. an index of @code{-1} represents the element at the top of the stack. This index value is supplied to the@code{lua_tostring} to retrieve the error message. The message is then printed to standard error output and the program exits.
+
+The member @code{operator()} provides the definition of the operator required by EO for individual evaluation. It takes one argument of type @code{EOT} which represents an EO individual. The function first checks that this individual has not been evaluated previously by calling the member function @code{EOT::invalid}. If the individual is invalid, then it needs to be evaluated and assigned a fitness.  If the individual is valid, the function exits.
+
+In order to evaluate this individual, the mapper must be supplied with a valid libGE structure. This is constructed by generating an array of integers and copying each element from the EO individual. This array is then supplied to the constructor of the @code{Genotype} object. This is then assigned to the @code{mapper} object using the member function @code{setGenotype}. Once this is complete, a libGE @code{Phenotype} is extracted from the @code{mapper} object. If the phenotype is invalid, a fitness value of 0.0 is returned and the function exits. If the phenotype is valid, the full executable code needs to be constructed so that the phenotype can be evaluated in the Lua backend.
+
+Instead of writing the phenotype code to a new file, the code is constructed in memory by appending the required start code, phenotype code, and end code to a @code{string} object (The start and end code are described in @ref{EXAMPLES/CartCentering/GE_MITGALIB/LuaStartCode} and @ref{EXAMPLES/CartCentering/GE_MITGALIB/LuaEndCode}).
+
+@findex luaL_dostring()
+This code is executed in the Lua runtime by calling the function @code{luaL_dostring} and passing it a pointer to the Lua state and the buffer containing the code to be executed. If execution fails, the error message is retrieved from the Lua stack and printed to standard error output and the program then exits.
+
+@findex lua_getglobal()
+@findex lua_isnumber()
+@findex lua_tonumber()
+If the compilation and execution is successful, the function @code{lua_getglobal} is called to retrieve the Lua variable @code{sumFitCaseTimes}. This function pushes the variable on to the top of the stack. The value is checked and retrieved from the stack using the functions @code{lua_isnumber} and @code{lua_tonumber}. The value is then assigned to the @code{fitness} variable.
+
+This fitness is then inverted because the problem requires that the total time take to center and stop the cart be minimised. Inverting the value provides EO with the correct fitness format i.e. EO is a maximising GA whereas the goal of the cart centering problem is to minimise the total time taken. Finally, the fitness is assigned to the EO individual using the member function @code{EOT::fitness}. The function then exits.
+
+
+@c --- EXAMPLES/CartCentering/GE_EO/Makefile ---
+@node EXAMPLES/CartCentering/GE_EO/Makefile,  , EXAMPLES/CartCentering/GE_EO/eoGEEvalFunc-lua.h, Cart Centering Implementation with GE_EO
+@subsubsection @file{Makefile}
+
+The file @file{Makefile} contained in the example allows you to create a program using a choice of evaluators for your phenotype strings. Use @command{make} to create all executables, or @command{make GE*} to create a specific evaluator implementation (where @command{*} is any of @command{GCC}, @command{SLANG}, @command{TCC}, @command{LIBTCC}, or @command{LUA}). At the top of the file there are definitions for the location of the GALib, GE, and evaluator specific header and library files. If you have installed any of these in non-standard locations, make sure the values are adjusted to suit your system.
+
+The file @file{Makefile} uses the @command{-include} compiler flag to use only the relevant include file for your choice of evaluator; if your compiler does not accept that flag, you should replace it with the appropriate flag.
+
+Finally, some of the evaluators require the pre-compilation of the file @file{GEcart.c}; this is done by the @file{Makefile}, when the relevant target implementations are chosen.
+
+
+@page
+@c --- Cart Centering Performance ---
+@node Cart Centering Performance,  , Cart Centering Implementation with GE_EO,Cart Centering Problem
+@subsection Cart Centering Performance
+
+@menu
+* GALib performance on Cart Centering::  
+* EO performance on Cart Centering::  
+@end menu
+
+This section looks at the performance obtained with most of the search engines
+tested, for this specific problem. All search engines used a similar
+experimental setup: steady-state replacement, population size of 500
+individuals, 100 generations, probability of crossover of 0.9, and probability
+of bit-wise mutation of 0.01. Furthermore, each experiment was performed with four different setups:
+
+@itemize
+@item Using a standard GE approach;
+@item Using effective crossover;
+@item Using sensible initialisation;
+@item Using a combination of the last two.
+@end itemize
+
+The results show that the standard GE configuration fairs slightly worse than the others and that the use of effective crossover alone produces the fittest individuals.The best centering time achieved over 30 runs using this configuration was approximately 54.9 seconds for 20 fitness cases.
+
+The average execution times of these runs for each of the five backends and for both search engines are shown below.
+
+@itemize
+@item GCC: 41m52.882s (GALib) 47m10.939s (EO)
+@item TCC: 7m14.129s (GALib) 6m33.551s (EO)
+@item LIBTCC: 5m6.340s (GALib) 5m47.404s (EO)
+@item SLANG: 8m27.626s (GALib) 10m9.699s (EO)
+@item LUA: 9m25.401s(GALib) 9m54.785s (EO)
+@end itemize
+
+For reference, these results were obtained on a PC with a Pentium IV processor
+running at 2.6GHz, 2048MB of memory, using Linux.
+
+@page
+
+@c --- GALib performance on Cart Centering ---
+@node GALib performance on Cart Centering, EO performance on Cart Centering,, Cart Centering Performance
+@subsubsection GALib performance
+
+@image{cart-mbipg-GALIB,12cm,,Mean Best Individual per Generation with GALib}
+
+@c --- EO performance on Cart Centering ---
+@node EO performance on Cart Centering,  , GALib performance on Cart Centering, Cart Centering Performance
+@subsubsection EO performance
+
+@image{cart-mbipg-EO,12cm,,Mean Best Individual per Generation with EO}
+
+@page
+
+
+
+
+

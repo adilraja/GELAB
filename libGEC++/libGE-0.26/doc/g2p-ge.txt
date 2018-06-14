@@ -1,0 +1,23 @@
+
+
+                   Biological System                   GE
+
+                          DNA                     Binary String
+                           |                            |
+     Transcription         |                            |
+                           V                            V
+                          RNA                    Integer String
+                           |                            |
+                           |                            |
+                           V                            V
+                      Amino-Acids                     Rules
+                           |                            |
+     Translation           |                            |
+                           V                            V
+                       Proteins                     Terminals
+                           |                            |
+                           |                            |
+                           V                            V
+                   Phenotypic Effect                 Program
+
+

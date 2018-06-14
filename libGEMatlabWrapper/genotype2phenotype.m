@@ -48,6 +48,9 @@ end
 
 if(grammar.getPhenotype().getValid()==1)
     fprintf("\nThe above phenotype is valid\n");
+    fileID = fopen('exp.txt','w');
+    fprintf(fileID,'\nThe above phenotype is valid\n');
+    fclose(fileID);
 else 
     fprintf("\nThe above phenotype is not valid\n");
 end
