@@ -28,12 +28,14 @@ public abstract class CFGrammar extends Grammar {
      */
     public CFGrammar() {
         super();
+        this.derivationTree=new Tree();
     }
     /**
      *Constructor setting the genotype structure of this mapper to newGenotype.
      */
     public CFGrammar(final Genotype newGenotype){
         super(newGenotype);
+        this.derivationTree=new Tree();
     }
     
     /**
@@ -41,6 +43,7 @@ public abstract class CFGrammar extends Grammar {
      */
     public CFGrammar(final Phenotype newPhenotype){
         super(newPhenotype);
+        this.derivationTree=new Tree();
     }
     
     
@@ -49,6 +52,7 @@ public abstract class CFGrammar extends Grammar {
      */
 public CFGrammar(final CFGrammar copy){
     super(copy);
+    this.derivationTree=new Tree(copy.derivationTree);
     // Now must go through the copied grammar, and replace references to
     // the copy's lhs symbols with references to the new lhs symbols.
     Iterator<Rule> ruleIt=this.iterator();//iterator of Rule

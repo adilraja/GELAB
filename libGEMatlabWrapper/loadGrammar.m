@@ -16,7 +16,7 @@ javaaddpath(libGEpath);
 %fileparts(which('loadGrammar.m')),
 bnffilepath=strcat(fileparts(which('loadGrammar.m')), '/grammars/', bnffile);
 bnffilepath2=javaObject('java.lang.String', bnffilepath);
-grammar=javaObject('libGEjava.GEGrammar');
+grammar=javaObject('libGEjava.GEGrammarSI');
 
 grammar.setMaxWraps(9);
 GrammarFile = grammar.readBNFFile(bnffilepath2);

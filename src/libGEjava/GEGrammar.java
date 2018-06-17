@@ -549,10 +549,7 @@ private String phenotypetoString(){
  * @return 
  */
 public String getPhenotypeString(){
-    if(this.phenotype.getValid()==true)
         return this.phenotypetoString();
-    else
-        return null;
 }
 
 public boolean isPhenotypeValid(){

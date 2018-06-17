@@ -182,8 +182,8 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
                 return true;
             }
             else{
-                genotype.setValid(false);
-                phenotype.setValid(false);
+                this.genotype.setValid(false);
+                this.phenotype.setValid(false);
                 return true;
             }
         }
@@ -219,7 +219,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
                     // is more than 1 production associated with current rule
                     this.genotype.add(possibleRules.get(Math.round((float)(possibleRules.size()*Math.random()))));
                     //save choice
-                    prodIt=rulePtr.iterator();
+                    prodIt=rulePtr.iterator();// What does this mean? prodIt=rulePtr->begin()+genotype.back();. Adil
                     int moveAhead=genotype.size();
                     for(int i=0;i<moveAhead;i++){
                         prodIt.next();//Just trying something. Adil
@@ -295,7 +295,12 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
         // Clear genotype
         this.genotype.clear();
         // Clear derivation tree, and add start symbol
-        this.derivationTree.clear();
+        try{
+            this.derivationTree.clear();
+        }
+        catch(java.lang.NullPointerException e){
+            e.printStackTrace();
+        }
         this.derivationTree.setData(this.getStartSymbol());
         this.derivationTree.setCurrentLevel(1);
         this.derivationTree.setDepth(1);
@@ -360,7 +365,11 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
 		this.popIndex=this.getPopSize()-((-newPopIndex)%this.getPopSize());
 	}
 	else if(newPopIndex>=this.getPopSize()){
-		this.popIndex=newPopIndex%this.getPopSize();
+            int popSize=this.getPopSize();
+            if(popSize>0)
+		this.popIndex=newPopIndex%popSize;
+            else
+                this.popIndex=1;
 	}
 	else{
 		this.popIndex=newPopIndex;

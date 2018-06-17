@@ -38,37 +38,45 @@ public class GEsMain{
     //    }
         
         Random rand=new Random();
-        int []newArray= new int[10];
+        int []newArray= new int[15];
         newArray[0]=152;
-        newArray[1]=2;
-        newArray[2]=1;
-        newArray[3]=3;
-        newArray[4]=3;
-        newArray[5]=3;
-        newArray[6]=3;
-        newArray[7]=3;
+        newArray[1]=1;
+        newArray[2]=2;
+        newArray[3]=5;
+        newArray[4]=4;
+        newArray[5]=6;
+        newArray[6]=9;
+        newArray[7]=1;
         newArray[8]=3;
-        newArray[9]=3;
+        newArray[9]=34;
+        newArray[10]=34;
+        newArray[11]=34;
+        newArray[12]=34;
+        newArray[13]=34;
+        newArray[14]=34;
         
         ArrayList<Integer> arrList=new ArrayList();
        for (int i=0;i<10;i++){
             arrList.add((Integer)newArray[i]);
        }
-        Genotype geno=new Genotype(newArray, 10, true,10);
+        Genotype geno=new Genotype(newArray, 15, true,10);
         
 
-        GEGrammar grammar=new GEGrammar(geno);
+        GEGrammarSI grammar=new GEGrammarSI();
+        grammar.setGenotype(geno);
      //   grammar.setGenotype(geno);
-     GEGrammar grammar3;
+     GEGrammarSI grammar3;
     
 
         grammar.setMaxWraps(9);
+        grammar.setMaxDepth(6);
+        
 
         if(grammar.readBNFFile("/home/adil/Dropbox/adils-java/libGEjava/grammars/sr.bnf")) {
         } else {
             System.out.println("Reading of the grammar file was not successful\n");
         }
-
+        grammar.init(1);
         try{
             grammar.genotype2phenotype(true);
         }
@@ -83,7 +91,7 @@ public class GEsMain{
         //grammar.setPhenotype(new Phenotype());
          try{
            //  grammar.setPhenotype(grammar.getPhenotype());
-        grammar3=new GEGrammar(grammar);
+        grammar3=new GEGrammarSI(grammar);
      }
      catch(java.lang.NullPointerException e){
          e.printStackTrace();

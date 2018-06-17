@@ -15,11 +15,11 @@ if(~isjava(grammar))
     fprintf(1, 'grammar is not a valid java object');
     return;
 end
-geno = uint32(genome);
+genome = uint32(genome);
 %disp(geno);
 %To check geno & grammar data type
-disp(class(genome));
-disp(class(grammar));
+% disp(class(genome));
+% disp(class(grammar));
 
 %clear JAVA;
 %libGEpath=strcat(fileparts(which('loadGrammar.m')), '/libGEjar/GrammaticOptimization.jar');
@@ -32,6 +32,10 @@ disp(class(grammar));
 
 
 grammar.setGenotype(genome, length(genome));
+grammar.setMaxWraps(9);%This is also important
+grammar.setMaxDepth(6);
+%grammar.init(1);
+
 
 try
     grammar.genotype2phenotype('true');
@@ -60,12 +64,16 @@ end
 %We can probably set the penotype to grammar object and return it as
 %grammar has both genotype, phenotype and the string representation of the
 %phenotype.
-pheno=javaObject('libGEjava.GEGrammar', grammar);
+pheno=javaObject('libGEjava.GEGrammarSI', grammar);
 grammar=pheno;
 phenotype_string=grammar.getPhenotypeString();
 disp(phenotype_string);
-if(grammar.isPhenotypeValid()==1)
-    phenotype_string=grammar.getPhenotypeString();
-    %disp(phenotype_string);
-end
+% if(grammar.isPhenotypeValid()==1)
+%     phenotype_string=grammar.getPhenotypeString();
+%     %disp(phenotype_string);
+% else
+%     phenotype_string=grammar.getPhenotypeString();
+% end
+
+% disp(phenotype_string);
 end
