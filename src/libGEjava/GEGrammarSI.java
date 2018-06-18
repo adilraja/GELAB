@@ -220,12 +220,14 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
                     this.genotype.add(possibleRules.get(Math.round((float)(possibleRules.size()*Math.random()))));
                     //save choice
                     prodIt=rulePtr.iterator();// What does this mean? prodIt=rulePtr->begin()+genotype.back();. Adil
-                    int moveAhead=genotype.size();
+                    int moveAhead=genotype.get(genotype.size()-1);
                     for(int i=0;i<moveAhead;i++){
                         prodIt.next();//Just trying something. Adil
                     }
                     // Perform "unmod" on choice
-                    //didnt do this. Adil
+                    //Adil. Is this the right way to do it?
+                    genotype.set(genotype.size()-1, genotype.get(genotype.size()-1)+(int)(genotype.getMaxCodonValue()/rulePtr.size()*Math.random()));
+                    //genotype.back()+=static_cast<CodonType>((genotype.getMaxCodonValue()/rulePtr->size()*(rand()/(RAND_MAX+1.0))))*rulePtr->size();
                 }
                 else{
                     // Otherwise set prodIt to point to the only production
