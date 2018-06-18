@@ -22,7 +22,7 @@
 % ## Author: FGFS <fgfs@fgfs-Precision-WorkStation-T3500>
 % ## Created: 2017-03-16
 
-function [fitness, individual] = ge_evaluate (individual, data)
+function individual = ge_evaluate (individual, data)
     individual.isEvaluated=1;%Mark this individual as evaluated, so that it does not get re-evaluated
     var='X';
     [x, y]=size(data.train_x);
@@ -39,6 +39,5 @@ function [fitness, individual] = ge_evaluate (individual, data)
         individual.fitness=ge_mse(result, data.train_y)
     else
         individual.fitness=50000;
-    %You ca plug in your own fitness function here.
-    fitness=individual.fitness;
+    %You can plug in your own fitness function here.
 end
