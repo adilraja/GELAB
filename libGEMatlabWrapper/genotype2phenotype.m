@@ -34,7 +34,7 @@ genome = uint32(genome);
 grammar.setGenotype(genome, length(genome));
 grammar.setMaxWraps(9);%This is also important
 grammar.setMaxDepth(6);
-%grammar.init(1);
+grammar.init(1);
 
 
 try

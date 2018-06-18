@@ -173,7 +173,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
             System.out.println(e.getMessage());
         }
         
-        if(rulePtr != null){// No definition for the current non-terminal found
+        if(rulePtr == null){// No definition for the current non-terminal found
             if(tree.getData().getSymbol().startsWith("<GECodonValue")){
                 this.genotype.add(new Integer(Math.round(genotype.getMaxCodonValue()*(float)Math.random())));
                 return true;
@@ -217,7 +217,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
                 else if(rulePtr.size()>1){
                     // Only choose production and insert it on genotype if there
                     // is more than 1 production associated with current rule
-                    this.genotype.add(possibleRules.get(Math.round((float)(possibleRules.size()*Math.random()))));
+                    this.genotype.add(possibleRules.get(Math.round((float)(possibleRules.size()*Math.random()*0.5))));
                     //save choice
                     prodIt=rulePtr.iterator();// What does this mean? prodIt=rulePtr->begin()+genotype.back();. Adil
                     int moveAhead=genotype.get(genotype.size()-1);
@@ -240,10 +240,10 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
 		int newMaxDepth=tree.getDepth();
                 while(symbIt.hasNext()&& result){
                     tree.add(new Tree(symbIt.next(), tree.getCurrentLevel()+1, tree.getDepth()+1));
-                    result=growTree(tree.get(tree.size()), growMethod, maximumDepth);
+                    result=growTree(tree.get(tree.size()-1), growMethod, maximumDepth);
                     // Update maximum depth of tree
-                    if(newMaxDepth<tree.get(tree.size()).getDepth()){
-                        newMaxDepth=tree.get(tree.size()).getDepth();
+                    if(newMaxDepth<tree.get(tree.size()-1).getDepth()){
+                        newMaxDepth=tree.get(tree.size()-1).getDepth();
                     }
                 }
                 this.genotype.setValid(result);

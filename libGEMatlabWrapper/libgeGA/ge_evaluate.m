@@ -25,9 +25,9 @@
 function [fitness, individual] = ge_evaluate (individual, data)
     individual.isEvaluated=1;%Mark this individual as evaluated, so that it does not get re-evaluated
     var='X';
-    [x, y]=size(data);
+    [x, y]=size(data.train_x);
     for(i=1:y)
-       val=strcat('data(:,', num2str(i),')');
+       val=strcat('data.train_x(:,', num2str(i),')');
        var2=strcat(var, num2str(i));
        eval([var2 '=' val ';']); 
     end
