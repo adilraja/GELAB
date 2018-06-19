@@ -36,8 +36,7 @@ function individual = ge_evaluate (individual, data)
     if(individual.valid)%if this is a valid individual
         result=eval(individual.string);
         individual.result=result;
-        [individual.intercept, individual.slope]=ge_linearScaling(result, data.train_y);
-        individual.fitness=ge_mse(individual.slope*result+individual.intercept, data.train_y);
+        [individual.intercept=ge_linearScaling(result, data.train_y)
     else
         individual.fitness=50000;
     %You can plug in your own fitness function here.

@@ -26,7 +26,7 @@ function individual = ge_createIndividual (genome_length, grammar, runGeno2Pheno
     rng(0,'twister');
     %genotype=randi([0 500000], 1, genome_length);
     
-    individual=struct('genome', randi([0 500000], genome_length, 1), 'fitness', 500000, 'ID', [0 0], 'left_parent', [0 0], 'right_parent', [0 0], 'isEvaluated', 0, 'age', 0, 'result', []);
+    individual=struct('genome', randi([0 500000], genome_length, 1), 'fitness', 500000, 'ID', [0 0], 'left_parent', [0 0], 'right_parent', [0 0], 'isEvaluated', 0, 'age', 0, 'result', [], 'slope', 1, 'intercept', 0);
     grammar.setGenotype(individual.genome, length(individual.genome));
     grammar.setMaxWraps(9);%This is also important
     grammar.setMaxDepth(6);
