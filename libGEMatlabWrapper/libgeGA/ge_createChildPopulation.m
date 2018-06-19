@@ -23,7 +23,7 @@
 % ## Created: 2017-03-16
 
 function [retval] = ge_createChildPopulation(population, genome_length, grammar)
-    childPopulation=ge_initPop(length(population)-1, genome_length, grammar);
+    childPopulation=ge_initPop(length(population)-1, genome_length, grammar, 0);
     j=1;
     for(i=1:length(population)/2)
         [parent1, parent2]=ge_selection(population, 2);

@@ -31,10 +31,8 @@ genome = uint32(genome);
 %methodsview libGEjava.GEGrammar;
 
 
-grammar.setGenotype(genome, length(genome));
-grammar.setMaxWraps(9);%This is also important
-grammar.setMaxDepth(6);
-grammar.init(1);
+
+
 
 
 try

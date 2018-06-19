@@ -1,0 +1,5 @@
+function pop=ge_genotype2phenotypeWholePop(pop)
+popSize=length(pop);
+for(i=1:popSize)
+    pop(i)=genotype2phenotype();
+end

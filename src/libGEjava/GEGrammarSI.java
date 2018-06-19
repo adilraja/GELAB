@@ -377,4 +377,14 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
 		this.popIndex=newPopIndex;
 	}
     }
+    public int[] getGenotypeIntArray(){
+        Iterator<Integer> intItr=this.genotype.iterator();
+        int[] geneArray=new int[this.genotype.size()];
+        int i=0;
+        while(intItr.hasNext()){
+            geneArray[i]=intItr.next();
+            i++;
+        }
+        return geneArray;
+    }
 }

@@ -15,14 +15,16 @@ function [pop, best]=ge_main(numgens, popsize, data, genome_length)
     
     %Load the grammar, you are going to need it.
     grammar=loadGrammar('sr.bnf');
-    pop=ge_initPop(popsize, genome_length, grammar);
+    pop=ge_initPop(popsize, genome_length, grammar, 1);
     pop=ge_evalPop(pop, data);
     
     
     
     for(i=1:numgens)
        childPopulation=ge_createChildPopulation(pop, genome_length, grammar);
+       childPopulation=ge_genotype2phenotypeWholePop(childPopulation);
        childPop=ge_evalPop(childPopulation, data);
        pop=ge_replacement(pop, childPop);
+       
     end
 end

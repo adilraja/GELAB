@@ -22,15 +22,22 @@
 % ## Author: FGFS <fgfs@fgfs-Precision-WorkStation-T3500>
 % ## Created: 2017-03-16
 
-function individual = ge_createIndividual (genome_length, grammar)
+function individual = ge_createIndividual (genome_length, grammar, runGeno2Pheno)
     rng(0,'twister');
     %genotype=randi([0 500000], 1, genome_length);
     
     individual=struct('genome', randi([0 500000], genome_length, 1), 'fitness', 500000, 'ID', [0 0], 'left_parent', [0 0], 'right_parent', [0 0], 'isEvaluated', 0, 'age', 0, 'result', []);
-    [phenotype_string grammar]=genotype2phenotype(individual.genome, grammar);
-    individual.grammar=grammar;% Trying to assign the grammar object to this struct as a field. I hope this works.
-    individual.string=phenotype_string;
-    s=individual.string;
+    grammar.setGenotype(individual.genome, length(individual.genome));
+    grammar.setMaxWraps(9);%This is also important
+    grammar.setMaxDepth(6);
+    grammar.init(1);
+    individual.genome=grammar.getGenotypeIntArray();
+    if(runGeno2Pheno)
+        [phenotype_string grammar]=genotype2phenotype(individual.genome, grammar);
+        individual.string=phenotype_string;
+    end
+    individual.grammar=grammar;% Trying to assign the grammar object to this struct as a field. I hope this works.   
+    %s=individual.string;
     individual.valid=grammar.isPhenotypeValid();%
     %individual.img=rand(300,300);
     %individual.fitness=500000;

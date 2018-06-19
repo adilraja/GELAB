@@ -177,6 +177,11 @@ public class GEsMain{
         System.out.println(grammar.getPhenotypeString());
         System.out.println("Here is the genotype string!");
         System.out.println(grammar.getGenotypeString());
+        System.out.println("Contents of the genotypeIntArray:");
+        int []tmpArr=grammar.getGenotypeIntArray();
+        for(int j=0;j<grammar.getGenotypeIntArray().length;j++){
+            System.out.print(tmpArr[j]+" ");
+        }
         
     /*    try{
             GEGrammar grammar2=new GEGrammar(grammar);
