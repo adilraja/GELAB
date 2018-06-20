@@ -3,4 +3,4 @@ function mse=ge_mse(d1, d2)
 
 diff_vec=d1-d2;
 sq_vec=diff_vec.^2;
-mse=sum(sq_vec);
+mse=mean(sq_vec);

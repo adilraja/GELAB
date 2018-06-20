@@ -40,5 +40,18 @@ function individual = ge_evaluate (individual, data)
         individual.fitness=ge_mse(individual.slope*result+individual.intercept, data.train_y);
     else
         individual.fitness=50000;
+        individual.testFitness=50000;
+        return;
+    end
     %You can plug in your own fitness function here.
+    %Compute testfitness
+    [x, y]=size(data.test_x);
+    for(i=1:y)
+       val=strcat('data.test_x(:,', num2str(i),')');
+       var2=strcat(var, num2str(i));
+       eval([var2 '=' val ';']); 
+    end
+    testResult=eval(individual.string);
+    individual.testResult=result;
+    individual.testFitness=ge_mse(individual.slope*testResult+individual.intercept, data.test_y);
 end

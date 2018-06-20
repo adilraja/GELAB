@@ -496,6 +496,7 @@ public void buildDTree(Tree currentNode, ListIterator<Production> prodIt){
 		}
 	// Expand each child node
 	Iterator<Tree> treeIt=currentNode.iterator();
+        prodIt.previous();
 	while(treeIt.hasNext()){
             try{
                 prodIt.next();
