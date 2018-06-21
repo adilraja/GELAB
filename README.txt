@@ -1,3 +1,6 @@
+
+Initially a framework for Grammatical Evolution in Java. This is based on the original source code of GE in C++.
+Now, GELAB: A Matlab Toolbox for Grammatical Evolution.
 Installation: -
 In order to install libGEjava on your system, simply clone this repository (or download it).
 
