@@ -3,8 +3,8 @@ function [intercept, slope]=ge_linearScaling(evolved,target)
 %symbolic regression.
 i=0;
 if length(evolved) ~= length(target)
-     printf('No of Target Values is not the same as Evolved Values');
-     printf('Exiting .... ');
+     disp('No of Target Values is not the same as Evolved Values');
+     disp('Exiting .... ');
      exit(0);
  end
  
@@ -19,6 +19,6 @@ if length(evolved) ~= length(target)
      slope=1;
  if denominator~=0     slope=numerator/denominator;
    elseif  (meanEvolved == 0)  slope = 1;
-   else slope = meanTarget / meanEvolved;
+   else slope = meanTarget ./ meanEvolved;
  end
  intercept=meanTarget - slope*meanEvolved; 

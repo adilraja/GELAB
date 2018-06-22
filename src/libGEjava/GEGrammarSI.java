@@ -217,7 +217,12 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
                 else if(rulePtr.size()>1){
                     // Only choose production and insert it on genotype if there
                     // is more than 1 production associated with current rule
-                    this.genotype.add(possibleRules.get(Math.round((float)(possibleRules.size()*Math.random()*0.5))));
+                    int index=Math.round((float)(possibleRules.size()*Math.random()));
+                    if(index>=possibleRules.size() && index!=0){
+                        index=possibleRules.size()-1;
+                    }
+                        
+                    this.genotype.add(possibleRules.get(index));
                     //save choice
                     prodIt=rulePtr.iterator();// What does this mean? prodIt=rulePtr->begin()+genotype.back();. Adil
                     int moveAhead=genotype.get(genotype.size()-1);

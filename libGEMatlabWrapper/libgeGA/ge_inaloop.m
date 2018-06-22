@@ -5,7 +5,7 @@ if(exist('numRuns', 'var')==0)
     numRuns=50;
 end
 if(exist('popsize', 'var')==0)
-    popsize=1000;
+    popsize=100;
 end
 if(exist('numgens', 'var')==0)
     numgens=150;
