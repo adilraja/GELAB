@@ -307,6 +307,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
         }
         catch(java.lang.NullPointerException e){
             e.printStackTrace();
+            return false;
         }
         this.derivationTree.setData(this.getStartSymbol());
         this.derivationTree.setCurrentLevel(1);

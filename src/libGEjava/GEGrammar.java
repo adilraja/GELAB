@@ -300,6 +300,8 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGeno
         }
         catch(java.lang.Exception e){
             System.out.println(e+" genotype2phenotypeStep()s rulePtr sucks");
+            returnValue=-1;
+            return returnValue;
         }
 	//cerr << "mapping " << *(nonterminals.top()) << " with " << *genoIt << "\n";
         
@@ -369,6 +371,8 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGeno
             }
             catch(java.lang.NullPointerException e){
                 System.out.println(e);
+                returnValue=-1;
+                return returnValue;
             }
 	}
         
@@ -420,6 +424,8 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGeno
                         }
                         catch(java.lang.NullPointerException e){
                             System.out.println(e+"tmpProd is null in GEGrammar");
+                            returnValue=-1;
+                            return returnValue;
                         }
                         
 			while((s_start<s_stop)&&tmpProd.get(s_start).getType().toString().compareTo("TSymbol")==0){
@@ -457,11 +463,15 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGeno
                 catch(java.lang.NullPointerException e){
                 System.out.println(e+"The while loop at the end of genotype2phenotypeStep sucks");
                 e.printStackTrace();
-                System.exit(0);
+                returnValue=-1;
+                return returnValue;
+              //  System.exit(0);
             }
             catch(java.util.EmptyStackException e){
                 System.out.println(e+" GEGrammar sucks...Stack is empty");
-                System.exit(0);
+                returnValue=-1;
+                return returnValue;
+              //  System.exit(0);
             }
             }
       //  }
@@ -506,7 +516,7 @@ public void buildDTree(Tree currentNode, ListIterator<Production> prodIt){
            }
             catch(java.util.NoSuchElementException e){
               System.out.println(e+" The last lines of buildTree suck");
-              System.exit(0);
+             // System.exit(0);
            }
 		
 	//	treeIt++;
