@@ -4,8 +4,6 @@ function [intercept, slope]=ge_linearScaling(evolved,target)
 i=0;
 if length(evolved) ~= length(target)
      disp('No of Target Values is not the same as Evolved Values');
-     [x, y]=size(target);
-     evolved=ones(x, y)*evolved(1);%perhaps evolved was just a constant returned by a program having no variables.
    %  disp('Exiting .... ');
     % exit(0);
  end

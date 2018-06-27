@@ -243,7 +243,9 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 				break;
 			default:System.out.println("Internal error in genotype2Phenotype()");
 				System.out.println("Execution aborted.");
-				System.exit(0);
+				//System.exit(0);
+                                returnValue=false;
+                                break;
 		}
 	}
 	//newEffectiveSize+=(genoIt-genotype.begin());
