@@ -36,7 +36,7 @@ function individual = ge_createIndividual (genome_length, grammar, runGeno2Pheno
         [phenotype_string grammar]=genotype2phenotype(individual.genome, grammar);
         individual.string=phenotype_string;
     end
-    individual.grammar=grammar;% Trying to assign the grammar object to this struct as a field. I hope this works.   
+    %individual.grammar=grammar;% Trying to assign the grammar object to this struct as a field. I hope this works.   
     %s=individual.string;
     individual.valid=grammar.isPhenotypeValid();%
     %individual.img=rand(300,300);

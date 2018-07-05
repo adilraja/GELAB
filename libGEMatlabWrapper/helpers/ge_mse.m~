@@ -1,7 +1,0 @@
-function mserror=ge_mse(evolved_data, target_data)
-%This function computes mean squared error of the data. Written by Muhammad
-%Adil Raja, 20th June, 2018
-
-data_difference=evolved_data-target_data;
-sq_error=power(data_difference, 2);
-mserror=mean(sq_erro);

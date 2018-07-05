@@ -5,5 +5,5 @@ for(i=1:popSize)
     [phenotype_string grammar]=genotype2phenotype(pop(i).genome, pop(i).grammar);
     pop(i).string=phenotype_string;
     pop(i).valid=grammar.isPhenotypeValid();%
-    pop(i).grammar=grammar;
+    %pop(i).grammar=grammar;
 end

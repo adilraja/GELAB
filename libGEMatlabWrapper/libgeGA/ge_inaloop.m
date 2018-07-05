@@ -2,13 +2,13 @@ function [all_pops, all_bests, all_stats]=ge_inaloop(numRuns, popsize, numgens)
 %This is going to run ge for multiple runs. Muhammad Adil Raja. 20 July,
 %2018
 if(exist('numRuns', 'var')==0)
-    numRuns=5;
+    numRuns=50;
 end
 if(exist('popsize', 'var')==0)
-    popsize=100;
+    popsize=1000;
 end
 if(exist('numgens', 'var')==0)
-    numgens=50;
+    numgens=100;
 end
 all_stats=ge_statistics;
 all_pops=[];
