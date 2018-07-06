@@ -33,7 +33,7 @@ genome = uint32(genome);
 
 
 
-
+grammar.setGenotype(genome, length(genome));
 
 try
     grammar.genotype2phenotype('true');
@@ -62,8 +62,8 @@ end
 %We can probably set the penotype to grammar object and return it as
 %grammar has both genotype, phenotype and the string representation of the
 %phenotype.
-pheno=javaObject('libGEjava.GEGrammarSI', grammar);
-grammar=pheno;
+%pheno=javaObject('libGEjava.GEGrammarSI', grammar);
+%grammar=pheno;
 phenotype_string=grammar.getPhenotypeString();
 disp(phenotype_string);
 % if(grammar.isPhenotypeValid()==1)

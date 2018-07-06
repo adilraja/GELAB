@@ -33,6 +33,7 @@ public class GEGrammar extends CFGrammar {
         super();
         setMaxWraps(0);
         this.productions=new ArrayList();
+        this.nonterminals=new Stack();
     }
    
     
@@ -42,7 +43,8 @@ public class GEGrammar extends CFGrammar {
 public GEGrammar(final Genotype newGenotype){
     super(newGenotype);
     setMaxWraps(0);
-    productions=new ArrayList();
+    this.productions=new ArrayList();
+    this.nonterminals=new Stack();
 }
 
 /**
@@ -51,6 +53,7 @@ public GEGrammar(final Genotype newGenotype){
 public GEGrammar(final Phenotype newPhenotype){
     super(newPhenotype);
     setMaxWraps(0);
+    this.nonterminals=new Stack();
 }
    /**
     * Copy Constructor.
@@ -62,6 +65,7 @@ public GEGrammar(final GEGrammar copy) throws Exception{
 	// and productions and derivationTree structures.
         this.productions=new ArrayList();
         this.productions.clear();
+        this.nonterminals=new Stack();
         this.genotype2phenotype(true);
 }
 
@@ -154,7 +158,7 @@ public boolean genotype2phenotype(final String buildDerivationTree){
  */
 public boolean genotype2phenotype(final boolean buildDerivationTree){
         
-	this.derivationTree=new Tree();//Initialize the tree
+	this.derivationTree.clear();//=new Tree();//Initialize the tree
 	boolean returnValue=true;
 	int newEffectiveSize=0;
         this.counterFlag=0;
@@ -162,9 +166,11 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 	genotype.setEffectiveSize(newEffectiveSize);
   //      System.out.println("You called readBNFString, which called this");
        
-        this.phenotype=new Phenotype(true,1);//No need to do this as this has already been done in Mapper's constructor.
-        if(!phenotype.isEmpty())
-            phenotype.clear();
+        //this.phenotype.clear();// =new Phenotype(true,1);//No need to do this as this has already been done in Mapper's constructor.
+        //this.phenotype.setValid(true);
+       // this.phenotype.setFitness(500000);
+        if(!this.phenotype.isEmpty())
+            this.phenotype.clear();
 	if(buildDerivationTree){
             if(!this.productions.isEmpty())
                 this.productions.clear();//Removes all items from the list
@@ -173,14 +179,14 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 	//if((!getValidGrammar())||(!genotype.getValid())||(!getGenotype()->size())){
         
 	if(!getValidGrammar()){
-		phenotype.clear();
-		phenotype.setValid(false);
+		this.phenotype.clear();
+		this.phenotype.setValid(false);
 		return false;
 	}
 
 	//Wraps counter and nonterminals (Symbols) stack
 	int wraps=0;
-	this.nonterminals=new Stack();
+	this.nonterminals.clear();// =new Stack();//No need to create a new object
 
 	// Iterators
 	Iterator<Rule> ruleIt;

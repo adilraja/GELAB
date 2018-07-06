@@ -24,7 +24,7 @@ function [pop, best, stats3]=ge_main(numgens, popsize, data, genome_length)
     for(i=1:numgens)
        tic;
        childPopulation=ge_createChildPopulation(pop, genome_length, grammar);
-       childPopulation=ge_genotype2phenotypeWholePop(childPopulation);
+       [childPopulation, grammar]=ge_genotype2phenotypeWholePop(childPopulation, grammar);
        childPop=ge_evalPop(childPopulation, data);
        pop=ge_replacement(pop, childPop);
        stats3=ge_computeStatistics(stats3, pop);
