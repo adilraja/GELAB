@@ -1,5 +1,6 @@
 function data=ge_load_dataset(trainx_filename, trainy_filename, testx_filename, testy_filename)
 tempData=load(trainx_filename);
+data.test=0;
 data.train_x=tempData;
 tempData=load(trainy_filename);
 data.train_y=tempData;
@@ -27,5 +28,6 @@ if(exist('testx_filename', 'var')~=0)
         disp('The number of features in training and testing data is not equal:'); 
         return;
     end
+    data.test=1;
 end
 

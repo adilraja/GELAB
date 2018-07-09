@@ -55,6 +55,9 @@ function individual = ge_evaluate (individual, data)
         return;
     end
     %You can plug in your own fitness function here.
+    if(data.test==0)
+        return;
+    end
     %Compute testfitness
     [x, y]=size(data.test_x);
     for(i=1:y)

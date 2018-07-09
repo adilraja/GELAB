@@ -20,6 +20,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
     private int tailSize;
     private int popSize;
     private int popIndex;
+    private ArrayList<Integer> possibleRules;
     
     
     /**
@@ -32,6 +33,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
 	setMaxDepth(1);
 	this.setTailRatio(0);
 	this.setTailSize(0);
+        this.possibleRules= new ArrayList();
     }
     /**
      * Constructor setting the genotype structure of this mapper to newGenotype
@@ -43,6 +45,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
 	this.setMaxDepth(1);
 	this.setTailRatio(0);
 	this.setTailSize(0);
+        this.possibleRules=new ArrayList();
     }
     
     /**
@@ -55,6 +58,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
 	this.setMaxDepth(1);
 	this.setTailRatio(0);
 	this.setTailSize(0);
+        this.possibleRules=new ArrayList();
     }
     
     /**
@@ -68,6 +72,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
 	setMaxDepth(copy.getMaxDepth());
 	setTailRatio(copy.getTailRatio());
 	setTailSize(copy.getTailSize());
+        this.possibleRules=new ArrayList();
     }
     /**
      * Return the grow percentage set for this initialiser.
@@ -190,8 +195,8 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
         else{
             Iterator<Production> prodIt=rulePtr.iterator();
             int ii=0;
-            ArrayList<Integer> possibleRules=new ArrayList();
-            possibleRules.clear();
+            //ArrayList<Integer> possibleRules=new ArrayList();
+            this.possibleRules.clear();
             
             boolean recursiveRules=false;// Flags the presence of recursive rules on full method
             while(prodIt.hasNext()){
@@ -202,27 +207,27 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
                     if(!growMethod && !recursiveRules && prod.getRecursive()){
                         // Choose only recursive rules from now on
                         recursiveRules=true;
-			possibleRules.clear();
+			this.possibleRules.clear();
                     }
                     if((growMethod)||(!recursiveRules)||((!growMethod)&&(recursiveRules)&&(prod.getRecursive()))){
-                        possibleRules.add(new Integer(ii));
+                        this.possibleRules.add(new Integer(ii));
                     }
                 }
                 ii++;
             }
                 // possibleRules now contains all valid rules
-                if(possibleRules.isEmpty()){
+                if(this.possibleRules.isEmpty()){
                     return false;
                 }
                 else if(rulePtr.size()>1){
                     // Only choose production and insert it on genotype if there
                     // is more than 1 production associated with current rule
-                    int index=Math.round((float)(possibleRules.size()*Math.random()));
-                    if(index>=possibleRules.size() && index!=0){
-                        index=possibleRules.size()-1;
+                    int index=Math.round((float)(this.possibleRules.size()*Math.random()));
+                    if(index>=this.possibleRules.size() && index!=0){
+                        index=this.possibleRules.size()-1;
                     }
                         
-                    this.genotype.add(possibleRules.get(index));
+                    this.genotype.add(this.possibleRules.get(index));
                     //save choice
                     prodIt=rulePtr.iterator();// What does this mean? prodIt=rulePtr->begin()+genotype.back();. Adil
                     int moveAhead=genotype.get(genotype.size()-1);
