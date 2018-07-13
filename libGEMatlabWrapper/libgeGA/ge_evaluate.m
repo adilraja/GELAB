@@ -67,5 +67,5 @@ function individual = ge_evaluate (individual, data)
     end
     testResult=eval(individual.string);
     individual.testResult=result;
-    individual.testFitness=ge_mse(individual.slope*testResult+individual.intercept, data.test_y);
+    individual.testFitness=ge_mse(individual.slope*testResult+individual.intercept, params.test_y);
 end

@@ -1,5 +1,5 @@
 <code> ::= <line> | <code> <line>
 <line> ::= <condition> | <op>
-<condition> ::= if(ge_antfoodahead()) <line> else <line> end
+<condition> ::= if(ge_antfoodahead()) <line> else <line> end;
 <op> ::=  ge_antleft(); | ge_antright(); | ge_antmove();
 

@@ -749,7 +749,7 @@ for(int pass=1;pass<=2;pass++){
         }
     }
 }
-this.pruneSpaces();//removes extra spaces
+//this.pruneSpaces();//removes extra spaces
 updateRuleFields();
 setValidGrammar(true);
 //genotype2phenotype();

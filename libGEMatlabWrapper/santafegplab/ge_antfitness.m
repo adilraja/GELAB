@@ -1,4 +1,4 @@
-function ind=ge_antfitness(individual, data)
+function individual=ge_antfitness(individual, data)
 %ANTFITNESS    Measures the fitness of a GPLAB artificial ant.
 %   ANTFITNESS(INDIVIDUAL,PARAMS,DATA,TERMINALS,VARSVALS) returns
 %   the fitness of INDIVIDUAL, measured as the number of food
@@ -32,7 +32,7 @@ global ntime;
 global sim;
 global path;
 
-trail=data.example;
+trail=data.train_x;
 x=1;
 y=1;
 direction='r';
@@ -47,14 +47,19 @@ end
 
 % evaluate ant and count food pellets eaten:
 % (repeat program until maxtime)
+if(individual.valid==0)
+    individual.fitness=0;%Bad fitness, (Higher is better)
+    return;
+end
+
 while 1
-   anteval(ind.tree);
+   eval(individual.string);
    if ntime>=maxtime
       break
    end
 end
 
 % raw fitness:
-ind.fitness=npellets; %higher fitness means better individual
+individual.fitness=npellets; %higher fitness means better individual
 
-ind.result(1)=ind.fitness;
+individual.result(1)=individual.fitness;

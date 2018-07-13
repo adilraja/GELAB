@@ -1,28 +1,18 @@
-function [all_pops, all_bests, all_stats]=ge_inaloop(numRuns, popsize, numgens, bnfFile)
+function [all_pops, all_bests, all_stats, params]=ge_inaloop(params)
 %This is going to run ge for multiple runs. Muhammad Adil Raja. 20 July,
 %2018
-if(exist('numRuns', 'var')==0)
-    numRuns=50;
+
+if(exist('params', 'var')==0)
+    params=ge_fiddleParams;
 end
-if(exist('popsize', 'var')==0)
-    popsize=1000;
-end
-if(exist('numgens', 'var')==0)
-    numgens=100;
-end
-if(exist('bnfFile', 'var')==0)
-    grammar=loadGrammar(bnfFile);
-else
-    grammar=loadGrammar('santafe.bnf');
-end
+
 all_stats=ge_statistics;
 all_pops=[];
 all_bests=[];
-%data=ge_load_dataset('trainingDataX.txt', 'trainingDataY.txt', 'testingDataX.txt', 'testingDataY.txt');
-data=ge_load_dataset('quartic_x.txt', 'quartic_y.txt');
 
-for(i=1:numRuns)
-    [pop, best, stats2]=ge_main(numgens, popsize, data, grammar);
+
+for(i=1:params.numRuns)
+    [pop, best, stats2]=ge_main(params);
     all_stats.bestfithistory=[all_stats.bestfithistory, stats2.bestfithistory];
     all_stats.testfithistory=[all_stats.testfithistory, stats2.testfithistory];
     all_stats.meanfithistory=[all_stats.meanfithistory, stats2.meanfithistory];

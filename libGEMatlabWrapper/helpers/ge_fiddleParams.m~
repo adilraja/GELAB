@@ -29,4 +29,4 @@ elseif(fitness==3)
 else
     params.fitnessFunction='ge_evaluate';
 end
-params.lowerisbetter=input('Lower is better? Please enter 1 for yes and 0 for no!\n');
+

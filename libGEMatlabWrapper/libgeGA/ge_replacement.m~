@@ -30,10 +30,10 @@ function survivedPopulation = ge_replacement (parentPopulation, childPopulation,
     end
     if(params.lowerisbetter==1)
         [sortedFitness, I]=sort(fitness, 'ascend');
-    elseif(params.lowerisbetter==0)
+    elseif(params.lowerisbetter=0)
         [sortedFitness, I]=sort(fitness, 'descend');
     else
-        disp('Please enter the right values for Lower is Better param: 0 or 1\n');
+        disp('Please enter the right values for ');
     end
     survivedPopulation=population(I(1:length(population)/2));
 end
