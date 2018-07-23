@@ -23,7 +23,7 @@ enum SymbolType{
     NTSymbol, TSymbol
 };
 
-public class Symbol{
+public class Symbol implements java.io.Serializable{
     
     private SymbolType type;
     private String symbol;

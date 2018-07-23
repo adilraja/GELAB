@@ -48,14 +48,15 @@ catch E
     end
 end
 
-if(grammar.getPhenotype().getValid()==1)
-    fprintf("\nThe above phenotype is valid\n");
-    fileID = fopen('exp.txt','w');
-    fprintf(fileID,'\nThe above phenotype is valid\n');
-    fclose(fileID);
-else 
-    fprintf("\nThe above phenotype is not valid\n");
-end
+%grammar.pruneSpaces();
+% if(grammar.getPhenotype().getValid()==1)
+%     fprintf("\nThe above phenotype is valid\n");
+%     fileID = fopen('exp.txt','w');
+%     fprintf(fileID,'\nThe above phenotype is valid\n');
+%     fclose(fileID);
+% else 
+%     fprintf("\nThe above phenotype is not valid\n");
+% end
 %pheno.string=grammar.phenotypetoString();
 %pheno.phenotype=grammar.getPhenotype();
 %pheno.
@@ -65,7 +66,9 @@ end
 %pheno=javaObject('libGEjava.GEGrammarSI', grammar);
 %grammar=pheno;
 phenotype_string=grammar.getPhenotypeString();
-disp(phenotype_string);
+%disp(phenotype_string);
+%treeDepth=grammar.getTreeDepth();
+%disp(phenotype_string);
 % if(grammar.isPhenotypeValid()==1)
 %     phenotype_string=grammar.getPhenotypeString();
 %     %disp(phenotype_string);

@@ -322,7 +322,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
         returnValue=this.growTree(derivationTree, grow, this.getMaxDepth());
         if(returnValue){
             this.genotype.setValid(true);
-            if(!this.genotype2phenotype()){
+            if(!this.genotype2phenotype(true)){
                 System.err.println("WARNING: invalid phenotype structure produced with Sensible Initialisation");
             }
         }

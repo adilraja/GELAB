@@ -20,6 +20,8 @@ import java.util.Iterator;
 public class GEGrammar extends CFGrammar {
     
     private int maxWraps;
+    private int tempTreeDepth;
+    private int treeDepth;
     protected ArrayList<Production> productions;
     private int counterFlag;//I just put it here
     private Stack<Symbol> nonterminals;
@@ -34,6 +36,8 @@ public class GEGrammar extends CFGrammar {
         setMaxWraps(0);
         this.productions=new ArrayList();
         this.nonterminals=new Stack();
+        this.tempTreeDepth=0;//By Adil
+        this.treeDepth=0;
     }
    
     
@@ -45,6 +49,8 @@ public GEGrammar(final Genotype newGenotype){
     setMaxWraps(0);
     this.productions=new ArrayList();
     this.nonterminals=new Stack();
+    this.tempTreeDepth=0;//By Adil
+    this.treeDepth=0;
 }
 
 /**
@@ -54,6 +60,8 @@ public GEGrammar(final Phenotype newPhenotype){
     super(newPhenotype);
     setMaxWraps(0);
     this.nonterminals=new Stack();
+    this.tempTreeDepth=0;//By Adil
+    this.treeDepth=0;
 }
    /**
     * Copy Constructor.
@@ -67,6 +75,8 @@ public GEGrammar(final GEGrammar copy) throws Exception{
         this.productions.clear();
         this.nonterminals=new Stack();
         this.genotype2phenotype(true);
+        this.tempTreeDepth=0;//By Adil
+        this.treeDepth=0;
 }
 
 
@@ -272,6 +282,8 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 		this.derivationTree.setData(getStartSymbol());
 		this.derivationTree.setCurrentLevel(1);
 		this.derivationTree.setDepth(1);
+                this.tempTreeDepth=0;//By Adil
+                this.treeDepth=0;
 		prodIt=productions.listIterator();//something wrong here
 		buildDTree(this.derivationTree,prodIt);
                 Production temp =prodIt.next();
@@ -496,9 +508,7 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGeno
  * Builds the derivation tree, based on the productions vector.
  *Arguments are current tree node, and iterator on productions vector.
  */
-public void buildDTree(Tree currentNode, ListIterator<Production> prodIt){
-    
-    
+public void buildDTree(Tree currentNode, ListIterator<Production> prodIt){   
     try{
 	// If current symbol is not a non-terminal, or if all productions have been treated
 	if(currentNode.getData().getType().toString().compareTo("NTSymbol")!=0||!prodIt.hasNext()){
@@ -509,16 +519,30 @@ public void buildDTree(Tree currentNode, ListIterator<Production> prodIt){
 	// Create new tree level
 	Iterator<Symbol> symbIt=prodIt.next().iterator();;
 	while(symbIt.hasNext()){
+             //   this.tempTreeDepth=currentNode.getDepth();
 		currentNode.add(new Tree(symbIt.next(), currentNode.getCurrentLevel()+1, currentNode.getDepth()+1));
+                
+        //        if(this.tempTreeDepth>this.treeDepth){
+        //            this.treeDepth=this.tempTreeDepth-1;
+        //        }
+                //this.tempTreeDepth=1;
 		//symbIt++;
-		}
+	}
 	// Expand each child node
 	Iterator<Tree> treeIt=currentNode.iterator();
         prodIt.previous();
+        this.tempTreeDepth=1;
 	while(treeIt.hasNext()){
             try{
                 prodIt.next();
+                //this.tempTreeDepth++;//trying to compute tree depth
+                //System.out.println("I come here: "+this.tempTreeDepth);
                 buildDTree(treeIt.next(), prodIt);
+                //The following if was added by Adil
+             //   if(this.tempTreeDepth>this.treeDepth){
+             //       this.treeDepth=this.tempTreeDepth;
+              //  }
+            //    this.tempTreeDepth=1;//set it to 1 again
   //              prodIt.next();
                 
            }
@@ -589,5 +613,12 @@ public String getGenotypeString(){
     return genoString;
 }
 
+/**
+ * Returns the depth of the derivation tree.
+ * @return 
+ */
+public int getTreeDepth(){
+    return this.treeDepth;
+}
 
 }

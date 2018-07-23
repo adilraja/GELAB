@@ -8,7 +8,15 @@ Running This Software: -
 
 Once you have done that, you can simply run this software from the Matlab command line. Simply navigate to the libgeGA folder and run ge_main.m. The software should run.
 
-In order to run a full-fledged experiment, simply run: [pop, best, stats3]=ge_inaloop(numRuns, popsize, numgens);
+In order to run a full-fledged experiment, simply run: 
+
+>>load('srparallelparams.mat', 'params');
+>> [all_pops, all_bests, all_stats, params]=ge_inaloop(params);
+
+Or simply:
+
+>> [all_pops, all_bests, all_stats, params]=ge_inaloop;
+
 
 If you are a lazy guy just like myself, you can copy your training and test data to the following files and run the whole thing for your own problem. trainingDataX.txt, trainingDataY.txt, testDataX.txt, testDataX.txt.
 

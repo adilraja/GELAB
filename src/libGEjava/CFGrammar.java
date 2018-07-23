@@ -781,6 +781,31 @@ public void pruneSpaces(){
 }
 
 /**
+ * Returns the production Rules in a String
+ * @return 
+ */
+public String getRules(){
+    Iterator<Rule> ruleIt=this.iterator();
+    String tmpStr="";
+    while(ruleIt.hasNext()){
+        Rule tmpRule=ruleIt.next();
+            //System.out.print(tmpRule.lhs.get(0).getSymbol()+"::=");
+            tmpStr+=tmpRule.lhs.get(0).getSymbol();
+            tmpStr+="::= ";
+            Iterator<Production> prodIt=tmpRule.iterator();
+            while(prodIt.hasNext()){
+                Iterator<Symbol> symbIt2=prodIt.next().iterator(); 
+                while(symbIt2.hasNext()){
+                    tmpStr+=symbIt2.next().getSymbol();
+                }
+                tmpStr+=" | ";
+            }
+            tmpStr+="\n";
+        }
+    return tmpStr;
+}
+
+/**
  * Reads in the BNF grammar-part specified by its argument text, and adds it to
  *the current grammar. Returns true if loading of new grammar part was
  *successful, false otherwise.

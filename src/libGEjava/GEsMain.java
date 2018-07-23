@@ -36,30 +36,12 @@ public class GEsMain{
     //   catch(java.io.IOException e){
     //        e.printStackTrace();
     //    }
-        
+    int[] newArray={ 2, 1, 1, 0, 0, 1, 4, 3, 44, 1, 2, 0, 3, 44, 3, 44, 2, 2, 1, 0, 0, 3, 44, 2, 3, 44, 2, 2, 2, 1, 3, 44, 3, 44, 2, 2, 3, 44, 3, 44};
         Random rand=new Random();
-        int []newArray= new int[15];
-        newArray[0]=152;
-        newArray[1]=1;
-        newArray[2]=2;
-        newArray[3]=5;
-        newArray[4]=4;
-        newArray[5]=6;
-        newArray[6]=9;
-        newArray[7]=1;
-        newArray[8]=3;
-        newArray[9]=34;
-        newArray[10]=34;
-        newArray[11]=34;
-        newArray[12]=34;
-        newArray[13]=34;
-        newArray[14]=34;
         
-        ArrayList<Integer> arrList=new ArrayList();
-       for (int i=0;i<10;i++){
-            arrList.add((Integer)newArray[i]);
-       }
-        Genotype geno=new Genotype(newArray, 15, true,10);
+        
+        
+        Genotype geno=new Genotype(newArray, newArray.length, true,10);
         
 
         GEGrammarSI grammar=new GEGrammarSI();
@@ -72,11 +54,11 @@ public class GEsMain{
         grammar.setMaxDepth(6);
         
 
-        if(grammar.readBNFFile("/home/adil/Dropbox/Matlab/GELAB/grammars/sr.bnf")) {
+        if(grammar.readBNFFile("/home/adil/Dropbox/UL/ULPostdoc/GELAB/grammars/sr.bnf")) {
         } else {
             System.out.println("Reading of the grammar file was not successful\n");
         }
-        grammar.init(1);
+        //grammar.init(1);
         try{
             grammar.genotype2phenotype(true);
         }
@@ -133,13 +115,7 @@ public class GEsMain{
             }
             System.out.println();
         }
-        System.out.println("My name is John Rambo "+grammar.size());
-        System.out.println(newArray.length);
-       
-        String str1=new String("Adil");
-        String str2=new String("Adil");
-        if(str1.equals(str2))
-                System.out.println("adilRaja");
+        
         Symbol symb=new Symbol();
         System.out.println(symb.getType().toString());
         symb.setType(SymbolType.NTSymbol);
@@ -182,7 +158,10 @@ public class GEsMain{
         for(int j=0;j<grammar.getGenotypeIntArray().length;j++){
             System.out.print(tmpArr[j]+" ");
         }
-        
+        System.out.println("\nTree depth is: "+grammar.getTreeDepth());
+        if(grammar.isPhenotypeValid())
+            System.out.println("The phenotype is also valid:");
+        System.out.println("The rules are: \n"+grammar.getRules());
     /*    try{
             GEGrammar grammar2=new GEGrammar(grammar);
         }
