@@ -1,5 +1,5 @@
 %This is the main file to run ge.
-function [pop, best, stats3]=ge_main(params, runNumber)
+function [pop, best, stats3, params]=ge_main(params, runNumber)
     if(exist('params', 'var')==0)
         disp('The right parameters have not been specified to run GELAB in ge_main.\n')
     end
@@ -7,16 +7,22 @@ function [pop, best, stats3]=ge_main(params, runNumber)
     %Load a statistics object. We are going to need it to keep track of
     %various things.
     stats3=ge_statistics();
+    params.grammar.setMaxDepth(params.initMaxDepth);
     
-    pop=ge_initUniqueValidPopUsingSensibleInit(params);
-    pop=ge_evalPop(pop, params);
+    [pop, params]=ge_initUniqueValidPopUsingSensibleInit(params);
+%     pop=ge_initPop(params, 1);
+%     disp('i am out of here');
+
+%     [pop, params]=ge_evalPop(pop, params);
+    %pop=ge_evalPop(pop, params);
+    %params.grammar.setMaxDepth(params.maxDepth);
     
     for(i=1:params.numGens)
        tic;
        childPopulation=ge_createChildPopulation(pop, params);
-       [childPopulation, grammar]=ge_genotype2phenotypeWholePop(childPopulation, params.grammar);
-       childPop=ge_evalPop(childPopulation, params);
-       pop=ge_replacement(pop, childPop, params);
+       childPopulation=ge_genotype2phenotypeWholePop(childPopulation, params);
+       [childPop, params]=ge_evalPop(childPopulation, params);
+       pop=ge_halfElitism(pop, childPop, params);
        %pause(3);
        fprintf('*****************************************\n');
        fprintf('Run-number: %d, Generation number: %d\n', runNumber, i);

@@ -519,12 +519,12 @@ public void buildDTree(Tree currentNode, ListIterator<Production> prodIt){
 	// Create new tree level
 	Iterator<Symbol> symbIt=prodIt.next().iterator();;
 	while(symbIt.hasNext()){
-             //   this.tempTreeDepth=currentNode.getDepth();
+                this.tempTreeDepth=currentNode.getDepth();
 		currentNode.add(new Tree(symbIt.next(), currentNode.getCurrentLevel()+1, currentNode.getDepth()+1));
                 
-        //        if(this.tempTreeDepth>this.treeDepth){
-        //            this.treeDepth=this.tempTreeDepth-1;
-        //        }
+                if(this.tempTreeDepth>this.treeDepth){
+                    this.treeDepth=this.tempTreeDepth-1;
+                }
                 //this.tempTreeDepth=1;
 		//symbIt++;
 	}

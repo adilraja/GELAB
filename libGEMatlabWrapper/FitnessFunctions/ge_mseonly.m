@@ -23,7 +23,7 @@ individual.isEvaluated=1;%Mark this individual as evaluated, so that it does not
         individual.result=result;
     else
         individual.fitness=params.maxBadFitness;
-        if(data.test)
+        if(params.data.test)
             individual.testFitness=params.maxBadFitness;
         end
         %disp('How often do I come here?');

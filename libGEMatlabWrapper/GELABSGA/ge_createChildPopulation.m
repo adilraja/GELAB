@@ -29,10 +29,10 @@ function [retval] = ge_createChildPopulation(population, params)
         [parent1, parent2]=ge_selection(population, params);
         [child1, child2]=ge_crossover(parent1, parent2, params.genome_length, params.grammar);%Apply crossover
         if(rand(1)<0.5)
-          child1=ge_mutation(child1);
+          child1=ge_mutation(child1, params);
         end
         if(rand(1)<0.5)
-          child2=ge_mutation(child2);
+          child2=ge_mutation(child2, params);
         end
         childPopulation(j)=child1;
         childPopulation(j+1)=child2;

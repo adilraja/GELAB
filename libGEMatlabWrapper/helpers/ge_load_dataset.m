@@ -28,6 +28,10 @@ if(exist('testx_filename', 'var')~=0)
         disp('The number of features in training and testing data is not equal:'); 
         return;
     end
+    if(tryc~=teyc)
+        disp('The number of output features in training and testing data is not equal:');
+        return;
+    end
     data.test=1;
 end
 

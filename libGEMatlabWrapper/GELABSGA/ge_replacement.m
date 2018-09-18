@@ -25,6 +25,7 @@
 function survivedPopulation = ge_replacement (parentPopulation, childPopulation, params)
     population=[parentPopulation childPopulation];
     popSize=length(population);
+    disp(popSize);
     for(i=1:popSize)
       fitness(i)=population(i).fitness;
     end
@@ -36,4 +37,5 @@ function survivedPopulation = ge_replacement (parentPopulation, childPopulation,
         disp('Please enter the right values for Lower is Better param: 0 or 1\n');
     end
     survivedPopulation=population(I(1:params.popSize));
+    disp(I(1));
 end

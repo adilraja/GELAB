@@ -22,7 +22,7 @@
 % ## Author: FGFS <fgfs@fgfs-Precision-WorkStation-T3500>
 % ## Created: 2017-03-16
 
-function individual = ge_evaluate (individual, params)
+function individual = ge_evaluate (individual, params, train_y)
     individual.isEvaluated=1;%Mark this individual as evaluated, so that it does not get re-evaluated
     if(params.evalinws==0)
         var='X';
@@ -46,7 +46,7 @@ function individual = ge_evaluate (individual, params)
             individual.result=result;
     else
             individual.fitness=params.maxBadFitness;
-            if(data.test)
+            if(params.data.test)
                 individual.testFitness=params.maxBadFitness;
             end
             %disp('How often do I come here?');
@@ -59,14 +59,14 @@ function individual = ge_evaluate (individual, params)
             %individual.valid=0;
             return;
         end
-         [individual.intercept, individual.slope]=ge_linearScaling(result, params.data.train_y);
-        individual.fitness=ge_mse(individual.slope*result+individual.intercept, params.data.train_y);
+         [individual.intercept, individual.slope]=ge_linearScaling(result, train_y);
+        individual.fitness=ge_mse(individual.slope*result+individual.intercept, train_y);
         % now limit fitness precision, to eliminate rounding error problem:
          individual.fitness=fixdec(individual.fitness, params.precision);
         if(isnan(individual.fitness)||isinf(individual.fitness))
             individual.fitness=params.maxBadFitness;%Give a very large value to fitness so that the individual is removed:Adil
             if(params.data.test)
-                individual.testFitness=params.maxBadFitness;
+                individual.testFitness=[];
             end
             return;
         end
@@ -75,5 +75,8 @@ function individual = ge_evaluate (individual, params)
         return;
     end
     %Compute testfitness
-    individual=ge_computeTestFitness(individual, params);
+%      individual=ge_computeTestFitness(individual, params);This should not
+%     be called for every individual as the overhead is high. Instead, call
+%     it only for a few best permorming individuals maybe after
+%     replacement.
 end

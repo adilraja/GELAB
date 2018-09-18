@@ -1,0 +1,8 @@
+<expr>	::=	(<expr> <op> <expr>)
+		| <u-pre-op>(<expr>)
+		| <b-pre-op>(<expr>,<expr>)
+		| <var>
+<op>	::=	+ | - | .* 
+<u-pre-op>	::=	abs| ge_sin | ge_cos | ge_exp | ge_log | ge_log2 | ge_log10 | ge_sqrt
+<b-pre-op>	::=	ge_divide | gt | lt | ge_power
+<var>	::=	X1 | X2 | X3 | X4 | X5 | X6 | X7 | X8 | X9 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | -1

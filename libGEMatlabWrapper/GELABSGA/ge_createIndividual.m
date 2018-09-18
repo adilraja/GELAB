@@ -25,21 +25,19 @@
 
 function individual = ge_createIndividual (genome_length, grammar, sensibleInit)
     rng(0,'twister');
-    %genotype=randi([0 500000], 1, genome_length);
     
-    individual=struct('genome', [], 'fitness', 500000, 'testFitness', 500000, 'ID', [0 0], 'left_parent', [0 0], 'right_parent', [0 0], 'valid', 0, 'treeDepth', 0, 'isEvaluated', 0, 'age', 0, 'result', [], 'testResult', [], 'slope', 1, 'intercept', 0);
-    grammar.setGenotype(individual.genome, length(individual.genome));
-    grammar.setMaxWraps(9);%This is also important
-    grammar.setMaxDepth(6);
+    
+    individual=struct('genome', [], 'string', '', 'fitness', 500000, 'testFitness', 500000, 'ID', [0 0], 'left_parent', [0 0], 'right_parent', [0 0], 'valid', 0, 'treeDepth', 0, 'isEvaluated', 0, 'age', 0, 'result', [], 'testResult', [], 'slope', 1, 'intercept', 0);
+%    grammar.setGenotype(individual.genome, length(individual.genome));
     
     if(sensibleInit)
         grammar.init(1);
         individual.genome=grammar.getGenotypeIntArray();
-        %[phenotype_string grammar]=genotype2phenotype(individual.genome, grammar);
-        phenotype_string=grammar.getPhenotypeString();
+        [phenotype_string grammar]=genotype2phenotype(individual.genome, grammar);
+        %individual.string=grammar.getPhenotypeString();
         individual.string=phenotype_string;
         individual.valid=grammar.isPhenotypeValid();%
-        individual.treeDepth=grammar.getMaxDepth;
+        individual.treeDepth=grammar.getTreeDepth;
     else
         individual.genome=randi([0, 500000] , 1, genome_length);
     end

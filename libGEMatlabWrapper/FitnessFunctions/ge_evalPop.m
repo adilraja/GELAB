@@ -1,21 +1,31 @@
-function [pop, numValid]=ge_evalPop(pop, params)
+function [pop, params]=ge_evalPop(pop, params)
     popsize=length(pop);
     j=0;
     for(i=1:popsize)
-        if(pop(i).valid==1 && pop(i).isEvaluated==0)
-            pop(i)=feval(params.fitnessFunction, pop(i), params);
-            pop(i).isEvaluated=1;
-            
-        elseif(pop(i).valid==0)
-            individual.fitness=50000;
-            if(params.data.test)
-                individual.testFitness=500000;
+        if(~ge_isKeyofGenotypeCache(pop(i), params.genotypeCache))
+            %Do nothing if the individual is not in the cache
+            if(pop(i).valid==1)
+                pop(i)=feval(params.fitnessFunction, pop(i), params, params.data.train_y);
+            elseif(pop(i).valid==0)
+                pop(i).fitness=params.maxBadFitness;
+                if(params.data.test)
+                    pop(i).testFitness=params.maxBadFitness;
+                end
             end
+            pop(i).isEvaluated=1;
+            params=ge_addIndtoGenotypeCache(pop(i), params);
+        else%if the individual is present in the cache
+            temp_key=sprintf('%d', pop(i).genome);
+            temp_ind=params.genotypeCache(temp_key);
+            pop(i).fitness=temp_ind.fitness;
+            pop(i).testFitness=temp_ind.fitness;
+            pop(i).valid=temp_ind.valid;
         end
+        
         if(pop(i).valid==1)
             j=j+1;
         end
     end
     numValid=j;
-    disp('Returning from evalPop');
+%     disp('Returning from evalPop');
 end

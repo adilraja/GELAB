@@ -22,7 +22,7 @@
 % ## Author: FGFS <fgfs@fgfs-Precision-WorkStation-T3500>
 % ## Created: 2017-03-16
 
-function [c_ind1, c_ind2] = ge_rossover (ind1, ind2, genome_length, grammar)
+function [c_ind1, c_ind2] = ge_crossover (ind1, ind2, genome_length, grammar)
 
 genome1=ind1.genome;
 genome2=ind2.genome;
@@ -39,7 +39,7 @@ y=genome_length;
 %Crossover scheme for variable length genome.
   c_genome1= [genome1(1:c1); genome2(c2+1:gl2)];
 
-%  c_genome2=zeros(x, y);
+
   c_genome2= [genome2(1:c2); genome1(c1+1:gl1)];
 
   c_ind1=ge_createIndividual(genome_length, grammar, 0);

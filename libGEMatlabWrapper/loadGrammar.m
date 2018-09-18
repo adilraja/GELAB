@@ -1,4 +1,4 @@
-function grammar=loadGrammar(bnffile)
+function grammar=loadGrammar(params)
 %This function loads a grammar for a particular domain such as symbolic
 %regression, classification, Santa Fe Ant Trail and so on. All you have to
 %do is to simply provide the file name of the grammar as input and this
@@ -7,18 +7,21 @@ function grammar=loadGrammar(bnffile)
 %java object). This function is written by Muhammad Adil Raja on 25th May,
 %2018.
 
-clear JAVA;
+% clear JAVA;
 
 %fileparts(which('loadGrammar.m')), 
-libGEpath=strcat(fileparts(which('loadGrammar.m')), '/libGEjar/libGEjava.jar');
-javaaddpath(libGEpath);
+% libGEpath=strcat(fileparts(which('loadGrammar.m')), '/libGEjar/libGEjava.jar');
+% javaaddpath(libGEpath);
 %javaclasspath;
 %fileparts(which('loadGrammar.m')),
-bnffilepath=strcat(fileparts(which('loadGrammar.m')), '/grammars/', bnffile);
+bnffilepath=strcat(fileparts(which('loadGrammar.m')), '/grammars/', params.bnfFile);
 bnffilepath2=javaObject('java.lang.String', bnffilepath);
 grammar=javaObject('libGEjava.GEGrammarSI');
 
 grammar.setMaxWraps(9);
+
+grammar.setMaxDepth(params.initMaxDepth);
+    
 GrammarFile = grammar.readBNFFile(bnffilepath2);
 disp('Grammar File');
 disp(GrammarFile);
