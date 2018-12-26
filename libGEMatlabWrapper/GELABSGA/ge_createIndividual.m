@@ -23,11 +23,13 @@
 % ## Author: FGFS <fgfs@fgfs-Precision-WorkStation-T3500>
 % ## Created: 2017-03-16
 
-function individual = ge_createIndividual (genome_length, grammar, sensibleInit)
+function individual = ge_createIndividual (params, sensibleInit)
     rng(0,'twister');
     
+    genome_length=params.genome_length;
+    grammar=params.grammar;
     
-    individual=struct('genome', [], 'string', '', 'fitness', 500000, 'testFitness', 500000, 'ID', [0 0], 'left_parent', [0 0], 'right_parent', [0 0], 'valid', 0, 'treeDepth', 0, 'isEvaluated', 0, 'age', 0, 'result', [], 'testResult', [], 'slope', 1, 'intercept', 0);
+    individual=struct('genome', [], 'string', '', 'fitness', 500000, 'testFitness', 500000, 'ID', [0 0], 'left_parent', [0 0], 'right_parent', [0 0], 'valid', 0, 'treeDepth', 0, 'isEvaluated', 0, 'age', 0, 'result', [], 'testResult', [], 'slope', 1, 'intercept', 0, 'constants', []);
 %    grammar.setGenotype(individual.genome, length(individual.genome));
     
     if(sensibleInit)
@@ -41,6 +43,12 @@ function individual = ge_createIndividual (genome_length, grammar, sensibleInit)
     else
         individual.genome=randi([0, 500000] , 1, genome_length);
     end
+    individual.constants=ones(1, params.numCoefs);
+    %The following flag tells us which operator was used to create the
+    %individual. 0 for none, 1 for fpxover, 2, for vpxover, 3 for weave, 4
+    %for tweave
+    individual.operator=0;%1, 2, 3, 4
+    individual.mutationoperator=0;
     %individual.grammar=grammar;% Trying to assign the grammar object to this struct as a field. I hope this works.   
     %s=individual.string;
     

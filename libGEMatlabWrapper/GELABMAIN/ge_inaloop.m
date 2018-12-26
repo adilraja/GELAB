@@ -1,4 +1,4 @@
-function [all_pops, all_bests, all_stats, params]=ge_inaloop(params2)
+function [all_pops, all_bests, all_stats, params]=ge_inaloop(params2, varargin)
 %This is going to run ge for multiple runs. Muhammad Adil Raja. 20 July,
 %2018
 
@@ -42,6 +42,17 @@ numvalidhistory=zeros(params.numGens, params.numRuns);
 dissimilarityhistory=zeros(params.numGens, params.numRuns);
 diversityhistory=zeros(params.numGens, params.numRuns);
 
+spxoverhistory=zeros(params.numGens, params.numRuns);
+vpxoverhistory=zeros(params.numGens, params.numRuns);
+weavehistory=zeros(params.numGens, params.numRuns);
+twhistory=zeros(params.numGens, params.numRuns);
+
+pmutationhistory=zeros(params.numGens, params.numRuns);
+fpmutationhistory=zeros(params.numGens, params.numRuns);
+fbutationhistory=zeros(params.numGens, params.numRuns);
+
+
+
 if(params.parallel~=1)
     for(i=1:params.numRuns)
         [pop, best, stats2, params2]=feval(params.ga_fcn, params, i);
@@ -55,6 +66,15 @@ if(params.parallel~=1)
         numvalidhistory(:, i)=stats2.numvalidhistory;
         dissimilarityhistory(:, i)=stats2.dissimilarityhistory;
         diversityhistory(:, i)=stats2.diversityhistory;
+        
+        spxoverhistory(:, i)=stats2.spxoverhistory;
+        vpxoverhistory(:, i)=stats2.vpxoverhistory;
+        weavehistory(:, i)=stats2.weavehistory;
+        tweavehistory(:, i)=stats2.tweavehistory;
+        pmutationhistory(:, i)=stats2.pmutationhistory;
+        fpmutationhistory(:, i)=stats2.fpmutationhistory;
+        fbmutationhistory(:, i)=stats2.fbmutationhistory;
+
         all_pops=[all_pops; pop];
         all_bests=[all_bests; best];
         params=ge_updateGenotypeCache(params, params2);
@@ -82,6 +102,15 @@ else
         numvalidhistory(:, i)=stats2.numvalidhistory;
         dissimilarityhistory(:, i)=stats2.dissimilarityhistory;
         diversityhistory(:, i)=stats2.diversityhistory;
+        
+        spxoverhistory(:, i)=stats2.spxoverhistory;
+        vpxoverhistory(:, i)=stats2.vpxoverhistory;
+        weavehistory(:, i)=stats2.weavehistory;
+        tweavehistory(:, i)=stats2.tweavehistory;
+        pmutationhistory(:, i)=stats2.pmutationhistory;
+        fpmutationhistory(:, i)=stats2.fpmutationhistory;
+        fbmutationhistory(:, i)=stats2.fbmutationhistory;
+        
         all_pops=[all_pops; pop];
         all_bests=[all_bests; best];
 %         params=params2;
@@ -100,4 +129,12 @@ all_stats.numvalidhistory=numvalidhistory;
 all_stats.dissimilarityhistory=dissimilarityhistory;
 all_stats.diversityhistory=diversityhistory;
 
-ge_plots(all_stats);
+all_stats.spxoverhistory=spxoverhistory;
+all_stats.vpxoverhistory=vpxoverhistory;
+all_stats.weavehistory=weavehistory;
+all_stats.tweavehistory=tweavehistory;
+all_stats.pmutationhistory=pmutationhistory;
+all_stats.fpmutationhistory=fpmutationhistory;
+all_stats.fbmutationhistory=fbmutationhistory;
+
+ge_plots(all_stats, varargin{:});

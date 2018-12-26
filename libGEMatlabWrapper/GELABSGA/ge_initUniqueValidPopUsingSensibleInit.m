@@ -11,13 +11,15 @@ fit_vec=[];%This is a fitness cache
 tot=0;
 
 while(j<=params.popSize)
-    temp_ind=ge_createIndividual(params.genome_length, params.grammar, 1);
+    temp_ind=ge_createIndividual(params, 1);
     tot=tot+1;
     %fit_vec=[fit_vec temp_ind.fitness];
     if(temp_ind.valid==1)
         temp_ind=feval(params.fitnessFunction, temp_ind, params, params.data.train_y);
         temp_ind.isEvaluated=1;
-        params = ge_addIndtoGenotypeCache(temp_ind, params);
+        if(params.genotypeCaching==1)
+            params = ge_addIndtoGenotypeCache(temp_ind, params);
+        end
         if(j>1)
             I=find(fit_vec==temp_ind.fitness);
             if(isempty(I))

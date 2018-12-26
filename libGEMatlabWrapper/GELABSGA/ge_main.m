@@ -19,16 +19,27 @@ function [pop, best, stats3, params]=ge_main(params, runNumber)
     
     for(i=1:params.numGens)
        tic;
+       if(params.hybrid)
+           if(i<=10)
+               params=ge_updateparams(params, 'selection', 'ge_lpptourinvert');
+           else
+               params=ge_updateparams(params, 'selection', 'ge_lpptour');
+           end
+       end
        childPopulation=ge_createChildPopulation(pop, params);
        childPopulation=ge_genotype2phenotypeWholePop(childPopulation, params);
        [childPop, params]=ge_evalPop(childPopulation, params);
+        if(params.hffs==1)
+           [pop, params]=ge_evalPop(pop, params);%eval the parent pop again
+       end
        pop=ge_halfElitism(pop, childPop, params);
+      
        %pause(3);
        fprintf('*****************************************\n');
        fprintf('Run-number: %d, Generation number: %d\n', runNumber, i);
        %fprintf('And the generation-number is: %d\n\n', i);
        %fprintf('************************************\n\n');
-       stats3=ge_computeStatistics(stats3, pop, params);
+       [stats3, params]=ge_computeStatistics(stats3, pop, params);
        stats3.timehistory=[stats3.timehistory; toc];
        
     end

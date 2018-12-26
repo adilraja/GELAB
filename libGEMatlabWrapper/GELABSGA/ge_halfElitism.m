@@ -45,8 +45,8 @@ function survivedPopulation = ge_halfElitism (parentPopulation, childPopulation,
     else
         disp('Please enter the right values for Lower is Better param: 0 or 1\n');
     end
-    plen=ceil(ppopSize/20);
-    clen=ceil(cpopSize/20*19);
+    plen=ceil(ppopSize/2);
+    clen=ceil(cpopSize/2);
     survivedPPopulation=parentPopulation(pI(1:plen));
     survivedCPopulation=childPopulation(cI(1:clen));
     survivedPopulation=[survivedPPopulation survivedCPopulation];

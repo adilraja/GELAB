@@ -6,7 +6,9 @@ In order to install libGEjava on your system, simply clone this repository (or d
 
 Running This Software: -
 
-Once you have done that, you can simply run this software from the Matlab command line. Simply navigate to the libgeGA folder and run ge_main.m. The software should run.
+Add the folder "GELAB/libGEMatlabWrapper", and all of its sub-folders, to your Matlab path.
+
+Once you have done that, you can simply run this software from the Matlab command line. Simply (navigate to the libgeGA folder and) run ge_main.m. The software should run.
 
 In order to run a full-fledged experiment, simply run: 
 
@@ -34,15 +36,22 @@ Please feel free to use this software in your research. Once you get your work p
 
 In the meanwhile, please cite the following if you wish to use this software in your research.
 
-O'Neill, Michael, and Conor Ryan. "Grammatical evolution." IEEE Transactions on Evolutionary Computation 5, no. 4 (2001): 349-358.
 
-@article{o2001grammatical,
-  title={Grammatical evolution},
-  author={O'Neill, Michael and Ryan, Conor},
-  journal={IEEE Transactions on Evolutionary Computation},
-  volume={5},
-  number={4},
-  pages={349--358},
-  year={2001},
-  publisher={IEEE}
+@InProceedings{gelab,
+author="Raja, Muhammad Adil
+and Ryan, Conor",
+editor="Yin, Hujun
+and Camacho, David
+and Novais, Paulo
+and Tall{\'o}n-Ballesteros, Antonio J.",
+title="GELAB - A Matlab Toolbox for Grammatical Evolution",
+booktitle="Intelligent Data Engineering and Automated Learning -- IDEAL 2018",
+year="2018",
+publisher="Springer International Publishing",
+address="Cham",
+pages="191--200",
+abstract="In this paper, we present a Matlab version of libGE. libGE is a famous library for Grammatical Evolution (GE). GE was proposed initially in [1] as a tool for automatic programming. Ever since then, GE has been widely successful in innovation and producing human-competitive results for various types of problems. However, its implementation in C++ (libGE) was somewhat prohibitive for a wider range of scientists and engineers. libGE requires several tweaks and integrations before it can be used by anyone. For anybody who does not have a background in computer science, its usage could be a bottleneck. This prompted us to find a way to bring it to Matlab. Matlab, as it is widely known, is a fourth generation programming language used for numerical computing. Details aside, but it is well known for its user-friendliness in the wider research community. By bringing GE to Matlab, we hope that many researchers across the world shall be able to use it, despite their academic background. We call our implementation of GE as GELAB. GELAB is currently present online as an open-source software (https://github.com/adilraja/GELAB). It can be readily used in research and development.",
+isbn="978-3-030-03496-2"
 }
+
+

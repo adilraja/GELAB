@@ -1,4 +1,4 @@
-function stats3=ge_computeStatistics(stats3, pop, params)
+function [stats3, params]=ge_computeStatistics(stats3, pop, params)
 %function stats3=ge_computeStatistics(stats3, pop)
 %This function computes statistics. Muhammad Adil Raja, 20th June, 2018
 %Please always apply this function after replacement.
@@ -51,6 +51,21 @@ function stats3=ge_computeStatistics(stats3, pop, params)
     stats3.numvalidhistory=[stats3.numvalidhistory; numValid];
     stats3.dissimilarityhistory=[stats3.dissimilarityhistory; dissimilarity_index];
     
+    stats3.spxoverhistory=[stats3.spxoverhistory; params.spxoverp];
+    stats3.vpxoverhistory=[stats3.vpxoverhistory; params.vpxoverp];
+    
+    stats3.weavehistory=[stats3.weavehistory; params.weavep];
+    stats3.tweavehistory=[stats3.tweavehistory; params.tweavep];
+    
+    stats3.pmutationhistory=[stats3.pmutationhistory; params.pmutationp];
+    stats3.fpmutationhistory=[stats3.fpmutationhistory; params.fpmutationp];
+    stats3.fbmutationhistory=[stats3.fbmutationhistory; params.fbmutationp];
+
+    
+    if(params.genotypeCaching==0)
+        params.genotypeCache.length=0;
+    end
+    
     fprintf(['*****************************************\n', ...
     'Best fitness: %d\n', ...
     'Mean fitness: %d\n', ...
@@ -64,4 +79,8 @@ function stats3=ge_computeStatistics(stats3, pop, params)
     pop(1).fitness, meanf, pop(1).testFitness, rtrain, rtest, diversity, dissimilarity_index, numValid, params.genotypeCache.length);
     %maintains the whole population in ascending order of fitness. So the
     %first element has the fittest individual.
+    if(params.adaptiveProbs)
+        params=ge_updateoperatorprobabilities(pop, params);
+        params=ge_updatemutationoperatorprobabilities(pop, params);
+    end
 end

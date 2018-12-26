@@ -20,7 +20,7 @@ while(j<=params.tournament_size)
     %Now choose the second individual
     cand_ind2=tour_ind(j);
     individual2=population(cand_ind2);
-    if(individual2.fitness~=individual1.fitness)%The desired individual has been found
+    if(individual2.fitness~=individual1.fitness && abs(individual1.age-individual2.age)<2)%The desired individual has been found
             break;
     elseif(j>=params.tournament_size)%else restart the loop
         restart_tournament=1;

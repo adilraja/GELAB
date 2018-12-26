@@ -1,7 +1,7 @@
 function pop=ge_initPop(params, runSensibleInitialization)
 
 for(i=1:params.popSize)
-    pop(i)=ge_createIndividual(params.genome_length, params.grammar, runSensibleInitialization);
+    pop(i)=ge_createIndividual(params, runSensibleInitialization);
     %disp(i);
 end
 end

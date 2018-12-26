@@ -21,16 +21,46 @@ else
 end
 [x, numMultipleTrees]=size(params.data.train_y);
 params.numMultipleTrees=numMultipleTrees;
+params.adaptiveProbs=input('Do you want to use adaptive operator probabilities? (0 or 1/ no or yes)\n');
 
-fitness=input('Please enter the name of the fitness function. Your options are: -\n1) 1 - for mean square error.\n2) 2 - for scaled mean squared error\n3) 3 - for Santafe ant trail.\n');
-if(fitness==1)
-    params.fitnessFunction='ge_mseonly';
-elseif(fitness==2)
-    params.fitnessFunction='ge_evaluate';
-elseif(fitness==3)
-    params.fitnessFunction='ge_antfitness';
+hybrid_yes_no=input('Do you want to perform hybrid optimization? [Y/N]', 's');
+
+if(strcmpi(hybrid_yes_no, 'y'))
+   params.hybrid=1;
+   params.fitnessFunction='ge_hybrid';
+   
+   numCoefs=input('Please enter the number of coefficients for hybrid optimzation.\nPlease make sure that symbols for those coefficients should be provided in the grammar file as w(1),. w(2), ..., w(n).\n');
+   params.numCoefs=numCoefs;
+   UB=input('Please specify the upper bound for coefficients.\n');
+   params.UB=abs(UB);
+   params.LB=-1*UB;
+   optialgo=input('Please specify which algorithm you want to use for optimization.\n(1) for simulated annealing.\n(2) for genetic algorithms.\n(3) for swarm optimization.\n(4) for least squares using Levenberg Marquardt.\n(5) Unconstrained optimization using Qausi-Newton method.\n');
+   switch optialgo
+       case 1
+           params.hybridAlgorithm='sa';
+       case 2
+           params.hybridAlgorithm='ga';
+       case 3
+           params.hybridAlgorithm='pso';
+       case 4
+           params.hybridAlgorithm='lsq';
+       case 5
+           params.hybridAlgorithm='fminuncqs';
+       otherwise
+           params.hybridAlgorithm='sa';
+   end
 else
-    params.fitnessFunction='ge_evaluate';
+    params.hybrid=0;
+    fitness=input('Please enter the name of the fitness function. Your options are: -\n1) 1 - for mean square error.\n2) 2 - for scaled mean squared error\n3) 3 - for Santafe ant trail.\n');
+    if(fitness==1)
+        params.fitnessFunction='ge_mseonly';
+    elseif(fitness==2)
+        params.fitnessFunction='ge_evaluate';
+    elseif(fitness==3)
+        params.fitnessFunction='ge_antfitness';
+    else
+        params.fitnessFunction='ge_evaluate';
+    end
 end
 
 ga_type=input('Please enter the type of GA that you would like to use\n1) 1 for simple GA.\n2) 2 for compact GA.\n3) 3 for MIMO GE using simple GA.\n');
@@ -45,15 +75,21 @@ elseif(ga_type==3)
     params.testFitnessFunction='ge_computeMultipleTreeTestFitness';
 end
 
+params.hffs=input('Do you want to use hierarchical fitness functions? (0 for no, 1 for yes).\n');
+if(params.hffs==1)
+    params.fitnessFunction='ge_alhf';
+end
+
 params.lowerisbetter=input('Lower is better? Please enter 1 for yes and 0 for no!\n');
 
-params.genome_length=input('Please enter a value for genome length.\nEnter a small value for Santafe (50-100).\nEnter a large value for symbolic regression (150-300)\n');
+params.genome_length=input('Please enter a value for genome length.\nEnter a small value for Santafe (50-100).\nEnter a large value for symbolic regression (150-300).\n');
 params.parallel=input('Do you want to run GELAB on parallel computing toolbox?\n 1) 1 for yes. 2) 0 for no.\n');
 if(params.parallel~=1)
     params.parallel=0;
 else
-    params.numcores=input('How many cores do you want to dedicate for parallel computing?');
+    params.numcores=input('How many cores do you want to dedicate for parallel computing?\n');
 end
+
 params=ge_defaultParams(params);%Load default parameters too.
 
 
