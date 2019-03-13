@@ -1,4 +1,4 @@
-function [all_pops, all_bests, all_stats, params]=ge_inaloop(params2, varargin)
+function [all_pops, all_bests, all_stats, params]=ge_inaloop(params2, results_file_name, varargin)
 %This is going to run ge for multiple runs. Muhammad Adil Raja. 20 July,
 %2018
 
@@ -14,9 +14,11 @@ libGEpath=strcat(fileparts(which('loadGrammar.m')), '/libGEjar/libGEjava.jar');
 
 if(params.parallel)
     if(isempty(gcp('nocreate')))
-        pool=parpool('IdleTimeout', 1200);
+        pool=parpool(params.numcores, 'IdleTimeout', 9600);
     else
-        pool = gcp('nocreate');
+        delete(gcp);
+%         pool = gcp('nocreate');
+        pool=parpool(params.numcores, 'IdleTimeout', 9600);
     end
     pctRunOnAll javaaddpath(strcat(fileparts(which('loadGrammar.m')), '/libGEjar/libGEjava.jar'));
 else
@@ -24,6 +26,8 @@ else
 end
 
 params.grammar=loadGrammar(params);
+params=ge_updateGrammarVars(params);
+params=ge_updateGrammarConsts(params);
 if(params.evalinws)
     ge_expandVarsinWorkSpace(params);
 end
@@ -45,11 +49,11 @@ diversityhistory=zeros(params.numGens, params.numRuns);
 spxoverhistory=zeros(params.numGens, params.numRuns);
 vpxoverhistory=zeros(params.numGens, params.numRuns);
 weavehistory=zeros(params.numGens, params.numRuns);
-twhistory=zeros(params.numGens, params.numRuns);
+tweavehistory=zeros(params.numGens, params.numRuns);
 
 pmutationhistory=zeros(params.numGens, params.numRuns);
 fpmutationhistory=zeros(params.numGens, params.numRuns);
-fbutationhistory=zeros(params.numGens, params.numRuns);
+fbmutationhistory=zeros(params.numGens, params.numRuns);
 
 
 
@@ -116,6 +120,7 @@ else
 %         params=params2;
     end
     delete(pool);
+    pause(5);
 end
 all_stats.bestfithistory=bestfithistory;
 all_stats.testfithistory=testfithistory;
@@ -136,5 +141,20 @@ all_stats.tweavehistory=tweavehistory;
 all_stats.pmutationhistory=pmutationhistory;
 all_stats.fpmutationhistory=fpmutationhistory;
 all_stats.fbmutationhistory=fbmutationhistory;
+
+disp('The simulation completed! Bye Bye!!');
+
+if(~endsWith(results_file_name, '.mat'))
+    fname=strcat(results_file_name, '.mat');
+else
+    fname=results_file_name;
+end
+
+for(i=1:params.numRuns)
+    for(j=1:params.popSize)
+        all_pops(i,j).result=[];
+    end
+end
+save(fname, 'all_pops', 'all_bests', 'all_stats', 'params');
 
 ge_plots(all_stats, varargin{:});

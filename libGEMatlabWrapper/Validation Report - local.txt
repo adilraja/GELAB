@@ -1,0 +1,58 @@
+VALIDATION REPORT
+Profile: local
+Scheduler Type: Local
+
+Stage: Cluster connection test (parcluster)
+Status: Passed
+Start Time: Mon Jan 28 15:46:04 GMT 2019
+Finish Time: Mon Jan 28 15:46:08 GMT 2019
+Running Duration: 0 min 4 sec
+Description: 
+Error Report: 
+Command Line Output: 
+Debug Log: 
+
+Stage: Job test (createJob)
+Status: Passed
+Start Time: Mon Jan 28 15:46:08 GMT 2019
+Finish Time: Mon Jan 28 15:46:55 GMT 2019
+Running Duration: 0 min 48 sec
+Description: 
+Error Report: 
+Command Line Output: 
+Debug Log: 
+
+Stage: SPMD job test (createCommunicatingJob)
+Status: Passed
+Start Time: Mon Jan 28 15:46:56 GMT 2019
+Finish Time: Mon Jan 28 15:47:26 GMT 2019
+Running Duration: 0 min 31 sec
+Description: Job ran with 2 workers.
+Error Report: 
+Command Line Output: 
+Debug Log: 
+
+Stage: Pool job test (createCommunicatingJob)
+Status: Passed
+Start Time: Mon Jan 28 15:47:27 GMT 2019
+Finish Time: Mon Jan 28 15:47:56 GMT 2019
+Running Duration: 0 min 30 sec
+Description: Job ran with 2 workers.
+Error Report: 
+Command Line Output: 
+Debug Log: 
+
+Stage: Parallel pool test (parpool)
+Status: Passed
+Start Time: Mon Jan 28 15:47:56 GMT 2019
+Finish Time: Mon Jan 28 15:48:35 GMT 2019
+Running Duration: 0 min 39 sec
+Description: Parallel pool ran with 2 workers.
+Error Report: 
+Command Line Output: Preserving jobs with IDs: 1 because they contain crash dump files.
+You can use 'delete(myCluster.Jobs)' to remove all jobs created with profile local. To create 'myCluster' use 'myCluster = parcluster('local')'.
+Checking communicating job status.
+Checking communicating job status.
+connected to 2 workers.
+Parallel pool using the 'local' profile is shutting down.
+Debug Log: 

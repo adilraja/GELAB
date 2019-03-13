@@ -29,7 +29,7 @@ function individual = ge_createIndividual (params, sensibleInit)
     genome_length=params.genome_length;
     grammar=params.grammar;
     
-    individual=struct('genome', [], 'string', '', 'fitness', 500000, 'testFitness', 500000, 'ID', [0 0], 'left_parent', [0 0], 'right_parent', [0 0], 'valid', 0, 'treeDepth', 0, 'isEvaluated', 0, 'age', 0, 'result', [], 'testResult', [], 'slope', 1, 'intercept', 0, 'constants', []);
+    individual=struct('genome', [], 'string', '', 'fitness', 500000, 'testFitness', 500000, 'ID', [0 0], 'left_parent', [0 0], 'right_parent', [0 0], 'valid', 0, 'treeDepth', 0, 'isEvaluated', 0, 'age', 0, 'result', [], 'testResult', [], 'slope', 1, 'intercept', 0, 'constants', [], 'improvable', 1, 'improvable2', 1);
 %    grammar.setGenotype(individual.genome, length(individual.genome));
     
     if(sensibleInit)

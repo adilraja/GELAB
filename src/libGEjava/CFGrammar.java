@@ -316,6 +316,7 @@ for(int pass=1;pass<=2;pass++){
                     else{
                         //currentBuffer.concat(Character.toString(currentChar));
                         currentBuffer+=currentChar;
+                        
                     }
                 }
             }
@@ -797,12 +798,93 @@ public String getRules(){
                 Iterator<Symbol> symbIt2=prodIt.next().iterator(); 
                 while(symbIt2.hasNext()){
                     tmpStr+=symbIt2.next().getSymbol();
+                    //tmpStr+=" <> ";
                 }
                 tmpStr+=" | ";
             }
             tmpStr+="\n";
         }
     return tmpStr;
+}
+
+/**
+ * Sets variables <var> production rules
+ * @return 
+ */
+public void setVars(final String var){
+    Iterator<Rule> ruleIt=this.iterator();
+    int j=0;
+    while(ruleIt.hasNext()){
+        Rule tmpRule=ruleIt.next();
+        
+        if(tmpRule.lhs.get(0).getSymbol().equalsIgnoreCase("<var>")){
+            //System.out.println("Do I come here");
+            ListIterator<Production> prodIt=tmpRule.listIterator();
+            j=0;
+            while(prodIt.hasNext()){
+                Iterator<Symbol> symbIt2=prodIt.next().iterator();  
+                while(symbIt2.hasNext()){
+                    //System.out.println("Here?");
+                    if(symbIt2.next().getSymbol().equalsIgnoreCase(var)){
+                        j+=1;
+                    //    System.out.println("I am quiting");
+                        break;
+                    }                   
+                }
+                
+            }
+            if(j==0){
+                    Symbol newSymbol =new Symbol(var, SymbolType.TSymbol);
+                    Production newProduction=new Production(1);
+                    newProduction.add(newSymbol);
+                    prodIt.add(newProduction);
+                    //System.out.println("I did come here!");
+                    break;
+                }
+            if(j>1)
+                break;
+        }
+    }
+}
+
+/**
+ * Sets constants <const> production rules
+ * @return 
+ */
+public void setConsts(final String constant){
+    Iterator<Rule> ruleIt=this.iterator();
+    int j=0;
+    while(ruleIt.hasNext()){
+        Rule tmpRule=ruleIt.next();
+        
+        if(tmpRule.lhs.get(0).getSymbol().equalsIgnoreCase("<const>")){
+            //System.out.println("Do I come here");
+            ListIterator<Production> prodIt=tmpRule.listIterator();
+            j=0;
+            while(prodIt.hasNext()){
+                Iterator<Symbol> symbIt2=prodIt.next().iterator();  
+                while(symbIt2.hasNext()){
+                    //System.out.println("Here?");
+                    if(symbIt2.next().getSymbol().equalsIgnoreCase(constant)){
+                        j+=1;
+                    //    System.out.println("I am quiting");
+                        break;
+                    }                   
+                }
+                
+            }
+            if(j==0){
+                    Symbol newSymbol =new Symbol(constant, SymbolType.TSymbol);
+                    Production newProduction=new Production(1);
+                    newProduction.add(newSymbol);
+                    prodIt.add(newProduction);
+                    //System.out.println("I did come here!");
+                    break;
+                }
+            if(j>1)
+                break;
+        }
+    }
 }
 
 /**

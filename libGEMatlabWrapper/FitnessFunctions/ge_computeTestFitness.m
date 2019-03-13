@@ -5,7 +5,7 @@ function individual =ge_computeTestFitness(individual, params, test_data_y)
     if(nargin<3)
         test_data_y=params.data.test_y(:,1);
     end
-    [x, y]=size(params.data.train_x);
+    [x, y]=size(params.data.test_x);
     X=params.data.test_x;
     w=individual.constants;
      if(individual.valid==1 && individual.treeDepth<=params.maxDepth)%if this is a valid individual

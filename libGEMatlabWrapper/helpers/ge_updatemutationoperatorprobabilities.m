@@ -12,7 +12,7 @@ for(i=1:popSize)
     operator_vector(i)=population(i).mutationoperator;
 end
 
-total_operators=max(operator_vector);
+total_operators=3;
 sum_prob_all_ops=0;
 operator_probability=zeros(3,1);
 for(i=1:total_operators)

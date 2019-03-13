@@ -1,8 +1,0 @@
-<expr>  ::= (<expr> + <expr>)
-        | (<expr> - <expr>)
-        | (<expr> * <expr>)
-        | GT(<expr>, <expr>)
-        | DIV(<expr>, <expr>)
-        | ABS (<expr>)
-        | <var>
-<var>   ::= X | V | (-1.0)

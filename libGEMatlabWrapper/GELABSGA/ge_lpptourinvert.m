@@ -7,6 +7,8 @@ popSize=length(population);
 
 j=2;
 restart_tournament=1;
+max_tournaments=20;
+tournaments=0;
 
 while(j<=params.tournament_size)
     
@@ -15,6 +17,7 @@ while(j<=params.tournament_size)
         tournament=population(tour_ind);
         individual1=tournament(1);%This chooses the first individual
         restart_tournament=0;
+        tournaments=tournaments+1;
         %Extract the fitness and sizes of the remaining individuals in the
         %tournament
         fitvec=zeros(params.tournament_size-1,1);
@@ -47,6 +50,10 @@ while(j<=params.tournament_size)
     elseif(j>=params.tournament_size)%else restart the loop
         restart_tournament=1;
         j=1;
+    end
+    if(tournaments>max_tournaments)
+        [individual1, individual2] = ge_tournamentSelection(population, params);%Perform a simple tournament selection
+        break;
     end
     j=j+1;
 end

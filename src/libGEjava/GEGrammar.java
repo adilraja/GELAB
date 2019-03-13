@@ -218,6 +218,7 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 		// Use start symbol as the derivationTree node
             try{
 		this.derivationTree.setData(tmpSmb);
+               
             }
             catch(java.lang.NullPointerException e){
                 System.out.println(e+" The call: derivationTree.setData(getStartSymbol()); in GEGrammar sucks");

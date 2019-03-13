@@ -18,6 +18,11 @@ params.pmutationp=0.3;%Point mutation
 params.fpmutationp=0.3;%Few points mutation
 params.fbmutationp=0.4;%%fixed bounds mutation
 %params.vbmutationp=0.25;%variable bounds mutation
+if(params.hybrid)
+    params.hybridFraction=0.25;%Proportion of individuals to be treated with numerical optimization
+    params.criticalAge1=1;
+    params.criticalAge2=5;
+end
 
 params.selectionFunction='ge_lpptour';
 

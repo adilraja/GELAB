@@ -22,6 +22,7 @@ key1=sprintf('%d', ind.genome);
 if(ge_isKeyofGenotypeCache(ind, params.genotypeCacheCounter))%Entry already exists
     value=params.genotypeCacheCounter(key1);
     params.genotypeCacheCounter(key1)=value+1;%just increment the count
+    params.genotypeCache(key1)=ind;%Insert the newest ind to the cache.
 else
     params.genotypeCache(key1)=ind;
     params.genotypeCacheCounter(key1)=1;

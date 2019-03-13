@@ -42,11 +42,12 @@ function [stats3, params]=ge_computeStatistics(stats3, pop, params)
     stats3.bestrsquaretrainhistory=[stats3.bestrsquaretrainhistory; rtrain];
     if(params.data.test)
         stats3.bestrsquaretesthistory=[stats3.bestrsquaretesthistory; rtest];
+        stats3.testfithistory=[stats3.testfithistory; pop(1).testFitness];
     end
     
     stats3.meanfithistory=[stats3.meanfithistory; meanf];
     
-    stats3.testfithistory=[stats3.testfithistory; pop(1).testFitness];
+    
     stats3.diversityhistory=[stats3.diversityhistory; diversity];
     stats3.numvalidhistory=[stats3.numvalidhistory; numValid];
     stats3.dissimilarityhistory=[stats3.dissimilarityhistory; dissimilarity_index];
@@ -63,7 +64,9 @@ function [stats3, params]=ge_computeStatistics(stats3, pop, params)
 
     
     if(params.genotypeCaching==0)
-        params.genotypeCache.length=0;
+        cache_size=0;
+    else
+        cache_size=params.genotypeCache.length;
     end
     
     fprintf(['*****************************************\n', ...
@@ -76,7 +79,7 @@ function [stats3, params]=ge_computeStatistics(stats3, pop, params)
     'Number of valid individuals is: %d\n', ...
     'The cache size is: %d\n', ...
     '*****************************************\n'], ...
-    pop(1).fitness, meanf, pop(1).testFitness, rtrain, rtest, diversity, dissimilarity_index, numValid, params.genotypeCache.length);
+    pop(1).fitness, meanf, pop(1).testFitness, rtrain, rtest, diversity, dissimilarity_index, numValid, cache_size);
     %maintains the whole population in ascending order of fitness. So the
     %first element has the fittest individual.
     if(params.adaptiveProbs)

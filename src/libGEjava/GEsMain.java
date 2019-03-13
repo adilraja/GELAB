@@ -161,7 +161,9 @@ public class GEsMain{
         System.out.println("\nTree depth is: "+grammar.getTreeDepth());
         if(grammar.isPhenotypeValid())
             System.out.println("The phenotype is also valid:");
+        grammar.setVars("G");
         System.out.println("The rules are: \n"+grammar.getRules());
+        
     /*    try{
             GEGrammar grammar2=new GEGrammar(grammar);
         }

@@ -34,6 +34,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
 	this.setTailRatio(0);
 	this.setTailSize(0);
         this.possibleRules= new ArrayList();
+        
     }
     /**
      * Constructor setting the genotype structure of this mapper to newGenotype

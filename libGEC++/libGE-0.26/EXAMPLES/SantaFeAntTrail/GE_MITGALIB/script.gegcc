@@ -1,6 +1,0 @@
-#!/bin/bash
-for (( run=1 ; run <= 5 ; run=${run}+1 )) ; do
-	./GEGCC popsize 500 ngen 50 seed ${run} sensible 1 effective 1
-	mv stats stats${run}
-done;
-

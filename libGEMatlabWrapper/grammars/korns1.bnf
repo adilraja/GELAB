@@ -1,0 +1,10 @@
+<expr>	::=	(<expr> <op> <expr>)
+		| <u-pre-op>(<expr>)
+		| <b-pre-op>(<expr>,<expr>)
+		| <var>
+		| <const>
+<op>	::=	+ | - | .* 
+<u-pre-op>	::= 	ge_square | ge_cube | ge_sin | ge_cos | ge_log | ge_exp | ge_sqrt
+<b-pre-op>	::=	ge_divide 
+<var>	::=	X(:,1) | X(:,2) | X(:,3) | X(:,4)
+<const>	::=	w(1) | w(2) 

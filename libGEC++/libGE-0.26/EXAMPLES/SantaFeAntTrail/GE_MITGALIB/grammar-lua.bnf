@@ -1,5 +1,0 @@
-<code> ::= <line> | <code> <line>
-<line> ::= <condition> | <op>
-<condition> ::= if food_ahead()==1 then <line> else <line> end
-<op> ::=  left() | right() | move()
-

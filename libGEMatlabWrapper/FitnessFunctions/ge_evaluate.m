@@ -28,7 +28,7 @@ function individual = ge_evaluate (individual, params, train_y)
     end
     individual.isEvaluated=1;%Mark this individual as evaluated, so that it does not get re-evaluated
     X=params.data.train_x;
-   
+    w=individual.constants;
     %in subsequent generations. This is supposed to save evaluation time.
     if(individual.valid==1 && individual.treeDepth<=params.maxDepth)%if this is a valid individual
         result=eval(individual.string);
