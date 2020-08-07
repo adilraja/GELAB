@@ -1,0 +1,852 @@
+@c --- Santa Fe Ant Trail Problem ---
+@section Santa Fe Ant Trail Problem
+
+@menu
+* Santa Fe Grammar File::			The grammar used for this example.
+* Ant Trail::					Map of the used trail.
+* Santa Fe Implementation with GE_ILLIGALSGA::	Implementation of problem using the sga code from IlliGAL.
+* Santa Fe Implementation with GE_MITGALIB::	Implementation of problem using GALib.
+* Santa Fe Implementation with GE_EO::		Implementation of problem using the EO library.
+* Santa Fe Ant Trail Performance::		Performance on this problem using the tested search engines.
+@end menu
+
+The Santa Fe Ant Trail is a standard problem in the area of Genetic
+Programming, and Grammatical Evolution has been applied to it on several
+occasions. The objective is to find a computer program to control an artificial
+ant, so that it can find all 89 pieces of food located on a 32 by 32 toroidal
+grid (i.e. a grid with no borders: top and bottom are connected, as are its
+left and right sides). The ant can turn left, turn right, move one square
+forward, and may also look ahead one square in the direction it is facing, to
+determine if that square contains a piece of food. All actions, with the
+exception of looking ahead for food, take one time step to execute. The ant
+starts in the top left-hand corner of the grid, facing the first piece of food
+on the trail.
+
+@c --- Grammar File ---
+@node Santa Fe Grammar File,Ant Trail,,Santa Fe Ant Trail Problem
+@subsection Grammar
+
+The grammar used is equal for most evaluators, and is contained in a file
+called @file{grammar.bnf}. Specific grammars exist, for evaluators that have
+different languages (e.g. @file{grammar-lua.bnf}).
+
+@c --- Ant Trail ---
+@node Ant Trail,Santa Fe Implementation with GE_ILLIGALSGA,Santa Fe Grammar File,Santa Fe Ant Trail Problem
+@subsection Ant Trail
+
+The @file{santafe.trl} file describes the Santa Fe Ant Trail. Modify this file
+only if you wish to try out different trails.
+
+@page
+@c --- Implementation with GE_ILLIGALSGA ---
+@node Santa Fe Implementation with GE_ILLIGALSGA,Santa Fe Implementation with GE_MITGALIB,Ant Trail,Santa Fe Ant Trail Problem
+@subsection GE_ILLIGALSGA
+
+@menu
+* EXAMPLES/SantaFeAntTrail/GE_ILLIGALSGA/app.c::	Integration of libGE into objective function.
+* EXAMPLES/SantaFeAntTrail/GE_ILLIGALSGA/Makefile::	Linking libGE with sga.
+@end menu
+
+This example, contained in the directory
+@file{EXAMPLES/SantaFeAntTrail/GE_ILLIGALSGA}, shows how to modify the code of
+the sga-c code from the IlliGAL laboratory to use libGE with the Santa Fe Ant
+Trail problem. In order to use this problem, you will need to replace the
+appropriate files in your distribution of the sga-c code with the files
+provided. The following sections describe those files.
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_ILLIGALSGA/app.c ---
+@node EXAMPLES/SantaFeAntTrail/GE_ILLIGALSGA/app.c,EXAMPLES/SantaFeAntTrail/GE_ILLIGALSGA/Makefile,,Santa Fe Implementation with GE_ILLIGALSGA
+@subsubsection @file{app.c}
+
+@cindex Genotypic structure
+@findex app_init()
+@findex objfunc()
+This file contains the source code required to run the Santa Fe Ant Trail
+problem with the sga-c code, using GCC as a compiler for the evolved phenotype
+strings. Only the functions @code{app_init} and @code{objfunc} need code for
+this problem.
+
+The function @code{app_init} initialises the libGE interface and mapper. It
+starts by setting the maximum number of wrapping events allowed, through a
+call to the wrapper function @code{GE_ILLIGALSGA_setMaxWraps}, and proceeds
+by reading the file containing the BNF grammar, through a call to the wrapper
+function @code{GE_ILLIGALSGA_readBNF} (@pxref{IlliGAL sga-c}).
+
+The function @code{objfunc} contains the code to map the genotypic
+structure passed as an argument onto a phenotypic structure, and the evaluation
+of the mapped structure. It starts by assigning the @code{struct individual}
+passed as an argument to this function as the genotype of the mapper used,
+through a call to the wrapper function @code{GE_ILLIGALSGA_Mapper}, and checks
+for the validity of the resulting phenotype, through a call to the wrapper
+function @code{GE_ILLIGALSGA_validPhenotype}. If valid, then a file is created,
+containing the phenotype code and some header and footer code, required to
+compile that phenotype. Once the file is created, it is compiled and executed
+through a system call, and the result of that execution, which was redirected
+to a file called @file{result}, is then read and assigned to the critter
+structure.
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_ILLIGALSGA/Makefile ---
+@node EXAMPLES/SantaFeAntTrail/GE_ILLIGALSGA/Makefile,,EXAMPLES/SantaFeAntTrail/GE_ILLIGALSGA/app.c,Santa Fe Implementation with GE_ILLIGALSGA
+@subsubsection @file{Makefile}
+
+The @file{Makefile} distributed with this example shows how to link the sga-c code
+to the libGE library.
+
+Few changes are required to the original Makefile, distributed with the sga-c
+code. The @code{LDLIBS} variable must include @kbd{-lGE}; both the
+@file{GEant.c} and @file{GEtrail.c} files must be compiled (with a C
+compiler); and the linking of all object files should be done with a C++
+compiler (in the file provided, the @command{g++} compiler is used).
+
+@page
+@c --- Implementation with GE_MITGALIB ---
+@node Santa Fe Implementation with GE_MITGALIB,Santa Fe Implementation with GE_EO,Santa Fe Implementation with GE_ILLIGALSGA,Santa Fe Ant Trail Problem
+@subsection GE_MITGALIB
+
+@menu
+* GALib Example User Guide::					User guide to the GALib library example.
+* EXAMPLES/SantaFeAntTrail/GE_MITGALIB/main.cpp::		GALib and libGE settings, plus evolutionary search parameters.
+* EXAMPLES/SantaFeAntTrail/GE_MITGALIB/initfunc.cpp::		Initialisation functions.
+* EXAMPLES/SantaFeAntTrail/GE_MITGALIB/GEListGenome.h::		GE specific genome.
+* EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-gcc.cpp::	Implementation using gcc as the evaluator.
+* EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-slang.cpp::	Implementation using slang as the evaluator.
+* EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-tcc.cpp::	Implementation using tcc as the evaluator.
+* EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-lua.cpp::	Implementation using lua as the evaluator.
+* EXAMPLES/SantaFeAntTrail/GE_MITGALIB/Makefile::		Linking GALib with libGE (and possibly slang).
+@end menu
+
+The example using MIT's GALib uses a @code{GAListGenome<unsigned char>}
+as the GALib genotype structure, with a steady-state genetic algorithm. Here
+follows a user's guide to the example, and a description of its files.
+
+@c --- GALib Example User Guide ---
+@node GALib Example User Guide,EXAMPLES/SantaFeAntTrail/GE_MITGALIB/main.cpp,,Santa Fe Implementation with GE_MITGALIB
+@subsubsection GALib Example User Guide
+
+This example of GALib code uses the standard @code{GAParameterList} way of
+passing arguments to the program, to specify the parameters of the run. The GE
+parameters were encoded in a similar way, by a simple parsing of the
+command-line.
+
+Parameters are passed to the executable in the following fashion:
+
+@command{./executable <param_name> <value>}
+
+The following are the parameters accepted by GALib, and their default values:
+
+@itemize
+@item popsize: population size (default is 100);
+@item ngen: population size (default is 10);
+@item pcross: crossover probability (default is 0.9);
+@item pmut: mutation probability (default is 0.01);
+@item prepl: steady-state replacement strategy (default is 1.0);
+@item sfreq: how often to record scores (generation interval) (default is 1);
+@item ffreq: how often to dump scores to file (generation interval) (default is 1);
+@item sfile: name of score data file (default is "sf-output.dat").
+@end itemize
+
+@noindent
+All other parameters are set to the GALib defaults (check the GALib
+documentation for more details). To this list, the following GE specific
+parameters were added:
+
+@itemize
+@item seed: random seed to be used both by GALib and libGE (default is random);
+@item grammar: grammar file to use (default is "grammar.bnf");
+@item wrap: number of wrapping events (default is 0);
+@item sensible: use sensible initialisation instead of random (default is 0);
+@item min: minimum genotype size for random initialisation (default is 15);
+@item max: maximum genotype size for random initialisation (default is 25);
+@item grow: grow rate for sensible initialisation (default is 0.5);
+@item maxDepth: maximum tree depth for sensible initialisation (default is 10);
+@item tailSize: tail size for sensible initialisation (default is 0);
+@item tailRatio: tail ratio for sensible initialisation (default is 0.0).
+@end itemize
+
+For example, to run the @command{GELUA} implementation, using the grammar file
+"grammar-lua.bnf", with a population size of 500 individuals, for 50
+generations, using random seed 1, and leaving all other parameters to standard
+values, the command to execute is:
+
+@command{./GELUA grammar grammar-lua.bnf popsize 500 ngen 50 seed 1}
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_MITGALIB/main.cpp ---
+@node EXAMPLES/SantaFeAntTrail/GE_MITGALIB/main.cpp,EXAMPLES/SantaFeAntTrail/GE_MITGALIB/initfunc.cpp,GALib Example User Guide,Santa Fe Implementation with GE_MITGALIB
+@subsubsection @file{main.cpp}
+
+@findex objfunc()
+This file drives the evolutionary process. It starts with the declaration of
+all functions required, and the definition of a @code{GEGrammarSI} mapper, as
+well as global integers containing size information for random initialisation,
+and a counter for the number of objective function calls.
+
+After displaying the version of libGE, it starts by checking the command-line
+for all arguments; first the parameters related to libGE are looked for, and
+the corresponding variables are set; afterwards, a @code{GAParameterList}
+object is created, to look for all GALib specific parameters (such as
+population size, number of generations, etc).
+
+Next comes the creation of a genome structure; in this example, the genome is a
+@code{GEListGenome}, defined on the files @file{GEListGenome.h} and
+@file{GEListGenome.cpp}. The fitness function, called @code{objfunc}, is
+associated with the genome.
+
+@findex initFuncRandom()
+@findex initFuncSI()
+@findex OnePointCrossover()
+@findex effCrossover()
+@findex PointMutator()
+The genetic operators to use are specified next. A specific initialisation
+function (@code{initFuncRandom()} or @code{initFuncSI()}), contained in the
+file @file{initfunc.cpp}, is associated with the genome. This is followed by
+the choice of crossover to use, which is either the the standard one-point
+crossover or an effective length version, and to use a specific mutation
+function (@code{PointMutator()}), all defined in the file
+@file{GEListGenome.h}.
+
+@findex app_init()
+A call to the function @code{app_init()} follows, which loads the code to place
+before and after each evolved phenotype prior to evaluation, and initialises
+the libGE mapper; this function is contained in the files @file{santafe-*.cpp}
+(with @file{*} replaced with the name of the evaluator used).
+
+Next comes the creation of the genetic algorithm @code{ga}, which uses a
+steady-state replacement strategy; the @code{GAParameterList} containing all
+parameters is associated with it. The mapper is also initialised, using either
+default values or the values obtained when parsing the command-line arguments.
+Finally, the statistics to record are selected, a custom statistics file is
+created, and a call to the @code{initialize()} method is made, to apply all
+settings to the genetic algorithm, including the random seed.
+
+An evolutionary cycle is then performed. This can either be done directly with
+@code{ga.evolve()}, or on a step by step cycle, as shown in the example. Also
+note how two statistics files are created, one using the GALib standard
+outputs, and a second one, illustrating the creation of a personalised
+statistics file.
+
+@findex print_individual()
+Finally, once the evolution is finished, the statistical data is dumped onto
+the screen, as is the best individual of the population (through a call to the
+function @code{print_individual()}, defined in the files @file{santafe-*.cpp}).
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_MITGALIB/initfunc.cpp ---
+@node EXAMPLES/SantaFeAntTrail/GE_MITGALIB/initfunc.cpp,EXAMPLES/SantaFeAntTrail/GE_MITGALIB/GEListGenome.h,EXAMPLES/SantaFeAntTrail/GE_MITGALIB/main.cpp,Santa Fe Implementation with GE_MITGALIB
+@subsubsection @file{initfunc.cpp}
+
+@findex initFuncRandom()
+This file contains the two specific initialisation functions designed for this
+example, @code{initFuncRandom()} and @code{initFuncSI()}. The first function is
+called to randomly initialise each genome from the population. It starts by
+destroying any data possibly contained on an individual, and chooses a number
+between @code{minSize} and @code{maxSize} (declared and initialised in
+@file{main.cpp}) for its size. It then initialises each gene to be a number
+between 0 and 255, starting with the head of the list.
+
+@findex initFuncSI()
+@findex GEGrammarSI.init()
+@findex init(), GEGrammarSI
+The second function (@code{initFuncSI()}) can be called to use libGE's
+sensible initialisation routines to initialise each genome from the population.
+It starts by destroying any data possibly contained on an individual, and then
+uses the @code{init()} method from the mapper to apply the sensible
+initialisation routines. If successful, each codon from the mapper's
+@code{Genotype} structure is then copied onto the genome.
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_MITGALIB/GEListGenome.h ---
+@node EXAMPLES/SantaFeAntTrail/GE_MITGALIB/GEListGenome.h,EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-gcc.cpp,EXAMPLES/SantaFeAntTrail/GE_MITGALIB/initfunc.cpp,Santa Fe Implementation with GE_MITGALIB
+@subsubsection @file{GEListGenome.h}
+
+This file declares the @code{GEListGenome} class, which is the genome used in
+this example. It derives from GALib's @code{GAListGenome} class, using the type
+@code{unsigned char} as its elements, as an @code{unsigned char} is usually
+composed of eight bits, which is the standard number of bits per gene used in
+Grammatical Evolution.
+
+@findex getEffectiveSize()
+@findex setEffectiveSize()
+@findex effCrossover()
+@findex pointMutator()
+This class extends the @code{GAListGenome} by allowing the genome to record its
+effective length, that is, the portion of the genome that was actually used
+during the mapping process. It also provides two methods, @code{effCrossover()}
+and @code{pointMutator()}, which implement a crossover restricted to the
+effective lengths of the genomes and GE's standard bit-level mutation,
+respectively. The implementation of all these methods is in the file
+@file{GEListGenome.cpp}.
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-gcc.cpp ---
+@node EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-gcc.cpp,EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-slang.cpp,EXAMPLES/SantaFeAntTrail/GE_MITGALIB/GEListGenome.h,Santa Fe Implementation with GE_MITGALIB
+@subsubsection @file{santafe-gcc.cpp}
+
+This file contains the functions directly related to the evaluation of each
+individual, made specifically for usage with the GCC compiler. It starts by
+defining two strings, @code{SFstart} and @code{SFend}, to contain
+buffer text for compilation, and a reference to the @code{GEGrammarSI} mapper,
+defined in the @file{main.cpp} file.
+
+@findex app_init()
+The @code{app_init} function, called from the @file{main.cpp} file,
+is responsible for reading in buffer code to place before and after each
+individual, before they are passed to the compiler for evaluation. It also
+initialises the libGE mapper, setting the maximum number of wrap events,
+and loading the grammar file.
+
+@findex objfunc()
+The @code{objfunc} function is responsible for evaluating an individual
+(passed as an argument). The @code{setGenotype()} method from the mapper is
+used to create a @code{Genotype} structure within the mapper, from the genome
+passed as argument.
+The resulting phenotype is then checked, and if valid, then a C file
+containing the individual is created; this file will contain the starting buffer
+code, the phenotype code, and the end buffer code. It is then compiled and
+linked with the @file{GEant.o} and @file{GEtrail.o} files, containing an
+interpreter for Santa Fe Ant Trail programs, and executed, all through a system
+call. The resulting program saves the output of the program onto a
+@file{result} file, which is then read, and the contents of that file are
+assigned as the fitness score of the current individual.
+Finally, the effective size of the individual is returned back to the genome.
+
+@findex print_individual()
+Finally, the @code{print_individual} function receives a genome as argument,
+performs its mapping to a phenotype structure, and prints it onto the screen,
+along with measurements of the genotype, generated phenotype, and the mapping
+process itself.
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-slang.cpp ---
+@node EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-slang.cpp,EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-tcc.cpp,EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-gcc.cpp,Santa Fe Implementation with GE_MITGALIB
+@subsubsection @file{santafe-slang.cpp}
+
+This file contains the functions related to the evaluation of each individual,
+made specifically for evaluation with the S-Lang library. As with the previous
+file, it makes reference to the @code{GEGrammarSI} mapper, defined in the
+@file{main.cpp} file.
+
+@findex app_init()
+@findex SLang_init_slang()
+@findex SLang_load_file()
+@findex SLang_load_string()
+@findex SLadd_intrinsic_variable()
+The @code{app_init} function, called from the @file{main.cpp} file, is
+responsible for initialising the libGE mapper, setting the maximum number of
+wrap events, and loading the grammar file. It also initialises the S-Lang
+interface, loading both the @file{GEant.sl} and @file{GEtrail.sl} files, which
+are S-Lang versions of the same interpreter for the Santa Fe Ant Trail problem
+(as used with the GCC compiler). It also calls the @code{ReadTrailGEtrail}
+function, defined within those files, to load the @file{santafe.trl} file.
+Finally, an interface with the S-Lang interpreter is created, through a call to
+the function @code{SLadd_intrinsic_variable}, to link the variable
+@code{fitness} to the S-Lang variable @code{Fitness_variable}.
+
+@findex objfunc()
+The @code{objfunc} function is again responsible for the evaluation of a genome
+passed as an argument. The @code{setGenotype()} method from the mapper is used
+to create a @code{Genotype} structure within the mapper, from the genome passed
+as argument. The resulting phenotype is then checked, and if valid, then a
+S-Lang function containing the individual is created, and wrote onto the string
+@code{buffer}, containing some buffer start and ending code, and the phenotype
+code. The function contained in the buffer is then executed with the S-Lang
+interpreter, and the resulting fitness is used as the fitness score of the
+genome.
+Finally, the effective size of the individual is returned back to the genome.
+
+@findex print_individual()
+Finally, the @code{print_individual} function receives a genome as argument,
+performs its mapping to a phenotype structure, and prints it onto the screen,
+along with measurements of the genotype, generated phenotype, and the mapping
+process itself.
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-tcc.cpp ---
+@node EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-tcc.cpp,EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-lua.cpp,EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-slang.cpp,Santa Fe Implementation with GE_MITGALIB
+@subsubsection @file{santafe-tcc.cpp}
+
+This file contains the functions directly related to the evaluation of each
+individual, made specifically for usage with the TCC compiler. It starts by
+defining two strings, @code{SFstart} and @code{SFend}, to contain
+buffer text for compilation, and a reference to the @code{GEGrammarSI} mapper,
+defined in the @file{main.cpp} file.
+
+@findex app_init()
+The @code{app_init} function, called from the @file{main.cpp} file, is
+responsible for reading in buffer code to place before and after each
+individual, before they are passed to a @code{TCCState} for evaluation. It also
+initialises the libGE mapper, setting the maximum number of wrap events,
+and loading the grammar file.
+
+@findex objfunc()
+@findex tcc_new()
+@findex tcc_set_output_type()
+@findex tcc_add_file()
+@findex tcc_compile_string()
+@findex tcc_run()
+The @code{objfunc} function is responsible for evaluating an individual (passed
+as an argument). The @code{setGenotype()} method from the mapper is used to
+create a @code{Genotype} structure within the mapper, from the genome passed as
+argument. The resulting phenotype is then checked, and if valid, then a
+@code{TCCState} is created with @code{tcc_new()}, its output type is set to
+memory (@code{tcc_set_output_type()}), and the file @file{GEantfuncs.o} is
+added to it (@code{tcc_add_file()}), which contains the object code for the
+functions called from the phenotype code (@code{left()}, @code{right()}, etc).
+A buffer is then created, containing the phenotype string and the start end end
+buffer code, and it is compiled inside the @code{TCCState} (with
+@code{tcc_compile_string()}). If the compilation is successful, the
+@code{main()} function is run by calling @code{tcc_run()}, and its return value
+is assigned as the fitness score of the current individual.
+Finally, the effective size of the individual is returned back to the genome.
+
+@findex print_individual()
+Finally, the @code{print_individual} function receives a genome as argument,
+performs its mapping to a phenotype structure, and prints it onto the screen,
+along with measurements of the genotype, generated phenotype, and the mapping
+process itself.
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-lua.cpp ---
+@node EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-lua.cpp,EXAMPLES/SantaFeAntTrail/GE_MITGALIB/Makefile,EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-tcc.cpp,Santa Fe Implementation with GE_MITGALIB
+@subsubsection @file{santafe-lua.cpp}
+
+This file contains the functions related to the evaluation of each individual,
+made specifically for evaluation with the Lua evaluator. It includes all the
+required Lua include files, wrapped with a @code{extern "C"} definition, as Lua
+is a C library and this example is written in C++. As with the previous files,
+this file makes reference to the @code{GEGrammarSI} mapper, defined in the
+@file{main.cpp} file. A global @code{lua_State} is also created at the top of
+the file.
+
+@findex app_init()
+@findex lua_open()
+@findex luaopen_base()
+@findex luaopen_io()
+@findex luaopen_string()
+@findex luaL_loadfile()
+@findex lua_pcall()
+@findex luaL_loadbuffer()
+The @code{app_init} function, called from the @file{main.cpp} file, is
+responsible for initialising the libGE mapper, setting the maximum number of
+wrap events, and loading the grammar file. It also creates the
+@code{lua_State}, initialising its base, I/O and string libraries. It then
+proceeds to load both the @file{GEant.lua} and @file{GEtrail.lua} files
+(through a call to the @code{luaL_loadfile()} function), which are Lua versions
+of the interpreter for the Santa Fe Ant Trail problem (as used with all the
+other evaluators), and executes them (through a call to @code{lua_pcall()}).
+Finally, it executes the @code{ReadTrailGEtrail} function (with the function
+@code{luaL_loadbuffer}), defined within those files, to load the
+@file{santafe.trl} file.
+
+@findex objfunc()
+@findex lua_getglobal()
+@findex lua_tonumber()
+The @code{objfunc} function is once again responsible for the evaluation of a
+genome passed as an argument. The @code{setGenotype()} method from the mapper
+is used to create a @code{Genotype} structure within the mapper, from the
+genome passed as argument. The resulting phenotype is then checked, and if
+valid, then the string @code{buffer} is loaded with the phenotype code and some
+start and ending code, and passed to the @code{lua_State} for evaluation. If
+successful, the @code{lua_getglobal()} function is used to push into the Lua
+stack the value of the @code{_picked_up} variable, and the @code{fitness}
+variable is used to receive that value from the stack (through the use of the
+@code{lua_tonumber()} function).
+Finally, the effective size of the individual is returned back to the genome.
+
+@findex print_individual()
+Finally, the @code{print_individual} function receives a genome as argument,
+performs its mapping to a phenotype structure, and prints it onto the screen,
+along with measurements of the genotype, generated phenotype, and the mapping
+process itself.
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_MITGALIB/Makefile ---
+@node EXAMPLES/SantaFeAntTrail/GE_MITGALIB/Makefile,,EXAMPLES/SantaFeAntTrail/GE_MITGALIB/santafe-lua.cpp,Santa Fe Implementation with GE_MITGALIB
+@subsubsection @file{Makefile}
+
+The @file{Makefile} contained with the example allows you to create a program
+using a choice of evaluators for your phenotype strings. Use @command{make} to
+create all executables, or @command{make GE*} to create a specific evaluator
+implementation (where @command{*} is any of @command{GCC}, @command{SLANG},
+@command{TCC} or @command{LUA}). At the top of the file there are definitions
+for the location of the libraries, make sure you adjust these to suit your
+system.
+
+Some of the evaluators require the pre-compilation of the @file{GEant.c} and
+@file{GEtrail.c} files; this is done by the @file{Makefile}, when the relevant
+target implementations are chosen.
+
+@page
+@c --- Implementation with GE_EO ---
+@node Santa Fe Implementation with GE_EO,Santa Fe Ant Trail Performance,Santa Fe Implementation with GE_MITGALIB,Santa Fe Ant Trail Problem
+@subsection GE_EO
+
+@menu
+* EO Example User Guide::				User guide to the EO library example.
+* EXAMPLES/SantaFeAntTrail/GE_EO/main.cpp::		EO parameters and settings.
+* EXAMPLES/SantaFeAntTrail/GE_EO/eoGE.h::		Definition of GE genome.
+* EXAMPLES/SantaFeAntTrail/GE_EO/eoGEInit.h::		Initialisation functions for GE.
+* EXAMPLES/SantaFeAntTrail/GE_EO/eoGEMutation.h::	Mutation operator for GE genome.
+* EXAMPLES/SantaFeAntTrail/GE_EO/eoGEQuadCrossover.h::	Crossover operator for GE genome.
+* EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncGCC.h::	Implementation using gcc as the evaluator.
+* EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncSlang.h::	Implementation using Slang as the evaluator.
+* EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncTCC.h::	Implementation using tcc as the evaluator.
+* EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncLua.h::	Implementation using lua as the evaluator.
+* EXAMPLES/SantaFeAntTrail/GE_EO/Makefile::		Linking EO and libGE.
+@end menu
+
+@c --- EO Example User Guide ---
+@node EO Example User Guide,EXAMPLES/SantaFeAntTrail/GE_EO/main.cpp,,Santa Fe Implementation with GE_EO
+
+The example using the EO library uses a custom genotype structure, as EO does
+not have direct support for variable-length integer-based structures. Here
+follows a user's guide to this implementation, and a description of its files.
+
+@subsubsection EO Example User Guide
+
+The EO library has a powerful command-line parser, which is fully-configurable.
+This example uses that parser to specify both the standard GA parameters, and
+also the GE specific parameters.
+
+Parameters are passed to the executable in the following fashion:
+
+@command{./executable -param_short_name[=value]}
+
+or
+
+@command{./executable --param_long_name[=value]}
+
+The following are the parameters accepted by this example, and their default
+values:
+
+@itemize
+@item -h, --help: prints help message (default is 0);
+@item --stopOnUnknownParam: stop if unknown parameter entered (default is 1);
+@item -C, --pCross: probability of crossover (default is 0.9);
+@item -E, --effCross: use effective crossover (default is 0);
+@item -M, --pMut: probability of mutation (default is 1);
+@item -b, --pMutPerBit: probability of bit-flip mutation (default is 0.01);
+@item -s, --sensibleInit: use sensible initialisation (default is 0);
+@item -x, --minSize: minimum size for random initialisation (default is 15);
+@item -X, --maxSize: maximum size for random initialisation (default is 25);
+@item -r, --grow: grow ratio for SI (default is 0.5);
+@item -d, --maxDepth: maximum depth for SI (default is 10);
+@item -T, --tailSize: tail size for SI (default is 0);
+@item -t, --tailRatio: tail ratio for SI (default is 0);
+@item -g, --grammarFile: grammar file (default is "grammar.bnf");
+@item -w, --wrappingEvents: number of wrapping events (default is 0);
+@item -L, --Load: save file to restart run (no default);
+@item -S, --Status: status file (default is "./<name_of_executable>.status");
+@item -R, --seed: sandom number seed (default is random);
+@item -P, --popSize: population size (default is 100);
+@item -G, --maxGen: maximum number of generations (default is 10).
+@end itemize
+
+For example, to run the @command{GELUA} implementation, using the grammar file
+"grammar-lua.bnf", with a population size of 500 individuals, for 50
+generations, using random seed 1, and leaving all other parameters to standard
+values, the command to execute is:
+
+@command{./GELUA -g=grammar-lua.bnf -P=500 -G=50 -R=1}
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_EO/main.cpp ---
+@node EXAMPLES/SantaFeAntTrail/GE_EO/main.cpp,EXAMPLES/SantaFeAntTrail/GE_EO/eoGE.h,EO Example User Guide,Santa Fe Implementation with GE_EO
+@subsubsection @file{main.cpp}
+
+This file contains the @code{main()} function, and is the central point of
+control over the evolutionary process. It begins by including all required EO
+include files, followed by a declaration of the fitness type to be used, the
+type of each individual, and finally the declaration (and required include) of
+the libGE mapper to use.
+
+The function @code{main_function()} follows. It starts by defining all parameters
+available to the system in a @code{eoParser} object, along with code related to
+it (such as printing help messages).
+
+The objective function is declared next, along with an objective function call
+counter, @code{eoEvalFuncCounter}. Finally, a population of individuals is
+declared.
+
+An @code{eoState} is then declared, on which the random generator and population
+are registered, and which either loads a previous existing population from disk
+(if the run is a continuation of a previous run), or calls the individual
+initialiser to create a new population. In the latter case, each individual is
+also evaluated.
+
+The definition of roulette-wheel selection and steady-state replacement (GE
+style) follow, along with the definition of the genetic operators to use
+(which are encapsulated into a @code{eoTransform} object). Finally, a series of
+continuators, checkpoints, statistics objects and monitors are defined, and
+associated together.
+
+At the end of the @code{main_function()}, the actual evolutionary algorithm is
+then declared (an @code{eoEasyEA} object), and associated with the checkpoints,
+evaluation function, selection procedure, genetic operators, and replacement
+mechanism. The evolutionary cycle consists merely of associating it to the
+previously declared population.
+
+The actual @code{main()} function consists only of a protected call to
+@code{main_function()}, to handle exceptions.
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_EO/eoGE.h ---
+@node EXAMPLES/SantaFeAntTrail/GE_EO/eoGE.h,EXAMPLES/SantaFeAntTrail/GE_EO/eoGEInit.h,EXAMPLES/SantaFeAntTrail/GE_EO/main.cpp,Santa Fe Implementation with GE_EO
+@subsubsection @file{eoGE.h}
+
+This file declares the @code{eoGE} class, defining a genome. The structure
+chosen is a vector of @code{unsigned char} elements, as these are typically
+represented by 8 bits, which is the standard GE representation of a codon.
+
+The methods @code{printOn()} and @code{readFrom()} output or read a genome,
+respectively, from the specified stream. The method @code{getEffectiveSize()}
+merely returns the recorded effective size of this individual.
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_EO/eoGEInit.h ---
+@node EXAMPLES/SantaFeAntTrail/GE_EO/eoGEInit.h,EXAMPLES/SantaFeAntTrail/GE_EO/eoGEMutation.h,EXAMPLES/SantaFeAntTrail/GE_EO/eoGE.h,Santa Fe Implementation with GE_EO
+@subsubsection @file{eoGEInit.h}
+
+This file declares the @code{eoGEInit} class, defining the initialisation
+procedure used to create individuals. The constructor reads, processes and
+stores the required parameters, to either select a random initialisation,
+or a sensible initialisation.
+
+In the case of a random initialisation, the method @code{operator()} calls
+the method @code{randomInit()}. This method creates individuals between the
+sizes @code{minSize} and @code{maxSize}, containing random @code{unsigned
+char} numbers.
+
+@findex GEGrammarSI.init()
+@findex init(), GEGrammarSI
+If the sensible initialisation is selected, the mapper's @code{init()} method
+is called, and if successful, the contents of its @code{Genotype} structure are
+used to initialise the @code{_genotype} object passed as an argument.
+
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_EO/eoGEMutation.h ---
+@node EXAMPLES/SantaFeAntTrail/GE_EO/eoGEMutation.h,EXAMPLES/SantaFeAntTrail/GE_EO/eoGEQuadCrossover.h,EXAMPLES/SantaFeAntTrail/GE_EO/eoGEInit.h,Santa Fe Implementation with GE_EO
+@subsubsection @file{eoGEMutation.h}
+
+This file declares the @code{eoGEMutation} class, which implements a point
+mutation operator, as used in standard GE. The mutation is applied to genotypes
+passed as arguments to the @code{operator()} method (the probability of mutation
+is specified through a call to the constructor).
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_EO/eoGEQuadCrossover.h ---
+@node EXAMPLES/SantaFeAntTrail/GE_EO/eoGEQuadCrossover.h,EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncGCC.h,EXAMPLES/SantaFeAntTrail/GE_EO/eoGEMutation.h,Santa Fe Implementation with GE_EO
+@subsubsection @file{eoGEQuadCrossover.h}
+
+This file declares the @code{eoGEQuadCrossover} class, which implements the
+crossover operator to use during the evolutionary cycle. Its constructor
+receives a boolean argument stating whether to use a standard 1-point
+crossover, or an effective crossover.
+
+If a standard 1-point crossover is to be used, a random cut point is selected
+within each individual; if the effective version is to be used, each cut point
+must lie within the effective part of each individual (that is, the part of its
+genome which has been read to create a phenotype). After choosing the cut
+points, the second half of each individual is then swapped.
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncGCC.h ---
+@node EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncGCC.h,EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncSlang.h,EXAMPLES/SantaFeAntTrail/GE_EO/eoGEQuadCrossover.h,Santa Fe Implementation with GE_EO
+@subsubsection @file{eoGEEvalFuncGCC.h}
+
+This file declares the @code{eoGEEvalFunc} class, which contains the fitness
+function to use on each individual, implemented using the GCC evaluator. Its
+constructor receives as arguments the name of the file containing the grammar,
+and the number of wrapping events; these are used to initialise the mapper
+passed as reference. The private strings @code{SFstart} and @code{SFend} are
+then loaded with buffer code, to be placed before and after each individual,
+before they are passed to the compiler for evaluation.
+
+The method @code{operator()}, receiving an individual as argument, updates the
+fitness score of that individual. If the individual is considered @i{invalid}
+(which, in EO terms, means it has been modified and requires re-evaluation), a
+vector of integers is created with its contents, and used to initialise the
+@code{Genotype} structure of the libGE mapper used. If the resulting
+@code{Phenotype} structure is not valid, a fitness of 0 is assigned; otherwise,
+the generated code is wrapped with the start and end buffer code and written to
+a file; this file is then compiled and linked to the @file{GEant.o} and
+@file{GEtrail.o} files, containing an interpreter for Santa Fe Ant Trail
+programs, and finally it is executed, through a system call. The resulting
+program saves the output of the program onto a @file{result} file, which is
+then read, and the contents of that file are assigned as the fitness score of
+the current individual.
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncSlang.h ---
+@node EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncSlang.h,EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncTCC.h,EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncGCC.h,Santa Fe Implementation with GE_EO
+@subsubsection @file{eoGEEvalFuncSlang.h}
+
+@findex SLang_init_slang()
+@findex SLang_load_file()
+@findex SLang_load_string()
+@findex SLadd_intrinsic_variable()
+This file declares the @code{eoGEEvalFunc} class, which contains the fitness
+function to use on each individual, implemented using the S-Lang evaluator. Its
+constructor receives as arguments the name of the file containing the grammar,
+and the number of wrapping events; these are used to initialise the mapper
+passed as reference. The constructor also initialises the S-Lang interface, to
+be used to run the evaluation of each individual; it loads the files
+@file{GEant.sl} and @file{GEtrail.sl}, containing definitions specific to the
+Santa Fe Ant Trail problem, and executes the code
+@code{ReadTrailGEtrail("santafe.trl")}, which is run on the S-Lang interpreter,
+and which loads a trail definition into memory. Finally, an interface with the
+S-Lang interpreter is created, through a call to the function
+@code{SLadd_intrinsic_variable}, to link the private variable @code{fit} to the
+S-Lang variable @code{Fitness_variable}.
+
+The method @code{operator()}, receiving an individual as argument, updates the
+fitness score of that individual. If the individual is considered @i{invalid}
+(which, in EO terms, means it has been modified and requires re-evaluation),
+a vector of integers is created with its contents, and used to initialise the
+@code{Genotype} structure of the libGE mapper used. If the resulting
+@code{Phenotype} structure is not valid, a fitness of 0 is assigned; otherwise,
+the generated code is wrapped with some buffer code, and then passed onto the
+S-Lang interpreter, which returns the fitness of that code through the
+@code{fit} variable, which is finally assigned to the individual.
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncTCC.h ---
+@node EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncTCC.h,EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncLua.h,EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncSlang.h,Santa Fe Implementation with GE_EO
+@subsubsection @file{eoGEEvalFuncTCC.h}
+
+This file declares the @code{eoGEEvalFunc} class, which contains the fitness
+function to use on each individual, implemented using the TCC evaluator. Its
+constructor receives as arguments the name of the file containing the grammar,
+and the number of wrapping events; these are used to initialise the mapper
+passed as reference. The private strings @code{SFstart} and @code{SFend} are
+then loaded with buffer code, to be placed before and after each individual,
+before they are passed to the compiler for evaluation.
+
+@findex tcc_new()
+@findex tcc_set_output_type()
+@findex tcc_add_file()
+@findex tcc_compile_string()
+@findex tcc_run()
+The method @code{operator()}, receiving an individual as argument, updates the
+fitness score of that individual. If the individual is considered @i{invalid}
+(which, in EO terms, means it has been modified and requires re-evaluation), a
+vector of integers is created with its contents, and used to initialise the
+@code{Genotype} structure of the libGE mapper used. If the resulting
+@code{Phenotype} structure is not valid, a fitness of 0 is assigned; otherwise,
+a @code{TCCState} is created with @code{tcc_new()}, its output type is set to
+memory (@code{tcc_set_output_type()}), and the file @file{GEantfuncs.o} is
+added to it (@code{tcc_add_file()}), which contains the object code for the
+functions called from the phenotype code (@code{left()}, @code{right()}, etc).
+A buffer is then created, containing the phenotype string and the start end end
+buffer code, and it is compiled inside the @code{TCCState} (with
+@code{tcc_compile_string()}). If the compilation is successful, the
+@code{main()} function is run by calling @code{tcc_run()}, and its return value
+is assigned as the fitness score of the current individual.
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncLua.h ---
+@node EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncLua.h,EXAMPLES/SantaFeAntTrail/GE_EO/Makefile,EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncTCC.h,Santa Fe Implementation with GE_EO
+@subsubsection @file{eoGEEvalFuncLua.h}
+
+This file declares the @code{eoGEEvalFunc} class, which contains the fitness
+function to use on each individual, implemented using the Lua evaluator. It
+includes all the required Lua include files, wrapped with an @code{extern "C"}
+definition, as Lua is a C library and this example is written in C++.
+
+@findex lua_open()
+@findex luaopen_base()
+@findex luaopen_io()
+@findex luaopen_string()
+@findex luaL_loadfile()
+@findex lua_pcall()
+@findex luaL_loadbuffer()
+The constructor receives as arguments the name of the file containing the grammar,
+and the number of wrapping events; these are used to initialise the mapper
+passed as reference. It also creates the @code{lua_State}, initialising its
+base, I/O and string libraries. It then proceeds to load both the
+@file{GEant.lua} and @file{GEtrail.lua} files (through a call to the
+@code{luaL_loadfile()} function), which are Lua versions of the interpreter for
+the Santa Fe Ant Trail problem (as used with all the other evaluators), and
+executes them (through a call to @code{lua_pcall()}). Finally, it executes the
+@code{ReadTrailGEtrail} function (with the function @code{luaL_loadbuffer}),
+defined within those files, to load the @file{santafe.trl} file.
+
+@findex lua_getglobal()
+@findex lua_tonumber()
+The method @code{operator()}, receiving an individual as argument, updates the
+fitness score of that individual. If the individual is considered @i{invalid}
+(which, in EO terms, means it has been modified and requires re-evaluation), a
+vector of integers is created with its contents, and used to initialise the
+@code{Genotype} structure of the libGE mapper used. If the resulting
+@code{Phenotype} structure is not valid, a fitness of 0 is assigned; otherwise,
+the string @code{buffer} is loaded with the phenotype code and some start and
+ending code, and passed to the @code{lua_State} for evaluation. If successful,
+the @code{lua_getglobal()} function is used to push into the Lua stack the
+value of the @code{_picked_up} variable, and the @code{fit} private variable
+variable is used to receive that value from the stack (through the use of the
+@code{lua_tonumber()} function).
+
+@c --- EXAMPLES/SantaFeAntTrail/GE_EO/Makefile ---
+@node EXAMPLES/SantaFeAntTrail/GE_EO/Makefile,,EXAMPLES/SantaFeAntTrail/GE_EO/eoGEEvalFuncLua.h,Santa Fe Implementation with GE_EO
+@subsubsection @file{Makefile}
+
+The @file{Makefile} contained with the example allows you to create a program
+using a choice of evaluators for your phenotype strings. Use @command{make} to
+create all executables, or @command{make GE*} to create a specific evaluator
+implementation (where @command{*} is any of @command{GCC}, @command{SLANG},
+@command{TCC} or @command{LUA}). At the top of the file there are definitions
+for the location of the libraries, make sure you adjust these to suit your
+system.
+
+The @file{Makefile} uses the @command{-include} compiler flag to use only the
+relevant include file for your choice of evaluator; if your compiler does not
+accept that flag, you should replace it with the appropriate flag.
+
+Finally, some of the evaluators require the pre-compilation of the
+@file{GEant.c} and @file{GEtrail.c} files; this is done by the @file{Makefile},
+when the relevant target implementations are chosen.
+
+@page
+@c --- Santa Fe Ant Trail Performance ---
+@node Santa Fe Ant Trail Performance,,Santa Fe Implementation with GE_EO,Santa Fe Ant Trail Problem
+@subsection Santa Fe Ant Trail Performance
+
+@menu
+* GALib performance on Santa Fe Ant Trail::		GALib performance on this problem.
+* EO performance on Santa Fe Ant Trail::		EO performance on this problem.
+@end menu
+
+This section looks at the performance obtained with most of the search engines
+tested, for this specific problem. All search engines used a similar
+experimental setup: steady-state replacement, population size of 500
+individuals, 50 generations, probability of crossover of 0.9, and probability
+of bit-wise mutation of 0.01. Furthermore, each experiment was performed with
+four different setups:
+@itemize
+@item Using a standard GE approach;
+@item Using effective crossover;
+@item Using sensible initialisation;
+@item Using a combination of the last two.
+@end itemize
+
+The results obtained show that the last setup is clearly the best. Although the
+results varied somewhat between search engines, they tend to be equivalent.
+Interestingly, EO performance tended to benefit more from the use of effective
+crossover, which was not the case with GALib.
+
+As for using which evaluator to use, the results obtained were identical with
+all the evaluators tested. The following list gives an approximation of the
+execution times to expect from each of the evaluators tested:
+@itemize
+@item GCC: average of 52:00.00 per run;
+@item SLANG: average of 1:57.51 per run;
+@item Lua: average of 1:17.22 per run;
+@item TCC: average of 0:45.01 per run.
+@end itemize
+For reference, these results were obtained on a PC with a Pentium IV processor
+running at 1.50GHz, 512MB of memory, using Linux.
+
+@page
+
+@c --- GALib performance on Santa Fe Ant Trail ---
+@node GALib performance on Santa Fe Ant Trail,EO performance on Santa Fe Ant Trail,,Santa Fe Ant Trail Performance
+@subsubsection GALib performance
+
+@image{mbipg-GALIB,12cm,,Mean Best Individual per Generation with GALib}
+
+@image{cfos-GALIB,12cm,,Cumulative Frequency of Success with GALib}
+
+@c --- EO performance on Santa Fe Ant Trail ---
+@node EO performance on Santa Fe Ant Trail,,GALib performance on Santa Fe Ant Trail,Santa Fe Ant Trail Performance
+@subsubsection EO performance
+
+@image{mbipg-EO,12cm,,Mean Best Individual per Generation with EO}
+
+@image{cfos-EO,12cm,,Cumulative Frequency of Success with EO}
+
+@page
+

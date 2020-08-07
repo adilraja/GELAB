@@ -12,9 +12,9 @@ for(i=1:popSize)
     operator_vector(i)=population(i).operator;
 end
 
-total_operators=4;
+total_operators=6;
 sum_prob_all_ops=0;
-operator_probability=zeros(4,1);
+operator_probability=zeros(6,1);
 for(i=1:total_operators)
     I=find(operator_vector==i);
     fitness_proportion=sum(fitness_vector(I))/sum(fitness_vector);
@@ -34,12 +34,16 @@ end
 for(i=1:total_operators)
     switch i
         case 1
-            params.spxoverp=operator_probability(i)/sum_prob_all_ops;%The denominotor does not make any difference if lower is not better, its '1' in that case anyways.
+            params.noxoverp=operator_probability(i)/sum_prob_all_ops;%No xover
         case 2
-            params.vpxoverp=operator_probability(i)/sum_prob_all_ops;
+            params.spxoverp=operator_probability(i)/sum_prob_all_ops;%The denominotor does not make any difference if lower is not better, its '1' in that case anyways.
         case 3
-            params.weavep=operator_probability(i)/sum_prob_all_ops;
+            params.vpxoverp=operator_probability(i)/sum_prob_all_ops;
         case 4
+            params.weavep=operator_probability(i)/sum_prob_all_ops;
+        case 5
             params.tweavep=operator_probability(i)/sum_prob_all_ops;
+        case 6
+            params.subtreexoverp=operator_probability(i)/sum_prob_all_ops;
     end
 end

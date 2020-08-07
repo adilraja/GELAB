@@ -1,0 +1,279 @@
+tHIS FILE CONTAINS RESULTS OF BOTH LIBGE FOLDERS, ONE IS FROM BDS SITE AND THE OTHER IS FROM BITBUCKET. THE ONE FROM BITBUCKET DID 'BETTER' AMONG THE TWO AS NO LIBRARIES HAD TO BE INCLUDED IN THAT CASE.
+
+1- Downloaded stable version of LibGE (libGE-0.26 (stable)) from the following link:
+http://bds.ul.ie/libGE/
+
+2- Unzip the .tar using the following coammand:
+tar -xvzf FILENAME
+
+3- Given the following commands
+ 'sudo ./configure'
+ 'sudo make'
+ 'sudo make install'
+
+3rd step also INCLUDESthe following task (TO REMOVE ERRORS) - Pasted below mentioned section in all files which were showing error:
+(FOR EXAMPLE this error line is aboutthe file named 'GEGrammarSI.cpp' in 'src' folder: "src/GEGrammarSI.cpp:35:32: error: ‘UINT_MAX’")
+(I had to paste this section of code in the following files placed in folder named 'src' THIS TIME: [Genotype.cpp, Production.cpp, Rule.cpp, CFGrammar.cpp, GEGrammar.cpp, GEGrammarSI.h, GEGrammarSI.cpp, ] )
+
+// NEW includes to solve errors in 'make' command as suggest by Fergal's email -- START
+#include <limits.h>
+#include <climits>
+#include <stdio.h>
+#include <cstdio>
+// NEW includes to solve errors in 'make' command as suggest by Fergal's email -- END
+
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+Results of commands:
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+
+sheraz@sheraz:~/Desktop/GE/libGE-0.26$ sudo ./configure
+[sudo] password for sheraz: 
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for gawk... no
+checking for mawk... mawk
+checking whether make sets $(MAKE)... yes
+checking for gcc... gcc
+checking for C compiler default output file name... a.out
+checking whether the C compiler works... yes
+checking whether we are cross compiling... no
+checking for suffix of executables... 
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking for style of include used by make... GNU
+checking dependency style of gcc... gcc3
+checking for g++... g++
+checking whether we are using the GNU C++ compiler... yes
+checking whether g++ accepts -g... yes
+checking dependency style of g++... gcc3
+checking for an ANSI C-conforming const... yes
+checking how to run the C preprocessor... gcc -E
+checking for grep that handles long lines and -e... /bin/grep
+checking for egrep... /bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking for stdlib.h... (cached) yes
+checking for GNU libc compatible malloc... yes
+checking how to run the C++ preprocessor... g++ -E
+checking ga/ga.h usability... yes
+checking ga/ga.h presence... yes
+checking for ga/ga.h... yes
+checking whether GALib library is installed... yes
+checking for stdbool.h that conforms to C99... yes
+checking for _Bool... no
+checking for ranlib... ranlib
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating src/libGEdefs.h
+config.status: executing depfiles commands
+configure: ************************************************************
+configure: * Now run `make` and `make install`. The following options *
+configure: * were set:                                                *
+configure: * - IlliGAL sga support was installed;                     *
+configure: * - GALib support was installed;                           *
+configure: * - EO support is implicit.                                *
+configure: ************************************************************
+
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+
+sheraz@sheraz:~/Desktop/GE/libGE-0.26$ sudo make
+Making all in .
+make[1]: Entering directory '/home/sheraz/Desktop/GE/libGE-0.26'
+if g++ -DHAVE_CONFIG_H -I. -I. -I./src  -Wall -pg   -g -O2 -MT Genotype.o -MD -MP -MF ".deps/Genotype.Tpo" -c -o Genotype.o `test -f 'src/Genotype.cpp' || echo './'`src/Genotype.cpp; \
+then mv -f ".deps/Genotype.Tpo" ".deps/Genotype.Po"; else rm -f ".deps/Genotype.Tpo"; exit 1; fi
+if g++ -DHAVE_CONFIG_H -I. -I. -I./src  -Wall -pg   -g -O2 -MT Phenotype.o -MD -MP -MF ".deps/Phenotype.Tpo" -c -o Phenotype.o `test -f 'src/Phenotype.cpp' || echo './'`src/Phenotype.cpp; \
+then mv -f ".deps/Phenotype.Tpo" ".deps/Phenotype.Po"; else rm -f ".deps/Phenotype.Tpo"; exit 1; fi
+if g++ -DHAVE_CONFIG_H -I. -I. -I./src  -Wall -pg   -g -O2 -MT Symbol.o -MD -MP -MF ".deps/Symbol.Tpo" -c -o Symbol.o `test -f 'src/Symbol.cpp' || echo './'`src/Symbol.cpp; \
+then mv -f ".deps/Symbol.Tpo" ".deps/Symbol.Po"; else rm -f ".deps/Symbol.Tpo"; exit 1; fi
+if g++ -DHAVE_CONFIG_H -I. -I. -I./src  -Wall -pg   -g -O2 -MT Production.o -MD -MP -MF ".deps/Production.Tpo" -c -o Production.o `test -f 'src/Production.cpp' || echo './'`src/Production.cpp; \
+then mv -f ".deps/Production.Tpo" ".deps/Production.Po"; else rm -f ".deps/Production.Tpo"; exit 1; fi
+if g++ -DHAVE_CONFIG_H -I. -I. -I./src  -Wall -pg   -g -O2 -MT Rule.o -MD -MP -MF ".deps/Rule.Tpo" -c -o Rule.o `test -f 'src/Rule.cpp' || echo './'`src/Rule.cpp; \
+then mv -f ".deps/Rule.Tpo" ".deps/Rule.Po"; else rm -f ".deps/Rule.Tpo"; exit 1; fi
+if g++ -DHAVE_CONFIG_H -I. -I. -I./src  -Wall -pg   -g -O2 -MT Mapper.o -MD -MP -MF ".deps/Mapper.Tpo" -c -o Mapper.o `test -f 'src/Mapper.cpp' || echo './'`src/Mapper.cpp; \
+then mv -f ".deps/Mapper.Tpo" ".deps/Mapper.Po"; else rm -f ".deps/Mapper.Tpo"; exit 1; fi
+if g++ -DHAVE_CONFIG_H -I. -I. -I./src  -Wall -pg   -g -O2 -MT Grammar.o -MD -MP -MF ".deps/Grammar.Tpo" -c -o Grammar.o `test -f 'src/Grammar.cpp' || echo './'`src/Grammar.cpp; \
+then mv -f ".deps/Grammar.Tpo" ".deps/Grammar.Po"; else rm -f ".deps/Grammar.Tpo"; exit 1; fi
+if g++ -DHAVE_CONFIG_H -I. -I. -I./src  -Wall -pg   -g -O2 -MT CFGrammar.o -MD -MP -MF ".deps/CFGrammar.Tpo" -c -o CFGrammar.o `test -f 'src/CFGrammar.cpp' || echo './'`src/CFGrammar.cpp; \
+then mv -f ".deps/CFGrammar.Tpo" ".deps/CFGrammar.Po"; else rm -f ".deps/CFGrammar.Tpo"; exit 1; fi
+if g++ -DHAVE_CONFIG_H -I. -I. -I./src  -Wall -pg   -g -O2 -MT GEGrammar.o -MD -MP -MF ".deps/GEGrammar.Tpo" -c -o GEGrammar.o `test -f 'src/GEGrammar.cpp' || echo './'`src/GEGrammar.cpp; \
+then mv -f ".deps/GEGrammar.Tpo" ".deps/GEGrammar.Po"; else rm -f ".deps/GEGrammar.Tpo"; exit 1; fi
+if g++ -DHAVE_CONFIG_H -I. -I. -I./src  -Wall -pg   -g -O2 -MT Initialiser.o -MD -MP -MF ".deps/Initialiser.Tpo" -c -o Initialiser.o `test -f 'src/Initialiser.cpp' || echo './'`src/Initialiser.cpp; \
+then mv -f ".deps/Initialiser.Tpo" ".deps/Initialiser.Po"; else rm -f ".deps/Initialiser.Tpo"; exit 1; fi
+if g++ -DHAVE_CONFIG_H -I. -I. -I./src  -Wall -pg   -g -O2 -MT GEGrammarSI.o -MD -MP -MF ".deps/GEGrammarSI.Tpo" -c -o GEGrammarSI.o `test -f 'src/GEGrammarSI.cpp' || echo './'`src/GEGrammarSI.cpp; \
+then mv -f ".deps/GEGrammarSI.Tpo" ".deps/GEGrammarSI.Po"; else rm -f ".deps/GEGrammarSI.Tpo"; exit 1; fi
+if g++ -DHAVE_CONFIG_H -I. -I. -I./src  -Wall -pg   -g -O2 -MT GE_ILLIGALSGA.o -MD -MP -MF ".deps/GE_ILLIGALSGA.Tpo" -c -o GE_ILLIGALSGA.o `test -f 'src/GE_ILLIGALSGA.cpp' || echo './'`src/GE_ILLIGALSGA.cpp; \
+then mv -f ".deps/GE_ILLIGALSGA.Tpo" ".deps/GE_ILLIGALSGA.Po"; else rm -f ".deps/GE_ILLIGALSGA.Tpo"; exit 1; fi
+rm -f libGE.a
+ar cru libGE.a  Genotype.o Phenotype.o Symbol.o Production.o Rule.o Mapper.o Grammar.o CFGrammar.o GEGrammar.o Initialiser.o GEGrammarSI.o GE_ILLIGALSGA.o 
+ar: `u' modifier ignored since `D' is the default (see `U')
+ranlib libGE.a
+make[1]: Leaving directory '/home/sheraz/Desktop/GE/libGE-0.26'
+
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+
+sheraz@sheraz:~/Desktop/GE/libGE-0.26$ sudo make install
+Making install in .
+make[1]: Entering directory '/home/sheraz/Desktop/GE/libGE-0.26'
+make[2]: Entering directory '/home/sheraz/Desktop/GE/libGE-0.26'
+test -z "/usr/local/lib" || mkdir -p -- "/usr/local/lib"
+ /usr/bin/install -c -m 644 'libGE.a' '/usr/local/lib/libGE.a'
+ ranlib '/usr/local/lib/libGE.a'
+test -z "/usr/local/include/GE" || mkdir -p -- "/usr/local/include/GE"
+ /usr/bin/install -c -m 644 'src/libGEdefs.h' '/usr/local/include/GE/libGEdefs.h'
+ /usr/bin/install -c -m 644 'src/ge.h' '/usr/local/include/GE/ge.h'
+ /usr/bin/install -c -m 644 'src/Genotype.h' '/usr/local/include/GE/Genotype.h'
+ /usr/bin/install -c -m 644 'src/Phenotype.h' '/usr/local/include/GE/Phenotype.h'
+ /usr/bin/install -c -m 644 'src/Symbol.h' '/usr/local/include/GE/Symbol.h'
+ /usr/bin/install -c -m 644 'src/Production.h' '/usr/local/include/GE/Production.h'
+ /usr/bin/install -c -m 644 'src/Rule.h' '/usr/local/include/GE/Rule.h'
+ /usr/bin/install -c -m 644 'src/Mapper.h' '/usr/local/include/GE/Mapper.h'
+ /usr/bin/install -c -m 644 'src/Grammar.h' '/usr/local/include/GE/Grammar.h'
+ /usr/bin/install -c -m 644 'src/Tree.h' '/usr/local/include/GE/Tree.h'
+ /usr/bin/install -c -m 644 'src/CFGrammar.h' '/usr/local/include/GE/CFGrammar.h'
+ /usr/bin/install -c -m 644 'src/GEGrammar.h' '/usr/local/include/GE/GEGrammar.h'
+ /usr/bin/install -c -m 644 'src/Initialiser.h' '/usr/local/include/GE/Initialiser.h'
+ /usr/bin/install -c -m 644 'src/GEGrammarSI.h' '/usr/local/include/GE/GEGrammarSI.h'
+ /usr/bin/install -c -m 644 'src/GE_ILLIGALSGA.h' '/usr/local/include/GE/GE_ILLIGALSGA.h'
+test -z "/usr/local/share/info" || mkdir -p -- "/usr/local/share/info"
+ /usr/bin/install -c -m 644 './doc/libGE.info' '/usr/local/share/info/libGE.info'
+ /usr/bin/install -c -m 644 './doc/libGE.info-1' '/usr/local/share/info/libGE.info-1'
+ /usr/bin/install -c -m 644 './doc/libGE.info-2' '/usr/local/share/info/libGE.info-2'
+ install-info --info-dir='/usr/local/share/info' '/usr/local/share/info/libGE.info'
+install-info: warning: no info dir entry in `/usr/local/share/info/libGE.info'
+make[2]: Leaving directory '/home/sheraz/Desktop/GE/libGE-0.26'
+make[1]: Leaving directory '/home/sheraz/Desktop/GE/libGE-0.26'
+
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+
+
+
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+Results of commands: (For LibGE downloaded from bitBucket) - NO ERRORS in this, so did not even have to include libraries in .cpp files, just super user permissions (i.e SUDO) were required. :)
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+
+1- Downloaded libGE from the following link OF BitBucket:
+https://bitbucket.org/bds-ul/libge
+
+2- Unzip the .tar using the following coammand:
+unzip FILENAME
+
+3- Given the following commands
+ 'sudo ./configure'
+ 'sudo make'
+ 'sudo make install'
+
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+
+sheraz@sheraz:~/Desktop/GE/bds-ul-libge-19b0d8b1ee29$ ./configure
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+/home/sheraz/Desktop/GE/bds-ul-libge-19b0d8b1ee29/config/missing: Unknown `--is-lightweight' option
+Try `/home/sheraz/Desktop/GE/bds-ul-libge-19b0d8b1ee29/config/missing --help' for more information
+configure: WARNING: 'missing' script is too old or missing
+checking for a thread-safe mkdir -p... /bin/mkdir -p
+checking for gawk... no
+checking for mawk... mawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking whether gcc understands -c and -o together... yes
+checking for style of include used by make... GNU
+checking dependency style of gcc... gcc3
+checking for g++... g++
+checking whether we are using the GNU C++ compiler... yes
+checking whether g++ accepts -g... yes
+checking dependency style of g++... gcc3
+checking for an ANSI C-conforming const... yes
+checking how to run the C preprocessor... gcc -E
+checking for grep that handles long lines and -e... /bin/grep
+checking for egrep... /bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking for stdlib.h... (cached) yes
+checking for GNU libc compatible malloc... yes
+checking how to run the C++ preprocessor... g++ -E
+checking ga/ga.h usability... yes
+checking ga/ga.h presence... yes
+checking for ga/ga.h... yes
+checking whether GALib library is installed... yes
+checking for stdbool.h that conforms to C99... yes
+checking for _Bool... no
+checking for ranlib... ranlib
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating src/libGEdefs.h
+config.status: src/libGEdefs.h is unchanged
+config.status: executing depfiles commands
+configure: ************************************************************
+configure: * Now run `make` and `make install`. The following options *
+configure: * were set:                                                *
+configure: * - IlliGAL sga support was installed;                     *
+configure: * - GALib support was installed;                           *
+configure: * - EO support is implicit.                                *
+configure: ************************************************************
+
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+
+sheraz@sheraz:~/Desktop/GE/bds-ul-libge-19b0d8b1ee29$ sudo make
+[sudo] password for sheraz: 
+Making all in .
+make[1]: Entering directory '/home/sheraz/Desktop/GE/bds-ul-libge-19b0d8b1ee29'
+make[1]: Leaving directory '/home/sheraz/Desktop/GE/bds-ul-libge-19b0d8b1ee29'
+
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+
+sheraz@sheraz:~/Desktop/GE/bds-ul-libge-19b0d8b1ee29$ sudo make install
+Making install in .
+make[1]: Entering directory '/home/sheraz/Desktop/GE/bds-ul-libge-19b0d8b1ee29'
+make[2]: Entering directory '/home/sheraz/Desktop/GE/bds-ul-libge-19b0d8b1ee29'
+ /bin/mkdir -p '/usr/local/lib'
+ /usr/bin/install -c -m 644  libGE.a '/usr/local/lib'
+ ( cd '/usr/local/lib' && ranlib libGE.a )
+ /bin/mkdir -p '/usr/local/include/GE'
+ /usr/bin/install -c -m 644 src/libGEdefs.h src/ge.h src/Genotype.h src/Phenotype.h src/Symbol.h src/Production.h src/Rule.h src/Mapper.h src/Grammar.h src/Tree.h src/CFGrammar.h src/GEGrammar.h src/Initialiser.h src/GEGrammarSI.h src/AGSymbol.h src/AGLookUp.h src/AGContext.h src/AGDerivationTree.h src/GenericAGSymbol.h src/GE_ILLIGALSGA.h '/usr/local/include/GE'
+ /bin/mkdir -p '/usr/local/share/info'
+ /usr/bin/install -c -m 644 ./doc/libGE.info ./doc/libGE.info-1 ./doc/libGE.info-2 '/usr/local/share/info'
+ install-info --info-dir='/usr/local/share/info' '/usr/local/share/info/libGE.info'
+install-info: warning: no info dir entry in `/usr/local/share/info/libGE.info'
+make[2]: Leaving directory '/home/sheraz/Desktop/GE/bds-ul-libge-19b0d8b1ee29'
+make[1]: Leaving directory '/home/sheraz/Desktop/GE/bds-ul-libge-19b0d8b1ee29'
+sheraz@sheraz:~/Desktop/GE/bds-ul-libge-19b0d8b1ee29$ 
+
+

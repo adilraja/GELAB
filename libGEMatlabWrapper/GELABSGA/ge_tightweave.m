@@ -53,7 +53,7 @@ c_ind2.constants=ind2.constants;
 c_ind2.left_parent=ind2.ID;
 c_ind2.right_parent=ind1.ID;
 
-c_ind1.operator=4;
-c_ind2.operator=4;
+c_ind1.operator=5;
+c_ind2.operator=5;
 
 end

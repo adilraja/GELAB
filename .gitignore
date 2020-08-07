@@ -1,2 +1,5 @@
 /build/
 /dist/
+libGEMatlabWrapper/data/1191_BNG_pbc_test_x.csv
+libGEMatlabWrapper/params/dm_bw_params.mat
+*.csv

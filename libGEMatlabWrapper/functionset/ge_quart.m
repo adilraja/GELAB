@@ -19,7 +19,7 @@ if(islogical(x1))
         x1=double(x1);
 end
 
-y=x1.^2;
+y=x1.^4;
 %y(find(isinf(y)))=0;
 %y(find(imag(y)))=0;
 %y(find(isnan(y)))=0;

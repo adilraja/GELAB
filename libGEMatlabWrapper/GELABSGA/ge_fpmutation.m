@@ -1,6 +1,11 @@
 %function individual = ge_mutation(individual, params). This function
 %implements fixed bounds, few points mutation. Muhammad Adil Raja, 16th November, 2018.
 function individual = ge_fpmutation(individual, params)
+
+% if(contains(ctfroot, 'MATLAB'))
+%   % MATLAB is running.
+%   rng('shuffle', 'twister');
+% end
     genome=individual.genome;
     genome=genome(:);
     glen= length(genome);
@@ -23,7 +28,7 @@ function individual = ge_fpmutation(individual, params)
     
     %genome(index1)=val1;
     individual.genome=genome;
-    individual.mutationoperator=2;
+    individual.mutationoperator=3;
     %genomeSize=size(genome);
     %out = individual;
 end

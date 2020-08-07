@@ -1,0 +1,28 @@
+
+
+Binary String :        00101011011101101000101100010001...
+       |               |       |       |       |
+       V               V       V       V       V
+Integer String:        43      118     144     17      ...
+       |
+       V
+ BNF Grammar:
+
+ <Seq> ::= <vowel> | <Seq> <vowel>
+ <vowel> ::= A | E | I | O | U
+
+       |
+       \-----> <Seq>                  |
+                                      |  43 % 2 = 1
+               <Seq> <vowel>          V
+                                      |
+                                      | 118 % 2 = 0
+               <vowel> <vowel>        V
+                                      |
+                                      | 144 % 5 = 4
+               U <vowel>              V
+                                      |
+                                      |  17 % 5 = 5
+               U I                    V
+
+

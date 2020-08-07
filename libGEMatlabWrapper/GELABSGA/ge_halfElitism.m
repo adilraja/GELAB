@@ -27,33 +27,40 @@ function survivedPopulation = ge_halfElitism (parentPopulation, childPopulation,
     ppopSize=length(parentPopulation);
     cpopSize=length(childPopulation);
 %     disp(ppopSize);
-    pfitness=zeros(ppopSize, 1);
+    pfitness_agegroup=zeros(ppopSize, 2);
     cfitness=zeros(cpopSize, 1);
     for(i=1:ppopSize)
-      pfitness(i)=parentPopulation(i).fitness;
+      pfitness_agegroup(i,1)=parentPopulation(i).age; 
+      pfitness_agegroup(i,2)=parentPopulation(i).fitness;
     end
+    I=find(pfitness_agegroup(:,1)<=5);
+    pfitness_agegroup(I,1)=0;
+    I=find(pfitness_agegroup(:,1)>5);
+    pfitness_agegroup(I,1)=1;
+    
     for(i=1:cpopSize)
         cfitness(i)=childPopulation(i).fitness;
     end
     
     if(params.lowerisbetter==1)
-        [psortedFitness, pI]=sort(pfitness, 'ascend');
+        [psortedFitness, pI]=sortrows(pfitness_agegroup, 'ascend');
         [csortedFitness, cI]=sort(cfitness, 'ascend');   
     elseif(params.lowerisbetter==0)
-        [psortedFitness, pI]=sort(pfitness, 'descend');
+        [psortedFitness, pI]=sortrows(pfitness_agegroup,[1 2], {'ascend' 'descend'});
         [csortedFitness, cI]=sort(cfitness, 'descend');
     else
         disp('Please enter the right values for Lower is Better param: 0 or 1\n');
     end
-    plen=ceil(ppopSize/2);
-    clen=ceil(cpopSize/2);
+    plen=ceil(ppopSize*0.95);
+    clen=ceil(cpopSize*0.05);
     survivedPPopulation=parentPopulation(pI(1:plen));
     survivedCPopulation=childPopulation(cI(1:clen));
     survivedPopulation=[survivedPPopulation survivedCPopulation];
     popSize=length(survivedPopulation);
-    fitness=zeros(popSize,1);
+    fitness=zeros(popSize,2);
     for(i=1:popSize)
-        fitness(i)=survivedPopulation(i).fitness;
+        fitness(i,1)=survivedPopulation(i).fitness;
+%          fitness(i,2)=survivedPopulation(i).age;
     end
     
     if(params.lowerisbetter==1)
@@ -65,7 +72,9 @@ function survivedPopulation = ge_halfElitism (parentPopulation, childPopulation,
     end
 %     length(survivedPopulation);
 %     disp('The length');
-    temp=survivedPopulation(I(1:params.popSize));
+    temp=survivedPopulation(I(1:popSize));
     survivedPopulation=temp;
+     age=zeros(popSize,1);
+    
 %     disp(I(1));
 end

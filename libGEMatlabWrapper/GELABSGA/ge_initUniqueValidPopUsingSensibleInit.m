@@ -3,12 +3,18 @@ function [pop, params]=ge_initUniqueValidPopUsingSensibleInit(params)
 %Creates a valid population using sensible initialization.
 %Written by Muhammad Adil Raja. 21st July, 2018
 
+% if strfind(ctfroot, 'MATLAB')
+%   % MATLAB is running.
+%   rng('shuffle', 'twister');
+% end
+
 precision=params.precision;
 params.precision=25;
 
 j=1;
 fit_vec=[];%This is a fitness cache
 tot=0;
+
 
 while(j<=params.popSize)
     temp_ind=ge_createIndividual(params, 1);

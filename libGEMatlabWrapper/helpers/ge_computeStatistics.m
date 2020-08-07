@@ -25,10 +25,18 @@ function [stats3, params]=ge_computeStatistics(stats3, pop, params)
         testresult=pop(1).testResult;
     end
     
-    r=corrcoef(result, params.data.train_y);
+    if(length(result)==length(params.data.train_y))
+        r=corrcoef(result, params.data.train_y);
+    else
+        r=zeros(2,2);
+    end
     rtrain=r(1,2)^2;
     if(params.data.test)
-        r=corrcoef(testresult, params.data.test_y);
+        if(length(testresult)==length(params.data.test_y))
+            r=corrcoef(testresult, params.data.test_y);
+        else
+            r=zeros(0,0);
+        end
         rtest=r(1,2)^2;
     end
     I=find(fitness<params.maxBadFitness);
@@ -54,6 +62,7 @@ function [stats3, params]=ge_computeStatistics(stats3, pop, params)
     
     stats3.spxoverhistory=[stats3.spxoverhistory; params.spxoverp];
     stats3.vpxoverhistory=[stats3.vpxoverhistory; params.vpxoverp];
+    stats3.subtreexoverhistory=[stats3.subtreexoverhistory; params.subtreexoverp];
     
     stats3.weavehistory=[stats3.weavehistory; params.weavep];
     stats3.tweavehistory=[stats3.tweavehistory; params.tweavep];
@@ -78,12 +87,15 @@ function [stats3, params]=ge_computeStatistics(stats3, pop, params)
     'Dissimilarity index: %f\n' ...
     'Number of valid individuals is: %d\n', ...
     'The cache size is: %d\n', ...
+    'The best ind is: %s\n', ...
+    'Active terminals are: %s\n', ...
     '*****************************************\n'], ...
-    pop(1).fitness, meanf, pop(1).testFitness, rtrain, rtest, diversity, dissimilarity_index, numValid, cache_size);
+    pop(1).fitness, meanf, pop(1).testFitness, rtrain, rtest, diversity, dissimilarity_index, numValid, cache_size, pop(1).string, ge_getTerminals(params));
     %maintains the whole population in ascending order of fitness. So the
     %first element has the fittest individual.
     if(params.adaptiveProbs)
         params=ge_updateoperatorprobabilities(pop, params);
         params=ge_updatemutationoperatorprobabilities(pop, params);
     end
+    params=ge_terminals_scores(pop, params);%Compute scores for terminal symbols
 end

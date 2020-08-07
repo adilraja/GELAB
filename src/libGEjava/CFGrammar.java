@@ -806,7 +806,33 @@ public String getRules(){
         }
     return tmpStr;
 }
+/**
+ * Get the active variables in the grammar in a string.
+ * @return 
+ */
 
+public String getVars(){
+    Iterator<Rule> ruleIt=this.iterator();
+    String vars="The vars are: -\n";
+    int j=0;
+    while(ruleIt.hasNext()){
+        Rule tmpRule=ruleIt.next();
+        
+        if(tmpRule.lhs.get(0).getSymbol().equalsIgnoreCase("<var>")){
+            //System.out.println("Do I come here");
+            ListIterator<Production> prodIt=tmpRule.listIterator();
+            while(prodIt.hasNext()){
+                Iterator<Symbol> symbIt2=prodIt.next().iterator();  
+                while(symbIt2.hasNext()){
+                    //System.out.println("Here?");
+                    vars+=symbIt2.next().getSymbol();
+                    vars+="\n";              
+                }
+            }
+        }
+    }
+    return vars;
+}
 /**
  * Sets variables <var> production rules
  * @return 

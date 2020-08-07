@@ -1,0 +1,68 @@
+
+------------------------------------------------------------------------------
+
+* Soon
+
+** (0.27) Bug fixes + New wrappers.
+
+** (0.27) Implementation of GAuGE and Chorus.
+
+** (0.27) README file explaining how to use the tests, inside TEST directory.
+
+** (0.27) UML diagram for validity of genotype and phenotype through different
+operations (setGenotype, setPhenotype, loadGrammar, addBNFString,
+setStartSymbol...).
+
+** (0.27) More wrappers
+With time, more and more wrappers will be available with libGE, such as the
+EO framework. Read the ChangeLog file for details.
+
+** (0.27) Note in OpenBeagle installation, about error "./GESLANG: error while
+loading shared libraries: libbeagle-2.2.0.so: cannot open shared object file:
+No such file or directory": must insert /usr/local/lib onto /etc/ld.so.conf
+and run ldconfig for OpenBeagle dynamic libraries to be used in the system.
+(Put in FAQ)
+
+** (0.27) Fix `make ps` to work - why can't it find .eps files? --> dvips is
+run as `dvips -o doc/libGE.ps doc/libGE.dvi`, which doesn't find the doc/*.eps
+files... No solution.
+
+** (0.27) Measure the gain in speed by using diferent allocators in vector
+derived classes.
+
+** (0.27) Include a random initialiser with GEGrammarSI; maybe change its name
+to GEInitialiser?
+
+** (0.28) Establish dependency between libGE.texi and the examples texi files.
+
+** (0.28) Switch to turn on/off warning errors to stdout... ?
+
+** (0.28) Maybe add pointer to Symbols, to point to its definition... void
+pointer?  It would remove the need for findRule() for example. Terminal symbols
+would have the pointer always set to 0 or NULL.
+
+** (*) Add method to GEGrammar to deal with extended symbols in one central
+location. Right now GEGrammar and GEGrammarSI do similar jobs with GECodonValue
+for example.
+
+** (*) Add flag to allow right to left mapping instead of left to right, in
+GEGrammar.
+
+** (*) Allow for comments to be placed in BNF files.
+
+** (*) Implement effective addBNFFile() and addBNFString() methods.
+
+* Later
+
+** Hardware support
+libGE has only been tested on its development machine, a P4 1.5GHz with 512MB
+RAM, gcc version 3.2.2, Mandrake Linux 9.1. Support of other GNU/Linux
+distributions and other *nix flavours is purely theoretical at this stage
+(but the main reason behind the move to use the GNU autotools); testing of
+other architectures should be done at some stage.
+
+** MacOS and Windows support
+
+As of yet, there is no support for these operating systems, although MacOS
+systems using GCC 3.0 or greater should be able to use libGE.
+

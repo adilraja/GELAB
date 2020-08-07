@@ -1,0 +1,26 @@
+
+
+--------------------------------------------------------------------------------
+|                                   Mapper                                     |
+|------------------------------------------------------------------------------|
+| - genotype: Genotype                                                         |
+| - phenotype: Phenotype                                                       |
+|------------------------------------------------------------------------------|
+| + Mapper()                                                                   |
+| + Mapper(const Genotype &)                                                   |
+| + Mapper(const Phenotype &)                                                  |
+| + Mapper(const Mapper &)                                                     |
+| + ~Mapper(): virtual                                                         |
+| + getGenotype(): const Genotype *                                            |
+| + setGenotype(const Genotype &): void                                        |
+| + setGenotype(const GA1DArrayGenome<T> &): void                              |
+| + setGenotype(const GAListGenome<T> &): void                                 |
+| + setGenotype(const Genotype &): void                                        |
+| + getPhenotype(): const Phenotype *                                          |
+| + setPhenotype(const Phenotype &): void                                      |
+| + setGenotypeMaxCodonValue(const CodonType): void                            |
+| - genotype2Phenotype(): virtual bool = 0                                     |
+| - phenotype2Genotype(): virtual bool = 0                                     |
+--------------------------------------------------------------------------------
+
+

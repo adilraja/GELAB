@@ -14,8 +14,10 @@ package libGEjava;
  * @author adilraja
  */
 import java.util.*;
+import java.util.ArrayList;
 import java.util.ListIterator;
 import java.util.Iterator;
+import java.util.Collections;
 
 public class GEGrammar extends CFGrammar {
     
@@ -25,7 +27,16 @@ public class GEGrammar extends CFGrammar {
     protected ArrayList<Production> productions;
     private int counterFlag;//I just put it here
     private Stack<Symbol> nonterminals;
+    private Stack<Symbol> tmpNonterminals;
     private String phenotypeString;
+    private String mappingSequence;
+    private Stack<Integer> lhs_rep_xover_stack;
+    private Stack<Integer> lhs_rep_xover_type_stack;
+    private ArrayList<Integer> lhs_rep_xover_array;
+    private ArrayList<Integer> lhs_rep_xover_array_indices;
+    private ArrayList<Integer> lhs_rep_xover_type_array;
+    private int lhs_rep_xover_counter;
+    private String codonsUsedForMapping;
     
     
     /** 
@@ -36,8 +47,15 @@ public class GEGrammar extends CFGrammar {
         setMaxWraps(0);
         this.productions=new ArrayList();
         this.nonterminals=new Stack();
+        this.tmpNonterminals=new Stack();
+        this.lhs_rep_xover_stack=new Stack();
         this.tempTreeDepth=0;//By Adil
         this.treeDepth=0;
+        this.lhs_rep_xover_type_stack=new Stack();
+        this.lhs_rep_xover_array=new ArrayList();
+        this.lhs_rep_xover_array_indices=new ArrayList();
+        this.lhs_rep_xover_type_array=new ArrayList();
+        this.lhs_rep_xover_counter=1;
     }
    
     
@@ -49,8 +67,15 @@ public GEGrammar(final Genotype newGenotype){
     setMaxWraps(0);
     this.productions=new ArrayList();
     this.nonterminals=new Stack();
+    this.tmpNonterminals=new Stack();
     this.tempTreeDepth=0;//By Adil
     this.treeDepth=0;
+    this.lhs_rep_xover_stack=new Stack();
+    this.lhs_rep_xover_type_stack=new Stack();
+    this.lhs_rep_xover_array=new ArrayList();
+    this.lhs_rep_xover_array_indices=new ArrayList();
+    this.lhs_rep_xover_type_array=new ArrayList();
+    this.lhs_rep_xover_counter=1;
 }
 
 /**
@@ -60,8 +85,15 @@ public GEGrammar(final Phenotype newPhenotype){
     super(newPhenotype);
     setMaxWraps(0);
     this.nonterminals=new Stack();
+    this.tmpNonterminals=new Stack();
     this.tempTreeDepth=0;//By Adil
     this.treeDepth=0;
+    this.lhs_rep_xover_stack=new Stack();
+    this.lhs_rep_xover_type_stack=new Stack();
+    this.lhs_rep_xover_array=new ArrayList();
+    this.lhs_rep_xover_array_indices=new ArrayList();
+    this.lhs_rep_xover_type_array=new ArrayList();
+    this.lhs_rep_xover_counter=1;
 }
    /**
     * Copy Constructor.
@@ -73,10 +105,20 @@ public GEGrammar(final GEGrammar copy) throws Exception{
 	// and productions and derivationTree structures.
         this.productions=new ArrayList();
         this.productions.clear();
+        this.lhs_rep_xover_stack=new Stack();
+        this.lhs_rep_xover_type_stack=new Stack();
+        this.lhs_rep_xover_array=new ArrayList();
+        this.lhs_rep_xover_array_indices=new ArrayList();
+        this.lhs_rep_xover_type_array=new ArrayList();
+        this.lhs_rep_xover_counter=1;
         this.nonterminals=new Stack();
-        this.genotype2phenotype(true);
+        this.tmpNonterminals=new Stack();
         this.tempTreeDepth=0;//By Adil
         this.treeDepth=0;
+        this.genotype2phenotype(true);
+        
+        
+        
 }
 
 
@@ -85,6 +127,15 @@ public GEGrammar(final GEGrammar copy) throws Exception{
  */
 public final int getMaxWraps() {
 	return maxWraps;
+}
+
+/**
+ * Return number of wraps to unfold the phenotype
+ * @return 
+ */
+
+public int getNumWraps(){
+    return this.genotype.getWraps();
 }
 
 /**
@@ -169,6 +220,12 @@ public boolean genotype2phenotype(final String buildDerivationTree){
 public boolean genotype2phenotype(final boolean buildDerivationTree){
         
 	this.derivationTree.clear();//=new Tree();//Initialize the tree
+        this.lhs_rep_xover_array.clear();
+        this.lhs_rep_xover_array_indices.clear();
+        this.lhs_rep_xover_type_array.clear();
+        this.lhs_rep_xover_stack.clear();
+        this.lhs_rep_xover_type_stack.clear();
+        this.mappingSequence=new String();
 	boolean returnValue=true;
 	int newEffectiveSize=0;
         this.counterFlag=0;
@@ -197,6 +254,7 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
 	//Wraps counter and nonterminals (Symbols) stack
 	int wraps=0;
 	this.nonterminals.clear();// =new Stack();//No need to create a new object
+        this.lhs_rep_xover_stack.clear();
 
 	// Iterators
 	Iterator<Rule> ruleIt;
@@ -225,8 +283,8 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
                 e.printStackTrace();
             }
 	}
-
-	boolean gotToUseWrap=true;
+      
+      boolean gotToUseWrap=true;
       Integer codonGenoIt=new Integer(0);
       try{
         codonGenoIt=genoIt.next();
@@ -234,10 +292,32 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
       catch(java.util.NoSuchElementException e){
           e.printStackTrace();
       }
+      this.lhs_rep_xover_counter=0;
+      this.codonsUsedForMapping="";
+      
+      
 	// Get rid of all non-terminal symbols
 	while((!this.nonterminals.empty())&&(wraps<=getMaxWraps())){
 		// Do a mapping step
+                //this.lhs_rep_xover_counter++;
+                String currentSymbol=this.nonterminals.peek().getSymbol();
                 
+                this.codonsUsedForMapping+=codonGenoIt.toString();
+                this.codonsUsedForMapping+=" ";
+                if(currentSymbol.equalsIgnoreCase("<lexpr>") || currentSymbol.startsWith("<u-pre-op") || currentSymbol.startsWith("<b-pre-op")){
+                    this.lhs_rep_xover_stack.push(new Integer(this.lhs_rep_xover_counter));
+                    this.pushSymbolsOnStack(currentSymbol);
+                    //System.out.println("I come here");
+                }
+                if(currentSymbol.equalsIgnoreCase("<const>") || currentSymbol.equalsIgnoreCase("<var>") || currentSymbol.equalsIgnoreCase("<op>") || currentSymbol.equalsIgnoreCase("<pop>")){
+                   // this.lhs_rep_xover_counter+=1;
+                }
+                //if(currentSymbol.equalsIgnoreCase("<pop>")==false){
+                    this.lhs_rep_xover_counter++;
+                //}
+               // else{
+                 //   this.lhs_rep_xover_counter++;
+                //}
 		switch(genotype2phenotypeStep(this.nonterminals, codonGenoIt, buildDerivationTree)){
 			case -1:returnValue=false;
 				break;
@@ -264,10 +344,12 @@ public boolean genotype2phenotype(final boolean buildDerivationTree){
                                 returnValue=false;
                                 break;
 		}
+              //  System.out.println("Geneotype to phenotype step executed");
 	}
 	//newEffectiveSize+=(genoIt-genotype.begin());
 	// Was the mapping successful?
 	if((wraps>getMaxWraps())||(!this.nonterminals.empty())){
+                //System.out.println("Cause is A");
 		returnValue=false;
 		// Add remaining symbols in nonterminals queue to phenotype
 		while(!this.nonterminals.empty()){
@@ -316,6 +398,17 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGeno
         this.nonterminals=nonterminals1;
 	// Find the rule for the current non-terminal
 	Rule rulePtr=null;
+        //System.out.print(this.nonterminals.peek().getSymbol()+" ");
+        this.mappingSequence+=this.nonterminals.peek().getSymbol();
+        
+        this.mappingSequence+="|";
+        if(this.nonterminals.peek().getSymbol().equalsIgnoreCase("<pop>")){
+            int tempVal=this.lhs_rep_xover_stack.pop().intValue();
+            this.lhs_rep_xover_array.add(new Integer(this.lhs_rep_xover_counter-tempVal));
+            this.lhs_rep_xover_array_indices.add(new Integer(tempVal));
+            this.lhs_rep_xover_type_array.add(this.lhs_rep_xover_type_stack.pop());
+            //System.out.println("I come here!");
+        }
         try{
             rulePtr=findRule(this.nonterminals.peek());
         }
@@ -334,16 +427,16 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGeno
 			int low=0,high=-1, pointer="<GECodonValue".length();
 			// currentChar is the first character after "<GECodonValue"
 			char currentChar=this.nonterminals.peek().getSymbol().substring(pointer,pointer+1).charAt(0);
-                       
+                       //System.out.println("Here are the current chars!");
 			// Look for range definitions
 			while(Character.toString(currentChar).compareTo(">")!=0){
 				if(Character.toString(currentChar).compareTo("-")==0){
 					// Low range specification
 					currentChar=this.nonterminals.peek().getSymbol().substring(++pointer,pointer+1).charAt(0);
+                                        //System.out.println(currentChar);
 					while(Character.isDigit(currentChar)){
 						low=(low*10)+(currentChar-'0');
-                                   
-						currentChar=this.nonterminals.peek().getSymbol().substring(++pointer,pointer+1).charAt(0);
+                                        	currentChar=this.nonterminals.peek().getSymbol().substring(++pointer,pointer+1).charAt(0);
 					}
 				}
 				else if(Character.toString(currentChar).compareTo("+")==0){
@@ -378,6 +471,7 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGeno
 			}
 			// Insert symbol with value onto phenotype
 			phenotype.add(new Symbol(codon,null));
+                        
 			returnValue=1;
 		}
 		else{
@@ -387,11 +481,13 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGeno
 			// Remove non-terminal
 			//nonterminals.pop();
 			// Invalidate mapping
+                        //System.out.println("Cause is 1");
 			returnValue=-1;
 		}
             }
             catch(java.lang.NullPointerException e){
                 System.out.println(e);
+                //System.out.println("Cause is 2");
                 returnValue=-1;
                 return returnValue;
             }
@@ -406,6 +502,7 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGeno
 		// Remove non-terminal
 		//nonterminals.pop();
 		// Invalidate mapping
+                //System.out.println("Cause is 3");
 		returnValue=-1;
 	}
 	else{
@@ -417,6 +514,7 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGeno
 			// Include symbol on phenotype
 			phenotype.add(rulePtr.lhs.get(0));
 			// Invalidate mapping
+                        //System.out.println("Cause is 4");
 			returnValue=-1;
 		}
 		else{
@@ -441,11 +539,12 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGeno
 			int s_start=0;
 			int s_stop=0;
                         try{
-                            s_stop=tmpProd.size();//Instead of prodIt.size();
+                            s_stop=tmpProd.size();//Instead of prodIt.size(); This could be wrong
                         }
                         catch(java.lang.NullPointerException e){
                             System.out.println(e+"tmpProd is null in GEGrammar");
                             returnValue=-1;
+                            //System.out.println("Cause is 5");
                             return returnValue;
                         }
                         
@@ -455,10 +554,10 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGeno
 			}
 			// Push all remaining symbols from production onto nonterminals queue, backwards
 			for(;s_stop>s_start;s_stop--){
-				this.nonterminals.push(tmpProd.get(s_stop-1));
+				this.nonterminals.push(tmpProd.get(s_stop-1));//Why not add the object? Why reference?
 			}
 			// 0 or 1 choice for current rule, didn't consume genotype codon
-			if(rulePtr.size()<=1){
+			if(rulePtr.size()<=0){//The actual comparison is against 1. I have used 0, and it works. So what is wrong here?
 				returnValue=0;
 			}
 			else{
@@ -480,6 +579,7 @@ public int genotype2phenotypeStep(Stack<Symbol> nonterminals1, Integer codonGeno
                     break;
                 }
                 phenotype.add(this.nonterminals.pop());
+                //this.lhs_rep_xover_counter++;
             }
                 catch(java.lang.NullPointerException e){
                 System.out.println(e+"The while loop at the end of genotype2phenotypeStep sucks");
@@ -518,7 +618,7 @@ public void buildDTree(Tree currentNode, ListIterator<Production> prodIt){
 		return;
 	}
 	// Create new tree level
-	Iterator<Symbol> symbIt=prodIt.next().iterator();;
+	Iterator<Symbol> symbIt=prodIt.next().iterator();
 	while(symbIt.hasNext()){
                 this.tempTreeDepth=currentNode.getDepth();
 		currentNode.add(new Tree(symbIt.next(), currentNode.getCurrentLevel()+1, currentNode.getDepth()+1));
@@ -583,10 +683,63 @@ private String phenotypetoString(){
     int siz=this.getPhenotype().size();
     Iterator<Symbol> symbIt=this.getPhenotype().iterator();
     while(symbIt.hasNext()){
-        this.phenotypeString+=symbIt.next().getSymbol().toString();
+        String tmp=symbIt.next().getSymbol().toString();
+        if(tmp!=null || tmp!=" "){
+            this.phenotypeString+=tmp;
+        }
     }
+    this.phenotypeString=this.phenotypeString.replaceAll("\\s", "");
     return this.phenotypeString;
 }
+
+/**
+ * Returns the LHS array in integer format
+ * @return 
+ */
+
+public int[] getLHSRepIntArray(){
+        Iterator<Integer> intItr=this.lhs_rep_xover_array.iterator();
+        int[] lhsArray=new int[this.lhs_rep_xover_array.size()];
+        int i=0;
+        while(intItr.hasNext()){
+            lhsArray[i]=intItr.next().intValue();
+            i++;
+        }
+        return lhsArray;
+    }
+
+/**
+ * The LHS array indices are returned
+ * @return 
+ */
+
+public int[] getLHSIndsRepIntArray(){
+        Iterator<Integer> intItr=this.lhs_rep_xover_array_indices.iterator();
+        int[] lhsArray=new int[this.lhs_rep_xover_array_indices.size()];
+        int i=0;
+        while(intItr.hasNext()){
+            lhsArray[i]=intItr.next().intValue();
+            i++;
+        }
+        return lhsArray;
+    }
+
+/**
+ * LHS type array is returned
+ * @return 
+ */
+public int[] getLHSRepTypeIntArray(){
+        Iterator<Integer> intItr=this.lhs_rep_xover_type_array.iterator();
+        int[] lhsArray=new int[this.lhs_rep_xover_type_array.size()];
+        int i=0;
+        while(intItr.hasNext()){
+            lhsArray[i]=intItr.next().intValue();
+            i++;
+        }
+        return lhsArray;
+    }
+
+
 
 /**
  * return the phenotype string
@@ -613,6 +766,35 @@ public String getGenotypeString(){
     }
     return genoString;
 }
+/**
+ * Returns the string format of the LHSRep array
+ * @return 
+ */
+public String getLHSRepArrayString(){
+  //  Collections.reverse(this.lhs_rep_xover_array);
+    Iterator<Integer> lhsIt=this.lhs_rep_xover_array.iterator();
+    String lhsString=new String();
+    while(lhsIt.hasNext()){
+        lhsString+=Integer.toString(lhsIt.next().intValue());
+        lhsString+=" ";
+    }
+    return lhsString;
+}
+
+/**
+ * Returns the LHSRespArrayIndices
+ * @return 
+ */
+
+public String getLHSRepArrayIndicesString(){
+    Iterator<Integer> lhsIt=this.lhs_rep_xover_array_indices.iterator();
+    String lhsString=new String();
+    while(lhsIt.hasNext()){
+        lhsString+=Integer.toString(lhsIt.next().intValue());
+        lhsString+=" ";
+    }
+    return lhsString;
+}
 
 /**
  * Returns the depth of the derivation tree.
@@ -620,6 +802,92 @@ public String getGenotypeString(){
  */
 public int getTreeDepth(){
     return this.treeDepth;
+}
+
+/**
+ * Returns the mapping sequence
+ * @return 
+ */
+public String getMappingSequence(){
+    return this.mappingSequence;
+}
+
+/**
+ * Returns the list of terminals in the grammar
+ * @return 
+ */
+public String[] getTerminals(){
+    Iterator<Rule> ruleIt=this.iterator();
+    ArrayList<String> terminalsList=new ArrayList();
+    while(ruleIt.hasNext()){
+        Rule tmpRule=ruleIt.next();
+        Iterator<Production> prodIt=tmpRule.iterator();
+        while(prodIt.hasNext()){
+            Iterator<Symbol> symbIt=prodIt.next().iterator();
+            while(symbIt.hasNext()){
+                Symbol tmpSymb=symbIt.next();
+                if(tmpSymb.getType().toString().compareTo("TSymbol")==0){
+                    if(tmpSymb.getSymbol().compareTo("")!=0 && tmpSymb.getSymbol().compareTo("(")!=0 && tmpSymb.getSymbol().compareTo(")")!=0 && tmpSymb.getSymbol().compareTo(",")!=0 && tmpSymb.getSymbol().compareTo(" ")!=0 && !tmpSymb.getSymbol().startsWith("w("))
+                        terminalsList.add(tmpSymb.getSymbol());
+                }
+            }
+        }
+    }
+    String[] terminals=new String[terminalsList.size()];
+    for(int i=0;i<terminalsList.size();i++){
+        terminals[i]=terminalsList.get(i);
+    }
+    return terminals;
+}
+
+/**
+ * Removes a production from the grammar given a symbol.
+ * @param symbol
+ * @return 
+ */
+public int removeProduction(String symbol){
+    int returnStatus=-1;
+    Iterator<Rule> ruleIt=this.iterator();
+    while(ruleIt.hasNext()){
+        Rule tmpRule=ruleIt.next();
+        Iterator<Production> prodIt=tmpRule.iterator();
+        while(prodIt.hasNext()){
+            Production tmpProd=prodIt.next();
+            Iterator<Symbol> symbIt=tmpProd.iterator();
+            while(symbIt.hasNext()){
+                Symbol tmpSymb=symbIt.next();
+                if(tmpSymb.getType().toString().compareTo("TSymbol")==0 && tmpSymb.getSymbol().startsWith(symbol) && tmpRule.size()>1){
+                    prodIt.remove();
+                    returnStatus = 1;
+                }
+            }
+        }
+    }
+    return returnStatus;
+}
+/**
+ * The codon sequence that is actually used for mapping
+ * @return 
+ */
+public String getCodonsUsedForMapping(){
+    return this.codonsUsedForMapping;
+}
+/**
+ * This function pushes symbols on stack
+ * @param currentSymbol 
+ */
+public void pushSymbolsOnStack(String currentSymbol){
+    if(currentSymbol.equalsIgnoreCase("<lexpr>")){
+        this.lhs_rep_xover_type_stack.push(new Integer(1));
+    }
+    else if(currentSymbol.startsWith("<u-pre-op")){
+        this.lhs_rep_xover_type_stack.push(new Integer(2));
+        //System.out.println("Don't I come here?");
+    }
+    else if(currentSymbol.startsWith("<b-pre-op")){
+        this.lhs_rep_xover_type_stack.push(new Integer(3));
+    }
+    
 }
 
 }

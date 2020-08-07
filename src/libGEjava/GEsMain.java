@@ -36,7 +36,7 @@ public class GEsMain{
     //   catch(java.io.IOException e){
     //        e.printStackTrace();
     //    }
-    int[] newArray={ 2, 1, 1, 0, 0, 1, 4, 3, 44, 1, 2, 0, 3, 44, 3, 44, 2, 2, 1, 0, 0, 3, 44, 2, 3, 44, 2, 2, 2, 1, 3, 44, 3, 44, 2, 2, 3, 44, 3, 44};
+    int[] newArray={ 2, 2, 2, 1, 1, 0, 0, 4, 3, 44, 1, 2, 0, 3, 44, 3, 44, 2, 2, 1, 0, 0, 3, 44, 2, 3, 44, 2, 2, 2, 1, 3, 44, 3, 44, 2, 2, 3, 44, 3, 44, 45, 46};
         Random rand=new Random();
         
         
@@ -54,7 +54,7 @@ public class GEsMain{
         grammar.setMaxDepth(6);
         
 
-        if(grammar.readBNFFile("/home/adil/Dropbox/UL/ULPostdoc/GELAB/grammars/sr.bnf")) {
+        if(grammar.readBNFFile("/home/adil/Dropbox/UL/ULPostdoc/GELAB/grammars/keijzer.bnf")) {
         } else {
             System.out.println("Reading of the grammar file was not successful\n");
         }
@@ -117,16 +117,16 @@ public class GEsMain{
         }
         
         Symbol symb=new Symbol();
-        System.out.println(symb.getType().toString());
+   //     System.out.println(symb.getType().toString());
         symb.setType(SymbolType.NTSymbol);
-        System.out.println(symb.getType().toString());
+  //      System.out.println(symb.getType().toString());
         
         ruleIt=grammar.iterator();
         System.out.println("\n\nHere is the grammar's NT/T info");
         Symbol tmpSymb23=null;
         while(ruleIt.hasNext()){
             Rule tmpRule=ruleIt.next();
-            System.out.print("\n"+tmpRule.lhs.get(0).getType().toString()+"::=");
+           // System.out.print("\n"+tmpRule.lhs.get(0).getType().toString()+"::=");
             Iterator<Production> prodIt=tmpRule.iterator();
             
             while(prodIt.hasNext()){
@@ -136,7 +136,7 @@ public class GEsMain{
                     tmpSymb23=symbIt2.next();
                     System.out.print(tmpSymb23.getType().toString()+"("+tmpSymb23.getSymbol() +") ");
                 }
-                System.out.print("|");
+               // System.out.print("|");
             }
         }
         if(grammar.phenotype.getValid()==true)
@@ -158,11 +158,34 @@ public class GEsMain{
         for(int j=0;j<grammar.getGenotypeIntArray().length;j++){
             System.out.print(tmpArr[j]+" ");
         }
+        System.out.println("\nCodons used for mapping: ");
+        System.out.println(grammar.getCodonsUsedForMapping());
+        System.out.println("\nHere is the LHS: ");
+        tmpArr=grammar.getLHSRepIntArray();
+        for(int j=0;j<grammar.getLHSRepIntArray().length;j++){
+            System.out.print(tmpArr[j]+" ");
+        }
+        System.out.println("\nHere is the LHS indices array: "+grammar.getLHSRepArrayIndicesString());
+        System.out.println("\nHere is the LHS type array: ");
+        tmpArr=grammar.getLHSRepTypeIntArray();
+        for(int j=0;j<grammar.getLHSRepTypeIntArray().length;j++){
+            System.out.print(tmpArr[j]+" ");
+        }
+        System.out.println("Here is the mapping sequence:");
+        System.out.println(grammar.getMappingSequence());
         System.out.println("\nTree depth is: "+grammar.getTreeDepth());
         if(grammar.isPhenotypeValid())
             System.out.println("The phenotype is also valid:");
-        grammar.setVars("G");
-        System.out.println("The rules are: \n"+grammar.getRules());
+        grammar.setVars("Y(:,2)");
+        grammar.setVars("Z(:,3)");
+        int removed= grammar.removeProduction("ge_sin");
+        System.out.println("Here are the terminals");
+        String[] terms=grammar.getTerminals();
+        for(int i=0;i<terms.length;i++){
+            System.out.println(terms[i]);
+        }
+        System.out.println(grammar.getVars());
+       // System.out.println("The rules are: \n"+grammar.getRules());
         
     /*    try{
             GEGrammar grammar2=new GEGrammar(grammar);

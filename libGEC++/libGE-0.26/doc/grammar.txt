@@ -1,0 +1,25 @@
+
+
+--------------------------------------------------------------------------------
+|                                  Grammar                                     |
+|------------------------------------------------------------------------------|
+| - validGrammar: bool                                                         |
+| - startSymbol: int                                                           |
+|------------------------------------------------------------------------------|
+| + Grammar()                                                                  |
+| + Grammar(const Genotype &)                                                  |
+| + Grammar(const Phenotype &)                                                 |
+| + Grammar(const Grammar &)                                                   |
+| + ~Grammar(): virtual                                                        |
+| + getValidGrammar(): bool                                                    |
+| - setValidGrammar(const bool): void                                          |
+| + getStartSymbol(): const Symbol *                                           |
+| + setStartSymbol(const unsigned int): bool                                   |
+| + setStartSymbol(const Symbol *): bool                                       |
+| + setStartSymbol(const string &): bool                                       |
+| + getStartRule(): const Rule *                                               |
+| - genotype2Phenotype(): virtual bool = 0                                     |
+| - phenotype2Genotype(): virtual bool = 0                                     |
+--------------------------------------------------------------------------------
+
+

@@ -1,0 +1,18 @@
+\input texinfo @c -*-texinfo-*-
+@c %**start of header
+@setfilename README.info
+@include version.texi
+@settitle libGE@value{VERSION}
+@c %**end of header
+
+-*-text-*-
+@chapter libGE-@value{VERSION}
+
+@section Introduction
+@include intro.texi
+
+@section Installation
+@include install.texi
+
+@bye
+

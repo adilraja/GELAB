@@ -1,6 +1,6 @@
 function ge_plots(stats, varargin)
  
-[x, y]=size(stats(1).bestfithistory);
+% [x, y]=size(stats(1).bestfithistory);
 
 if(isempty(varargin))
 %     figure;
@@ -44,9 +44,77 @@ switch lower(varargin{j})
         grid on;
         xlabel('Experiment NUmber');
         ylabel('Fitness (MSE)');
+    case 'scoreherr'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=1./(1+stats{j, i}.bestfithistory);
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2));
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Score');
+            legend('SA', 'GA', 'PSO', 'GE', 'GP');
+        end
+    case 'tscoreherr'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=1./(1+stats{j, i}.testfithistory);
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2)); 
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Score');
+            legend('SA', 'GA', 'PSO', 'GE', 'GP');
+        end
+    case 'cumtimeherr'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=cumsum(stats{j, i}.timehistory)./60;
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2));
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Time (Minutes)');
+            legend('SA', 'GA', 'PSO', 'GE', 'GP');
+        end
+    case 'timeherr'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=stats{j, i}.timehistory;
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2));
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Time (Seconds)');
+            legend('SA', 'GA', 'PSO', 'GE', 'GP');
+        end
     case 'fherr'
-        mean_f=mean(stats.bestfithistory,2);
-        err_f=std(stats.bestfithistory, 0, 2);
+        mean_f=mean(stats{1,1}.bestfithistory,2);
+        err_f=std(stats{1,1}.bestfithistory, 0, 2);
         figure;
         grid on;
         hold on;
@@ -111,23 +179,74 @@ switch lower(varargin{j})
         xlabel('Generations');
         ylabel('R^{2}');
     case 'dh'
-        mean_f=mean(stats.diversityhistory,2);
-        err_f=std(stats.diversityhistory, 0, 2);
+        mean_f=mean(stats.diversityhistory, 2);
+        err_f=1.96*std(stats.diversityhistory, 0, 2)./sqrt(size(stats.diversityhistory, 2));
         figure;
         grid on;
         hold on;
         errorbar(mean_f, err_f);
         xlabel('Generations');
-        ylabel('Diversity History');
+        ylabel('Diversity');
     case 'dissh'
-        mean_f=mean(stats.diisimilarityhistory,2);
-        err_f=std(stats.dissimilarityhistory, 0, 2);
+        mean_f=mean(stats.disimilarityhistory,2);
+        err_f=1.96*std(stats.dissimilarityhistory, 0, 2)./sqrt(size(stats.dissimilarityhistory, 2));
         figure;
         grid on;
         hold on;
         errorbar(mean_f, err_f);
         xlabel('Generations');
         ylabel('Dissimilarity Index');
+    case 'divhisterr'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=stats{j, i}.diversityhistory;
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2)); 
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Diversity');
+            legend('SA', 'GA', 'PSO', 'GE', 'GP');
+        end
+    case 'dissimhisterr'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=stats{j, i}.dissimilarityhistory;
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2)); 
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Dissimilarity Index');
+            legend('SA', 'GA', 'PSO', 'GE', 'GP');
+        end
+    case 'nvhisterr'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=stats{j, i}.numvalidhistory;
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2)); 
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Num. Valid');
+            legend('SA', 'GA', 'PSO', 'GE', 'GP');
+        end
     case 'therr'
         mean_f=mean(stats.timehistory,2);
         err_f=std(stats.timehistory, 0, 2);
@@ -136,7 +255,7 @@ switch lower(varargin{j})
         hold on;
         errorbar(mean_f, err_f);
         xlabel('Generations');
-        ylabel('Fitness (MSE)');
+        ylabel('Time (Seconds)');
     case 'th'
         figure;
         grid on;
@@ -186,6 +305,15 @@ switch lower(varargin{j})
     case 'vpxoverh'
         mean_f=mean(stats.vpxoverhistory,2);
         err_f=std(stats.vpxoverhistory, 0, 2);
+        figure;
+        grid on;
+        hold on;
+        errorbar(mean_f, err_f);
+        xlabel('Generations');
+        ylabel('Probability');
+    case 'subtreexoverh'
+        mean_f=mean(stats.subtreexoverhistory,2);
+        err_f=std(stats.subtreexoverhistory, 0, 2);
         figure;
         grid on;
         hold on;

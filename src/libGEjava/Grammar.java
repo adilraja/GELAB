@@ -86,7 +86,7 @@ public final Symbol getStartSymbol(){
         Symbol symb=null;
         if(this.startSymbol<this.size())
         {
-         symb=this.get(startSymbol).lhs.get(0);
+            symb=this.get(startSymbol).lhs.get(0);
         }
         return symb;
 }

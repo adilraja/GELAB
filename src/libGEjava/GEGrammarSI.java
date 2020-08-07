@@ -21,6 +21,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
     private int popSize;
     private int popIndex;
     private ArrayList<Integer> possibleRules;
+    private MersenneTwisterFast myRand;
     
     
     /**
@@ -34,6 +35,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
 	this.setTailRatio(0);
 	this.setTailSize(0);
         this.possibleRules= new ArrayList();
+        this.myRand=new MersenneTwisterFast(System.currentTimeMillis());
         
     }
     /**
@@ -47,6 +49,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
 	this.setTailRatio(0);
 	this.setTailSize(0);
         this.possibleRules=new ArrayList();
+        this.myRand=new MersenneTwisterFast(System.currentTimeMillis());
     }
     
     /**
@@ -60,6 +63,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
 	this.setTailRatio(0);
 	this.setTailSize(0);
         this.possibleRules=new ArrayList();
+        this.myRand=new MersenneTwisterFast(System.currentTimeMillis());
     }
     
     /**
@@ -74,6 +78,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
 	setTailRatio(copy.getTailRatio());
 	setTailSize(copy.getTailSize());
         this.possibleRules=new ArrayList();
+        this.myRand=new MersenneTwisterFast(System.currentTimeMillis());
     }
     /**
      * Return the grow percentage set for this initialiser.
@@ -161,6 +166,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
      * maximumDepth specified.
      */
     public boolean growTree(Tree tree, final boolean growMethod, final int maximumDepth){
+        //this.myRand.setSeed(System.currentTimeMillis());
         // Stop conditions
 	if(tree.getCurrentLevel()>maximumDepth){
 		return false;
@@ -181,7 +187,9 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
         
         if(rulePtr == null){// No definition for the current non-terminal found
             if(tree.getData().getSymbol().startsWith("<GECodonValue")){
-                this.genotype.add(new Integer(Math.round(genotype.getMaxCodonValue()*(float)Math.random())));
+                //this.genotype.add(new Integer(this.myRand.nextInt(genotype.getMaxCodonValue())));
+                this.genotype.add(new Integer(Math.round(genotype.getMaxCodonValue()*this.myRand.nextFloat(true, true))));
+                //genotype.push_back(static_cast<CodonType>(genotype.getMaxCodonValue()*(static_cast<float>(rand())/RAND_MAX)));
                 return true;
             }
             else if(tree.getData().getSymbol().compareTo("<GEXOMarker>")==0){
@@ -223,7 +231,8 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
                 else if(rulePtr.size()>1){
                     // Only choose production and insert it on genotype if there
                     // is more than 1 production associated with current rule
-                    int index=Math.round((float)(this.possibleRules.size()*Math.random()));
+                    int denominator=Integer.MAX_VALUE+1;
+                    int index= Math.round((float)(this.possibleRules.size()*this.myRand.nextDouble(true, false)));//Math.round((float)(this.possibleRules.size()*Math.random()));//
                     if(index>=this.possibleRules.size() && index!=0){
                         index=this.possibleRules.size()-1;
                     }
@@ -237,7 +246,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
                     }
                     // Perform "unmod" on choice
                     //Adil. Is this the right way to do it?
-                    genotype.set(genotype.size()-1, genotype.get(genotype.size()-1)+(int)(genotype.getMaxCodonValue()/rulePtr.size()*Math.random()));
+                    genotype.set(genotype.size()-1, genotype.get(genotype.size()-1)+(int)(genotype.getMaxCodonValue()/rulePtr.size()*this.myRand.nextDouble(true, false)));
                     //genotype.back()+=static_cast<CodonType>((genotype.getMaxCodonValue()/rulePtr->size()*(rand()/(RAND_MAX+1.0))))*rulePtr->size();
                 }
                 else{
@@ -287,6 +296,7 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
 		System.err.println("Cannot initialise individual with maxDepth set to zero.\n");
 		return false;
 	}
+        this.myRand.setSeed(System.currentTimeMillis());
         // Check for valid mapper
 	if(!getValidGrammar()){
 		System.err.println("Invalid Mapper, cannot initialise individual.\n");
@@ -324,7 +334,8 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
         if(returnValue){
             this.genotype.setValid(true);
             if(!this.genotype2phenotype(true)){
-                System.err.println("WARNING: invalid phenotype structure produced with Sensible Initialisation");
+                returnValue=false;
+                //System.err.println("WARNING: invalid phenotype structure produced with Sensible Initialisation");
             }
         }
     	// Create tails if required
@@ -338,8 +349,9 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
         }
         if(tailSize>0){
             // Create tail of size tailsize
+            //this.myRand.setSeed(System.currentTimeMillis());
             for(int ii=0;ii<tailSize;ii++){
-                this.genotype.add(Math.round(this.genotype.getMaxCodonValue()*(float)Math.random()));
+                this.genotype.add(Math.round(this.genotype.getMaxCodonValue()*this.myRand.nextFloat(true, true)));
             }
         }
         this.setIndex(this.getIndex()+1);
@@ -389,6 +401,11 @@ public class GEGrammarSI extends GEGrammar implements Initialiser{
 		this.popIndex=newPopIndex;
 	}
     }
+    
+    /**
+     * Return the genotype as an integer array
+     * @return 
+     */
     public int[] getGenotypeIntArray(){
         Iterator<Integer> intItr=this.genotype.iterator();
         int[] geneArray=new int[this.genotype.size()];

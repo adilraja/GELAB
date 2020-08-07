@@ -6,3 +6,6 @@ for(i=1:y)
     str=strcat('X(:,', num2str(i), ')');
     params.grammar.setVars(str);
 end
+% disp('Updating Vars in Grammar');
+% params.grammar.getVars()
+% disp(i);

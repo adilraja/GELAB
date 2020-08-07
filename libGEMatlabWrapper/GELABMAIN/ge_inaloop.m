@@ -1,10 +1,17 @@
-function [all_pops, all_bests, all_stats, params]=ge_inaloop(params2, results_file_name, varargin)
+function [all_pops, all_bests, all_stats, params]=ge_inaloop(params, results_file_name, called_external, varargin)
 %This is going to run ge for multiple runs. Muhammad Adil Raja. 20 July,
-%2018
+%2018.
+%Input: -
+%   called_external: If an external program has called it then they should
+%   also have set up parpool if parallel processing is being used.
 
 clear JAVA;
 
-params=params2;
+if(contains(ctfroot, 'MATLAB'))
+  % MATLAB is running.
+  rng('shuffle', 'twister');
+end
+
 
 if(exist('params', 'var')==0)
     params=ge_fiddleParams;
@@ -12,22 +19,26 @@ end
 
 libGEpath=strcat(fileparts(which('loadGrammar.m')), '/libGEjar/libGEjava.jar');
 
-if(params.parallel)
-    if(isempty(gcp('nocreate')))
-        pool=parpool(params.numcores, 'IdleTimeout', 9600);
+if(~called_external)
+    if(params.parallel)
+        if(isempty(gcp('nocreate')))
+            pool=parpool(params.numcores, 'IdleTimeout', 9600);
+        else
+            delete(gcp);
+    %         pool = gcp('nocreate');
+            pool=parpool(params.numcores, 'IdleTimeout', 9600);
+        end
+        pctRunOnAll javaaddpath(strcat(fileparts(which('loadGrammar.m')), '/libGEjar/libGEjava.jar'));
     else
-        delete(gcp);
-%         pool = gcp('nocreate');
-        pool=parpool(params.numcores, 'IdleTimeout', 9600);
+        javaaddpath(libGEpath);
     end
-    pctRunOnAll javaaddpath(strcat(fileparts(which('loadGrammar.m')), '/libGEjar/libGEjava.jar'));
-else
-    javaaddpath(libGEpath);
 end
 
 params.grammar=loadGrammar(params);
 params=ge_updateGrammarVars(params);
+params=ge_updateNumCoefs(params);
 params=ge_updateGrammarConsts(params);
+
 if(params.evalinws)
     ge_expandVarsinWorkSpace(params);
 end
@@ -48,6 +59,7 @@ diversityhistory=zeros(params.numGens, params.numRuns);
 
 spxoverhistory=zeros(params.numGens, params.numRuns);
 vpxoverhistory=zeros(params.numGens, params.numRuns);
+subtreexoverhistory=zeros(params.numGens, params.numRuns);
 weavehistory=zeros(params.numGens, params.numRuns);
 tweavehistory=zeros(params.numGens, params.numRuns);
 
@@ -59,6 +71,7 @@ fbmutationhistory=zeros(params.numGens, params.numRuns);
 
 if(params.parallel~=1)
     for(i=1:params.numRuns)
+        params=ge_updateParamsTerminalsScores(params);%Do a fresh load on grammar
         [pop, best, stats2, params2]=feval(params.ga_fcn, params, i);
         bestfithistory(:,i)=stats2.bestfithistory;
         testfithistory(:, i)=stats2.testfithistory;
@@ -73,6 +86,7 @@ if(params.parallel~=1)
         
         spxoverhistory(:, i)=stats2.spxoverhistory;
         vpxoverhistory(:, i)=stats2.vpxoverhistory;
+        subtreexoverhistory(:, i)=stats2.subtreexoverhistory;
         weavehistory(:, i)=stats2.weavehistory;
         tweavehistory(:, i)=stats2.tweavehistory;
         pmutationhistory(:, i)=stats2.pmutationhistory;
@@ -89,9 +103,16 @@ else
 %     pop=repmat(p, [params.numRuns, params.popSize]);
 %     best=repmat(p, [params.numRuns, 1]);
 %     stats2=repmat(all_stats, [params.numRuns, 1]);
+    params=ge_updateParamsTerminalsScores(params);%Do a fresh load on grammar
     parfor(i=1:params.numRuns, params.numcores)
         %params=params2;
-        %
+        % 
+        disp(i);
+        seed=floor(now);
+        seed1=rem(now,1)*1e6;
+        seed2=rem(seed1, 1)*1e9;
+        seed3=floor(seed2)+(53*i)+seed;
+        rng(seed3, 'multFibonacci');%'combRecursive');%
         [pop, best, stats2]=feval(params.ga_fcn, params, i);
         %params=ge_updateGenotypeCache(params3, params2);
         %params=params2(i);
@@ -109,6 +130,7 @@ else
         
         spxoverhistory(:, i)=stats2.spxoverhistory;
         vpxoverhistory(:, i)=stats2.vpxoverhistory;
+        subtreexoverhistory(:, i)=stats2.subtreexoverhistory;
         weavehistory(:, i)=stats2.weavehistory;
         tweavehistory(:, i)=stats2.tweavehistory;
         pmutationhistory(:, i)=stats2.pmutationhistory;
@@ -119,8 +141,10 @@ else
         all_bests=[all_bests; best];
 %         params=params2;
     end
-    delete(pool);
-    pause(5);
+    if(~called_external)
+        delete(pool);
+        pause(5);
+    end
 end
 all_stats.bestfithistory=bestfithistory;
 all_stats.testfithistory=testfithistory;
@@ -135,6 +159,7 @@ all_stats.dissimilarityhistory=dissimilarityhistory;
 all_stats.diversityhistory=diversityhistory;
 
 all_stats.spxoverhistory=spxoverhistory;
+all_stats.subtreexoverhistory=subtreexoverhistory;
 all_stats.vpxoverhistory=vpxoverhistory;
 all_stats.weavehistory=weavehistory;
 all_stats.tweavehistory=tweavehistory;

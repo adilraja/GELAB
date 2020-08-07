@@ -1,0 +1,7 @@
+<expr>	::= <b-pre-op>(<expr>, <expr>) <pop>
+		| <var>
+		| <const>
+<b-pre-op>  ::= ge_divide | ge_add | ge_subtract | ge_multiply
+<var>	::=	X(:,1)
+<const>	::=	w(1)
+<pop>   ::= ""

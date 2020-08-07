@@ -12,9 +12,9 @@ for(i=1:popSize)
     operator_vector(i)=population(i).mutationoperator;
 end
 
-total_operators=3;
+total_operators=5;
 sum_prob_all_ops=0;
-operator_probability=zeros(3,1);
+operator_probability=zeros(5,1);
 for(i=1:total_operators)
     I=find(operator_vector==i);
     fitness_proportion=sum(fitness_vector(I))/sum(fitness_vector);
@@ -34,10 +34,14 @@ end
 for(i=1:total_operators)
     switch i
         case 1
-            params.pmutationp=operator_probability(i)/sum_prob_all_ops;%The denominotor does not make any difference if lower is not better, its '1' in that case anyways.
+            params.nomutationp=operator_probability(i)/sum_prob_all_ops;%No mutation
         case 2
-            params.fpmutationp=operator_probability(i)/sum_prob_all_ops;%Few points mutation
+            params.pmutationp=operator_probability(i)/sum_prob_all_ops;%The denominotor does not make any difference if lower is not better, its '1' in that case anyways.
         case 3
+            params.fpmutationp=operator_probability(i)/sum_prob_all_ops;%Few points mutation
+        case 4
             params.fbmutationp=operator_probability(i)/sum_prob_all_ops;%Fixed bounds all points
+        case 5
+            params.stmutationp=operator_probability(i)/sum_prob_all_ops;%Subtree mutation
     end
 end

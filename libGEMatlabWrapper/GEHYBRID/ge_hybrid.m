@@ -1,8 +1,13 @@
+
 function individual = ge_hybrid(individual, params, train_y, hybridAlgorithm)
 %function individual = ge_hybrid(individual, params, train_y). This
 %function performs hybrid optimization. To this end, it tunes values of
 %coefficients of the models produced by GE. Written by Muhammad Adil Raja.
 %9th October, 2018
+
+if(~individual.improvable)
+    return;% The individual is not improvable, so lets go back.
+end
 
 X=params.data.train_x;
 T=train_y;
@@ -11,11 +16,13 @@ str1=char(individual.string);
 if(contains(str1, 'w')==0)
     return;%Do nothing as there are no constants in the string (Model).
 end
-if(~individual.improvable)
-    return;% The individual is not improvable, so lets go back.
-end
+
+slope=num2str(individual.slope);
+intercept=num2str(individual.intercept);
+
+str2=strcat(slope, '.*(', str1, ')+', intercept);
 % disp(str1);
-fitfunc=['@(w,X,T)mean(power(T-(' str1 '),2))'];
+fitfunc=['@(w,X,T, mT2)mean(power(T-(' str2 '),2))'];
 parameterized_objective=str2func(fitfunc);
 ObjectiveFunction=@(w)parameterized_objective(w, X, T);
 LB=params.LB;
@@ -30,7 +37,7 @@ end
 
 switch hybridAlgorithm
     case 'sa'
-        options = optimoptions('simulannealbnd','Display','off', 'MaxTime', 30);
+        options = optimoptions('simulannealbnd','Display','off', 'MaxTime', 60);
         LB=ones(1, params.numCoefs).*params.LB;
         UB=ones(1, params.numCoefs).*params.UB;
         [coefs,cost, exitflag] = simulannealbnd(ObjectiveFunction,W0, LB, UB, options);
@@ -39,7 +46,7 @@ switch hybridAlgorithm
             individual.improvable=0;%The individual is either not improvable, or it is difficult to improve it. So it will not be optimized again.
         end
     case 'ga'
-        options = optimoptions('ga','Display','off', 'MaxTime', 30);
+        options = optimoptions('ga','Display','off', 'MaxTime', 60);
         LB=ones(1, params.numCoefs).*params.LB;
         UB=ones(1, params.numCoefs).*params.UB;
         [coefs,cost, exitflag] = ga(ObjectiveFunction, params.numCoefs, [], [], [], [], LB, UB, [], options);
@@ -48,7 +55,7 @@ switch hybridAlgorithm
             individual.improvable=0;%The individual is either not improvable, or it is difficult to improve it. So it will not be optimized again.
         end
     case 'pso'
-        options = optimoptions('particleswarm','SwarmSize',100, 'Display', 'off', 'MaxTime', 30);
+        options = optimoptions('particleswarm','SwarmSize',100, 'Display', 'off', 'MaxTime', 60);
         [coefs,cost,exitflag] = particleswarm(ObjectiveFunction, params.numCoefs,LB,UB,options);
         if(exitflag==-5)%Computation time infeasible
 %             individual.isEvaluated=1;

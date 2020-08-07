@@ -1,5 +1,5 @@
 %import libGEjava.*;
-function [phenotype_string grammar]=genotype2phenotype(genome, grammar)
+function [phenotype_string grammar lhs_rep_array lhs_rep_inds_array numWraps]=genotype2phenotype(genome, grammar)
 %This function does the mapping from genotype to phenotype. It calls
 %libGE's jar and gets its work done.
 % Inputs:
@@ -16,22 +16,6 @@ if(~isjava(grammar))
     return;
 end
 genome = uint32(genome);
-%disp(geno);
-%To check geno & grammar data type
-% disp(class(genome));
-% disp(class(grammar));
-
-%clear JAVA;
-%libGEpath=strcat(fileparts(which('loadGrammar.m')), '/libGEjar/GrammaticOptimization.jar');
-% javarmpath(libGEpath);
-%javaaddpath(libGEpath);
-%javaclasspath;
-
-% Just to display the list of all the methods in GEGrammar
-%methodsview libGEjava.GEGrammar;
-
-
-
 
 grammar.setGenotype(genome, length(genome));
 
@@ -47,34 +31,14 @@ catch E
             fprintf('Caught this: printStackTrace: %s\n',getReport(E));
     end
 end
-
-%grammar.pruneSpaces();
-% if(grammar.getPhenotype().getValid()==1)
-%     fprintf("\nThe above phenotype is valid\n");
-%     fileID = fopen('exp.txt','w');
-%     fprintf(fileID,'\nThe above phenotype is valid\n');
-%     fclose(fileID);
-% else 
-%     fprintf("\nThe above phenotype is not valid\n");
-% end
-%pheno.string=grammar.phenotypetoString();
-%pheno.phenotype=grammar.getPhenotype();
-%pheno.
-%We can probably set the penotype to grammar object and return it as
-%grammar has both genotype, phenotype and the string representation of the
-%phenotype.
-%pheno=javaObject('libGEjava.GEGrammarSI', grammar);
-%grammar=pheno;
+% disp('hello');
 phenotype_string=grammar.getPhenotypeString();
-%disp(phenotype_string);
-%treeDepth=grammar.getTreeDepth();
-%disp(phenotype_string);
-% if(grammar.isPhenotypeValid()==1)
-%     phenotype_string=grammar.getPhenotypeString();
-%     %disp(phenotype_string);
-% else
-%     phenotype_string=grammar.getPhenotypeString();
-% end
+numWraps=grammar.getNumWraps();
+lhs_rep_array=grammar.getLHSRepIntArray();
+lhs_rep_inds_array=grammar.getLHSIndsRepIntArray();
 
-% disp(phenotype_string);
+lhs_rep_array=lhs_rep_array(:);
+lhs_rep_inds_array=lhs_rep_inds_array(:);
+
+
 end

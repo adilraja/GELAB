@@ -15,14 +15,19 @@ i=0;
  
  b = 1; a=0; numerator=0;denominator=0;
  
-      factor123 = evolved-meanEvolved;
-     numerator= sum((target-meanTarget).*factor123);
-     denominator =sum(power(factor123,2));
+      factor1 = evolved-meanEvolved;
+      factor2=target-meanTarget;
+     numerator= sum(factor2.*factor1);
+     denominator =sum(power(factor1,2));
      slope=1;
- if (denominator~=0)     slope=numerator/denominator;
- elseif (denominator==0) slope=0;%i.e. when the variance in evolved y is zero
-   %elseif  (meanEvolved == 0)  slope = 1;
-  % else slope = meanTarget ./ meanEvolved;
- else slope=1;
- end
+if(denominator~=0)     
+     slope=numerator/denominator;
+%  elseif (denominator==0) 
+%      slope=0;%i.e. when the variance in evolved y is zero
+elseif(meanEvolved == 0)  
+     slope = 1;
+else
+    slope = meanTarget ./ meanEvolved;
+%  else slope=1;
+end
  intercept=meanTarget - slope*meanEvolved; 

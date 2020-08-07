@@ -3,6 +3,11 @@ function [individual1, individual2] = ge_lpptour(population, params)
 %version of the tournament selection algorithm was written on 31st October,
 %2018. Muhammad Adil Raja. It chooses two (fitness-wise) dissimilar
 %individuals. Moreover, it implements lexicographic parsimony pressure.
+% if(contains(ctfroot, 'MATLAB'))
+%   % MATLAB is running.
+%   rng('shuffle', 'twister');
+% end
+
 val_ind=[];
 
 popSize=length(population);
@@ -45,7 +50,7 @@ while(j<=params.tournament_size)
     %Now choose the second individual
     cand_ind2=tour_ind(j);
     temp_ind=population(cand_ind2);
-    if(temp_ind.fitness~=individual1.fitness && abs(individual1.age-temp_ind.age)<2)%
+    if(temp_ind.fitness~=individual1.fitness && abs(individual1.age-temp_ind.age)<=3)%
         if(j>=params.tournament_size)
             individual2=temp_ind;%We have no option and the second individual has been found.
             break;

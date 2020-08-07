@@ -16,12 +16,24 @@ age=individual.age;
     if(r<0.25)
         individual = ge_hybrid(individual, params, train_y);
     end
-elseif(age<=10 && age>params.criticalAge2)
+ elseif(age<=6 && age>params.criticalAge2)
+    individual = ge_evaluate(individual, params, train_y);
+    individual.improvable=1;
+ elseif(age<=10 && age>6)
     r=rand(1,1);
+    individual.isEvaluated=0;
     if(r<0.25)
-        individual = ge_numerical(individual, params, train_y, 'sa');
+        individual = ge_hybrid(individual, params, train_y);
     end
-else
+ elseif(age<=12 && age>10)
     individual = ge_evaluate(individual, params, train_y);
     individual.isEvaluated=1;
+ elseif(age<=16 && age>12)
+    r=rand(1,1);
+    individual.isEvaluated=0;
+    if(r<0.25)
+        individual = ge_hybrid(individual, params, train_y);
+    end
+ else
+     individual = ge_evaluate(individual, params, train_y);
 end

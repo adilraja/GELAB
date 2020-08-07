@@ -1,0 +1,12 @@
+<expr>	::=	(<lexpr> <op> <expr>) <pop>
+        | <u-pre-op>(<expr>) <pop>
+		| <b-pre-op>(<expr>,<expr>) <pop>
+		| <var>
+		| <const>
+<op>	::=	+ | - | .* 
+<lexpr> ::= <expr> 
+<u-pre-op>  ::= ge_sin | ge_square | ge_cube
+<b-pre-op>	::=	ge_divide
+<var>	::=	X(:,1)
+<const>	::=	w(1)
+<pop>   ::= ""

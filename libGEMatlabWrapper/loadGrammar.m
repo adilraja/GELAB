@@ -23,7 +23,7 @@ grammar.setMaxWraps(9);
 grammar.setMaxDepth(params.initMaxDepth);
     
 GrammarFile = grammar.readBNFFile(bnffilepath2);
-disp('Grammar File');
+disp('Grammar File Loaded?');
 disp(GrammarFile);
 % if grammar.readBNFFile('grammars/sr.bnf')
 %     genoSample(1:10) = [1 4 2 5 1 6 3 1 2 8];

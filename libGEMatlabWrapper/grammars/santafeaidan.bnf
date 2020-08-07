@@ -1,0 +1,5 @@
+<code> ::= <line> | <code> <line>
+<line> ::= <condition> | <op> | <mod>
+<condition> ::= if(food_ahead()) {<op>} else {<op>}
+<op> ::=  left(); | right(); | move();
+<mod> ::= if(food_ahead()) {move();} else {move();} | if(food_ahead()) {move();} else {left();} | if(food_ahead()) {move();} else {right();} | if(food_ahead()) {left();} else {move();} | if(food_ahead()) {right();} else {move();} | move(); move(); | right(); move(); | move(); right(); | left(); move(); | move(); left(); | if(food_ahead()) {move();} else {left();} move(); | if(food_ahead()) {move();} else {move();} move(); | if(food_ahead()) {move();} else {right();} move(); | if(food_ahead()) {move();} else {right();} left(); | if(food_ahead()) {move();} else {move();} right();

@@ -1,0 +1,1 @@
+/home/fgfs/Dropbox/UL/ULPostdoc/DairyMaster/MFRP/icsi-scenic-tools-20120105/feacalc-0.92/feacalc -sr 1500 -nyq 20000 -delta 0 -ras no -plp no -dom cep -com no -frq mel -filt tri -cep 13 -opf htk 062622_572430_00002_audio.wav-o htk/hi.htk @ Fri Nov 15 11:12:05 2019

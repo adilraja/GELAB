@@ -1,0 +1,19 @@
+
+
+--------------------------------------------------------------------------------
+|                                Initialiser                                   |
+|------------------------------------------------------------------------------|
+| - popIndex: unsigned int = 0                                                 |
+| - popSize: unsigned int = 1                                                  |
+|------------------------------------------------------------------------------|
+| + Initialiser()                                                              |
+| + Initialiser(const Initialiser &)                                           |
+| + ~Initialiser(): virtual                                                    |
+| + getPopSize(): unsigned int                                                 |
+| + setPopSize(const unsigned int): void                                       |
+| + getIndex(): unsigned int                                                   |
+| + setIndex(const unsigned int): void                                         |
+| + init(const unsigned int): virtual bool = 0                                 |
+--------------------------------------------------------------------------------
+
+

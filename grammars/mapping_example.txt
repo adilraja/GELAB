@@ -1,0 +1,126 @@
+gt(abs((ge_log(1) - ge_divide(1,1))),lt(abs((1 .* 1)),lt(gt(1,1),lt(1,1))))
+Here is the genotype string!
+2 1 1 0 0 1 4 3 44 1 2 0 3 44 3 44 2 2 1 0 0 3 44 2 3 44 2 2 2 1 3 44 3 44 2 2 3 44 3 44 
+Contents of the genotypeIntArray:
+2 1 1 0 0 1 4 3 44 1 2 0 3 44 3 44 2 2 1 0 0 3 44 2 3 44 2 2 2 1 3 44 3 44 2 2 3 44 3 44 
+Tree depth is: 5
+The phenotype is also valid:
+The rules are: 
+<expr>::= (<expr> <op> <expr>) | <u-pre-op>(<expr>) | <b-pre-op>(<expr>,<expr>) | <var> | 
+<op>::= + | - | .* | 
+<u-pre-op>::= abs | ge_sin | ge_cos | ge_exp | ge_log | ge_log | ge_log10 | 
+<b-pre-op>::= ge_divide | gt | lt | 
+<var>::= X1 | X2 | X3 | X4 | X5 | X6 | X7 | X8 | X9 | X10 | X11 | X12 | X13 | X14 | X15 | X16 | X17 | X18 | X19 | X20 | X21 | X22 | X23 | X24 | X25 | X26 | X27 | X28 | X29 | X30 | X31 | X32 | X33 | X34 | X35 | X36 | X37 | X38 | X39 | X40 | X41 | X42 | X43 | X44 | 1 | 2 | 3 | 4
+
+2->b(e,e)
+1->gt(e,e)
+1->gt(u(e),e)
+0->gt(abs(e),e)
+0->gt(abs((e o e)),e)
+1->gt(abs((u(e) o e)),e)
+4->gt(abs((ge_log(e) o e)),e)
+3->gt(abs((ge_log(v) o e)),e)
+44->gt((abs(ge_log(1) o e)),e)
+1->gt((abs(ge_log(1) - e)),e)
+2->gt((abs(ge_log(1) - b(e,e))),e)
+0->gt((abs(ge_log(1) - ge_divide(e,e))),e)
+3->gt((abs(ge_log(1) - ge_divide(v,e))),e)
+44->gt((abs(ge_log(1) - ge_divide(1,e))),e)
+3->gt((abs(ge_log(1) - ge_divide(1,v))),e)
+44->gt((abs(ge_log(1) - ge_divide(1,1))),e)
+2->gt((abs(ge_log(1) - ge_divide(1,1))),b(e,e))
+2->gt((abs(ge_log(1) - ge_divide(1,1))),lt(e,e))
+1->gt((abs(ge_log(1) - ge_divide(1,1))),lt(u(e),e))
+0->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs(e),e))
+0->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((e o e)),e))
+3->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((v o e)),e))
+44->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 o e)),e))
+2->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* e)),e))
+3->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* v)),e))
+44->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* 1)),e))
+2->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* 1)),b(e,e)))
+2->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* 1)),lt(e,e)))
+2->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* 1)),lt(b(e,e),e)))
+1->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* 1)),lt(gt(e,e),e)))
+3->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* 1)),lt(gt(v,e),e)))
+44->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* 1)),lt(gt(1,e),e)))
+3->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* 1)),lt(gt(1,v),e)))
+44->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* 1)),lt(gt(1,1),e)))
+2->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* 1)),lt(gt(1,1),b(e,e))))
+2->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* 1)),lt(gt(1,1),lt(e,e))))
+3->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* 1)),lt(gt(1,1),lt(v,e))))
+44->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* 1)),lt(gt(1,1),lt(1,e))))
+3->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* 1)),lt(gt(1,1),lt(1,v))))
+44->gt((abs(ge_log(1) - ge_divide(1,1))),lt(abs((1 .* 1)),lt(gt(1,1),lt(1,1))))
+
+gt(abs((ge_log(1)-ge_divide(1,1))),lt(abs((1.*1)),lt(gt(1,1),lt(1,1))))
+gt(abs((ge_log(1)-ge_divide(1,1))),lt(abs((1.*1)),lt(gt(1,1),lt(1,1))))
+2 1 1 0 0 1 4 3 44 1 2 0 3 44 3 44 2 2 1 0 0 3 44 2 3 44 2 2 2 1 3 44 3 44 (35)2 2 3 44 3 44 
+
+<expr>|<b-pre-op>|<expr>|<b-pre-op>|<expr>|<u-pre-op>|<expr>|<lexpr>|<expr>|<var>|<op>|<expr>|<b-pre-op>|<expr>|<var>|<expr>|<var>|<pop>|<pop>|<pop>|<expr>|<lexpr>|<expr>|<var>|<op>|<expr>|<var>|<pop>|<pop>|<expr>|<b-pre-op>|<expr>|<var>|<expr>|<var>|<pop>|<pop>|
+
+Here are the results: phenotype size= 85
+
+gt(abs((ge_log(1  )  - ge_divide(1 ,1 ) )  ) ,lt(abs((1  .* 1 )  ) ,lt(gt(1 ,1 ) ,lt(1 ,1 ) ) ) ) 
+
+Contents of the genotypeIntArray:
+2 1 1 0 0 1 4 3 44 1 2 0 3 44 3 44 2 2 1 0 0 3 44 2 3 44 2 2 2 1 3 44 3 44 2 2 3 44 3 44 
+Here is the LHS: 
+6 12 15 7 26 6 36 
+Here is the LHS indices array: 12 7 5 21 3 30 1
+
+1->e
+2->b(e,e) p
+1->gt(e,e) p
+1->gt(u(e) p,e) p 
+0->gt(abs(e) p,e) p
+0->gt(abs(v) p,e) p
+0->gt(abs(1) p,e) p
+0->gt(abs(1) ,e) p
+0->gt(abs(1) ,v) p
+0->gt(abs(1) ,1) p
+0->gt(abs(1) ,1)
+
+ebeuevpevp
+
+<expr><u-pre-op><expr><b-pre-op><expr><const><expr><const><pop><pop>
+
+e
+u(e)p
+sin(e)p
+sin(b(e,e)p)p
+sin(pow(e,e)p)p
+sin(pow(c,e)p)p
+sin(pow(1,e)p)p
+sin(pow(1,c)p)p
+sin(pow(1,1)p)p
+sin(pow(1,1))p
+sin(pow(1,1))
+
+<expr><u-pre-op><expr><u-pre-op><expr><const><pop><pop>
+
+0e
+1u(e)p
+2sin(e)
+3sin(u(e)p)p
+4sin(cos(e)p)p
+5sin(cos(c)p)p
+6sin(cos(2)p)p
+7sin(cos(2))p
+8sin(cos(2))
+
+b(e,e)p
+div(e,e)p
+div(c,e)p
+div(1,e)p
+div(1,c)p
+div(1,1)p
+div(1,1)
+
+2. b(e,e)p
+1. div(e,e)p
+1. div(u(e)p,e)p
+3. div(sin(e)p,e)p
+024s040211
+
+

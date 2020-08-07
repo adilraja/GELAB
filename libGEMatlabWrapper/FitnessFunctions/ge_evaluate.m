@@ -49,8 +49,11 @@ function individual = ge_evaluate (individual, params, train_y)
         %individual.valid=0;
         return;
     end
-    [individual.intercept, individual.slope]=ge_linearScaling(result, train_y);
-    individual.fitness=ge_mse(individual.slope*result+individual.intercept, train_y);
+    [intercept, slope]=ge_linearScaling(result, train_y);
+    individual.intercept=intercept;
+    individual.slope=slope;
+    ls_result=(individual.slope*result)+individual.intercept;
+    individual.fitness=ge_mse(ls_result, train_y);
     % now limit fitness precision, to eliminate rounding error problem:
     individual.fitness=fixdec(individual.fitness, params.precision);
     if(isnan(individual.fitness)||isinf(individual.fitness))
