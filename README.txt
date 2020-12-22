@@ -13,6 +13,7 @@ Once you have done that, you can simply run this software from the Matlab comman
 In order to run a full-fledged experiment, simply run: 
 
 >>load('srparallelparams.mat', 'params');
+
 >> [all_pops, all_bests, all_stats, params]=ge_inaloop(params);
 
 Or simply:
@@ -54,4 +55,14 @@ abstract="In this paper, we present a Matlab version of libGE. libGE is a famous
 isbn="978-3-030-03496-2"
 }
 
+If you have used GELAB with hybrid optimization turned on, please cite the following paper:
+
+@inproceedings{raja2020gelab,
+  title={GELAB and Hybrid Optimization Using Grammatical Evolution},
+  author={Raja, Muhammad Adil and Murphy, Aidan and Ryan, Conor},
+  booktitle={International Conference on Intelligent Data Engineering and Automated Learning},
+  pages={292--303},
+  year={2020},
+  organization={Springer}
+}
 
