@@ -15,8 +15,8 @@ if(isempty(varargin))
 end
 
 nargs=length(varargin);
-for j=1:nargs
-switch lower(varargin{j})
+for k=1:nargs
+switch lower(varargin{k})
     case 'boxpf'
         stats_l=length(stats);
         fitness=[];
@@ -93,7 +93,7 @@ switch lower(varargin{j})
             end
             xlabel('Generations');
             ylabel('Time (Minutes)');
-            legend('SA', 'GA', 'PSO', 'GE', 'GP');
+            legend('SA', 'GA', 'PSO', 'GE', 'libGE');
         end
     case 'timeherr'
         [x,y]=size(stats);
@@ -110,7 +110,7 @@ switch lower(varargin{j})
             end
             xlabel('Generations');
             ylabel('Time (Seconds)');
-            legend('SA', 'GA', 'PSO', 'GE', 'GP');
+            legend('SA', 'GA', 'PSO', 'GE', 'libGE');
         end
     case 'fherr'
         mean_f=mean(stats{1,1}.bestfithistory,2);
@@ -293,6 +293,193 @@ switch lower(varargin{j})
         end
         xlabel('Generations');
         ylabel('Num. Valid');
+    case 'spxoverhist'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=stats{j, i}.spxoverhistory;
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2)); 
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Probability');
+            legend('SA', 'GA', 'PSO', 'GE');
+        end
+    case 'vpxoverhist'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=stats{j, i}.vpxoverhistory;
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2)); 
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Probability');
+            legend('SA', 'GA', 'PSO', 'GE');
+        end
+    case 'subtreexoverhist'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=stats{j, i}.subtreexoverhistory;
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2)); 
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Probability');
+            legend('SA', 'GA', 'PSO', 'GE');
+        end
+    case 'noxoverhist'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=stats{j, i}.noxoverhistory;
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2)); 
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Probability');
+            legend('SA', 'GA', 'PSO', 'GE');
+        end
+    case 'weavehist'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=stats{j, i}.weavehistory;
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2)); 
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Probability');
+            legend('SA', 'GA', 'PSO', 'GE');
+        end
+    case 'tweavehist'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=stats{j, i}.tweavehistory;
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2)); 
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Probability');
+            legend('SA', 'GA', 'PSO', 'GE');
+        end
+    case 'pmutationhist'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=stats{j, i}.pmutationhistory;
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2)); 
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Probability');
+            legend('SA', 'GA', 'PSO', 'GE');
+        end
+    case 'fpmutationhist'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=stats{j, i}.fpmutationhistory;
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2)); 
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Probability');
+            legend('SA', 'GA', 'PSO', 'GE');
+        end
+    case 'fbmutationhist'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=stats{j, i}.fbmutationhistory;
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2)); 
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Probability');
+            legend('SA', 'GA', 'PSO', 'GE');
+        end
+    case 'stmutationhist'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=stats{j, i}.stmutationhistory;
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2)); 
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Probability');
+            legend('SA', 'GA', 'PSO', 'GE');
+        end
+    case 'nomutationhist'
+        [x,y]=size(stats);
+        mylinespec=['b:', 'rx--', 'g-.', 'c+:', 'm-.-'];
+        for(i=1:y)
+            figure;
+            grid on;
+            hold on;
+            for(j=1:x)
+                score_f=stats{j, i}.nomutationhistory;
+                mean_f=mean(score_f,2);
+                err_f=1.96*std(score_f, 0, 2)/sqrt(size(score_f,2)); 
+                errorbar(mean_f, err_f, mylinespec(j), 'LineWidth',1.5);
+            end
+            xlabel('Generations');
+            ylabel('Probability');
+            legend('SA', 'GA', 'PSO', 'GE');
+        end
     case 'spxoverherr'
         mean_f=mean(stats.spxoverhistory,2);
         err_f=std(stats.spxoverhistory, 0, 2);
@@ -387,7 +574,7 @@ switch lower(varargin{j})
         ylabel('Mutation Probability');
         legend('Point', 'Few points', 'All Points');
     otherwise
-          error(['Unexpected option: ' varargin{j}])
+          error(['Unexpected option: ' varargin{k}])
     end
 %   j=j+2;
 end

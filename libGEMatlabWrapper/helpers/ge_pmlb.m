@@ -10,6 +10,9 @@ i=1;
 size_mat=[];
 siz_m=[];
 
+params.hybrid=0;
+params.fitnessFunction='ge_evaluate';
+
 if(exist('numCores', 'var'))
     params.numcores=numCores;
     params.numRuns=numCores;

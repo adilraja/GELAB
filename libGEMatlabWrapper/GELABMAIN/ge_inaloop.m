@@ -62,10 +62,13 @@ vpxoverhistory=zeros(params.numGens, params.numRuns);
 subtreexoverhistory=zeros(params.numGens, params.numRuns);
 weavehistory=zeros(params.numGens, params.numRuns);
 tweavehistory=zeros(params.numGens, params.numRuns);
+noxoverhistory=zeros(params.numGens, params.numRuns);
 
 pmutationhistory=zeros(params.numGens, params.numRuns);
 fpmutationhistory=zeros(params.numGens, params.numRuns);
 fbmutationhistory=zeros(params.numGens, params.numRuns);
+stmutationhistory=zeros(params.numGens, params.numRuns);
+nomutationhistory=zeros(params.numGens, params.numRuns);
 
 
 
@@ -89,9 +92,12 @@ if(params.parallel~=1)
         subtreexoverhistory(:, i)=stats2.subtreexoverhistory;
         weavehistory(:, i)=stats2.weavehistory;
         tweavehistory(:, i)=stats2.tweavehistory;
+        noxoverhistory(:, i)=stats2.noxoverhistory;
         pmutationhistory(:, i)=stats2.pmutationhistory;
         fpmutationhistory(:, i)=stats2.fpmutationhistory;
         fbmutationhistory(:, i)=stats2.fbmutationhistory;
+        stmutationhistory(:, i)=stats2.stmutationhistory;
+        nomutationhistory(:, i)=stats2.nomutationhistory;
 
         all_pops=[all_pops; pop];
         all_bests=[all_bests; best];
@@ -133,9 +139,12 @@ else
         subtreexoverhistory(:, i)=stats2.subtreexoverhistory;
         weavehistory(:, i)=stats2.weavehistory;
         tweavehistory(:, i)=stats2.tweavehistory;
+        noxoverhistory(:, i)=stats2.noxoverhistory;
         pmutationhistory(:, i)=stats2.pmutationhistory;
         fpmutationhistory(:, i)=stats2.fpmutationhistory;
         fbmutationhistory(:, i)=stats2.fbmutationhistory;
+        stmutationhistory(:, i)=stats2.stmutationhistory;
+        nomutationhistory(:, i)=stats2.nomutationhistory;
         
         all_pops=[all_pops; pop];
         all_bests=[all_bests; best];
@@ -163,9 +172,13 @@ all_stats.subtreexoverhistory=subtreexoverhistory;
 all_stats.vpxoverhistory=vpxoverhistory;
 all_stats.weavehistory=weavehistory;
 all_stats.tweavehistory=tweavehistory;
+all_stats.noxoverhistory=noxoverhistory;
 all_stats.pmutationhistory=pmutationhistory;
 all_stats.fpmutationhistory=fpmutationhistory;
 all_stats.fbmutationhistory=fbmutationhistory;
+all_stats.stmutationhistory=stmutationhistory;
+all_stats.nomutationhistory=nomutationhistory;
+
 
 disp('The simulation completed! Bye Bye!!');
 

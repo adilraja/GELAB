@@ -66,10 +66,13 @@ function [stats3, params]=ge_computeStatistics(stats3, pop, params)
     
     stats3.weavehistory=[stats3.weavehistory; params.weavep];
     stats3.tweavehistory=[stats3.tweavehistory; params.tweavep];
+    stats3.noxoverhistory=[stats3.noxoverhistory; params.noxoverp];
     
     stats3.pmutationhistory=[stats3.pmutationhistory; params.pmutationp];
     stats3.fpmutationhistory=[stats3.fpmutationhistory; params.fpmutationp];
     stats3.fbmutationhistory=[stats3.fbmutationhistory; params.fbmutationp];
+    stats3.stmutationhistory=[stats3.stmutationhistory; params.stmutationp];
+    stats3.nomutationhistory=[stats3.nomutationhistory; params.nomutationp];
 
     
     if(params.genotypeCaching==0)

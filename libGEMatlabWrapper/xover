@@ -1,0 +1,13 @@
+\documentclass{article}
+\begin{document}
+ \begin{tabular}{ |l | l | }
+\hline
+0.00e+0 & 0.00e+0 \\ \hline 
+0.00e+0 & 0.00e+0 \\ \hline 
+0.00e+0 & 0.00e+0 \\ \hline 
+0.00e+0 & 0.00e+0 \\ \hline 
+0.00e+0 & 0.00e+0 \\ \hline 
+0.00e+0 & 0.00e+0 \\ \hline 
+\hline
+\end{tabular}
+\end{document}

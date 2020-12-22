@@ -34,23 +34,23 @@ function [retval] = ge_createChildPopulation(population, params)
     for(i=1:length(population)/2)
         [parent1, parent2]=feval(params.selectionFunction, population, params);
         dice=rand(1);
-        if(dice<params.weavep)
-            [child1, child2] = ge_weave(parent1, parent2, params);
-        elseif(dice<(params.weavep+params.tweavep))
-            [child1, child2] = ge_tightweave(parent1, parent2, params);
-        elseif(dice<(params.weavep+params.tweavep+params.spxoverp))
-            [child1, child2]=ge_spcrossover(parent1, parent2, params);%Apply crossover
-        elseif((dice<(params.weavep+params.tweavep+params.spxoverp+params.vpxoverp)))
-            [child1, child2]=ge_vpcrossover(parent1, parent2, params);%Apply crossover
-        elseif((dice<(params.weavep+params.tweavep+params.spxoverp+params.vpxoverp+params.subtreexoverp)))
-            [child1, child2]=ge_subtreexover(parent1, parent2, params);%Apply crossover
-        else
-            %No xover
-            [child1, child2]=ge_nocrossover(parent1, parent2, params);%Do not apply crossover
-            child1.operator=1;
-            child2.operator=1;
-        end
-%          [child1, child2]=ge_subtreexover(parent1, parent2, params);%Apply crossover
+%         if(dice<params.weavep)
+%             [child1, child2] = ge_weave(parent1, parent2, params);
+%         elseif(dice<(params.weavep+params.tweavep))
+%             [child1, child2] = ge_tightweave(parent1, parent2, params);
+%         elseif(dice<(params.weavep+params.tweavep+params.spxoverp))
+%             [child1, child2]=ge_spcrossover(parent1, parent2, params);%Apply crossover
+%         elseif((dice<(params.weavep+params.tweavep+params.spxoverp+params.vpxoverp)))
+%             [child1, child2]=ge_vpcrossover(parent1, parent2, params);%Apply crossover
+%         elseif((dice<(params.weavep+params.tweavep+params.spxoverp+params.vpxoverp+params.subtreexoverp)))
+%             [child1, child2]=ge_subtreexover(parent1, parent2, params);%Apply crossover
+%         else
+%             %No xover
+%             [child1, child2]=ge_nocrossover(parent1, parent2, params);%Do not apply crossover
+%             child1.operator=1;
+%             child2.operator=1;
+%         end
+          [child1, child2]=ge_spcrossover(parent1, parent2, params);%Apply crossover
         dice=rand(1);
         if(dice<params.pmutationp)
             child1=ge_pmutation(child1, params);
