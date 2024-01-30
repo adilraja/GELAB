@@ -54,7 +54,7 @@ public class GEsMain{
         grammar.setMaxDepth(6);
         
 
-        if(grammar.readBNFFile("/home/adil/Dropbox/UL/ULPostdoc/GELAB/grammars/keijzer.bnf")) {
+        if(grammar.readBNFFile("/home/madil/OneDrive/Dropbox/UL/ULPostdoc/GELAB/grammars/keijzer.bnf")) {
         } else {
             System.out.println("Reading of the grammar file was not successful\n");
         }

@@ -17,6 +17,10 @@ if(exist('params', 'var')==0)
     params=ge_fiddleParams;
 end
 
+if(exist('called_external', 'var')==0)
+    called_external=0;
+end
+
 libGEpath=strcat(fileparts(which('loadGrammar.m')), '/libGEjar/libGEjava.jar');
 
 if(~called_external)

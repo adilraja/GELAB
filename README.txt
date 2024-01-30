@@ -14,7 +14,7 @@ In order to run a full-fledged experiment, simply run:
 
 >>load('srparallelparams.mat', 'params');
 
->> [all_pops, all_bests, all_stats, params]=ge_inaloop(params);
+>> [all_pops, all_bests, all_stats, params]=ge_inaloop(params, 'some_file_name_for_saving_the_output, 0);
 
 Or simply:
 
@@ -29,6 +29,17 @@ If you make any changes to the java code, please copy the latest version of libG
 mv dist/libGEjava.jar libGEMatlabWrapper/libGEjar/libGEjava.jar
 
 You can tweak the java code using Netbeans IDE easily as the code has been built using that. 
+
+BY the way the current version of the code has been tested on MATLAB 2023b. The java version is as follow:
+>> version -java
+
+ans =
+
+    'Java 1.8.0_202-b08 with Oracle Corporation Java HotSpot(TM) 64-Bit Server VM mixed mode'
+
+>> 
+
+To this end, it would be nice to recompile the libGEjava using Netbeans with a compatible version of Java. Or please check for backward compatibility.
 
 For any additional queries please email adilraja@gmail.com | conor.ryan@ul.ie
 
